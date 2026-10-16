@@ -2264,6 +2264,9 @@ function timeOfDay(ts) {
   const d = new Date(ts);
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
+function receivedAt(ts) {
+  return `${dayStamp(ts)}T${timeOfDay(ts)}:${pad(new Date(ts).getSeconds())}`;
+}
 function sanitizeFileName(name) {
   return name.replace(/[\r\n\\/:*?"<>|#^[\]]/g, "_").trim() || "untitled";
 }
@@ -2416,12 +2419,13 @@ async function importMessage(app, transport, msg, settings) {
           body = body.split(ph).join(`![image](${img.url})`);
         }
         const note = [
-          `# ${title}`,
-          "",
-          `> **${t("importer.source")}**: ${url}`,
-          `> **${t("importer.imported")}**: ${new Date(msg.timeMs).toLocaleString()}`,
-          `> **${t("importer.from")}**: ${msg.from}`,
-          info.description ? `> **${t("importer.summary")}**: ${info.description}` : "",
+          "---",
+          `title: ${JSON.stringify(title)}`,
+          `source: ${JSON.stringify(url)}`,
+          `received_at: ${receivedAt(msg.timeMs)}`,
+          `sender: ${JSON.stringify(msg.from)}`,
+          `description: ${JSON.stringify(info.description.replace(/\s+/g, " ").trim())}`,
+          "---",
           "",
           body,
           ""

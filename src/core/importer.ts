@@ -53,6 +53,11 @@ export function timeOfDay(ts: number): string {
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+/** Obsidian date-time property in the same local time used by the daily note. */
+function receivedAt(ts: number): string {
+  return `${dayStamp(ts)}T${timeOfDay(ts)}:${pad(new Date(ts).getSeconds())}`;
+}
+
 /** Replace characters that are invalid in file names */
 export function sanitizeFileName(name: string): string {
   return name.replace(/[\r\n\\/:*?"<>|#^[\]]/g, '_').trim() || 'untitled';
@@ -266,12 +271,13 @@ export async function importMessage(
           body = body.split(ph).join(`![image](${img.url})`);
         }
         const note = [
-          `# ${title}`,
-          '',
-          `> **${t('importer.source')}**: ${url}`,
-          `> **${t('importer.imported')}**: ${new Date(msg.timeMs).toLocaleString()}`,
-          `> **${t('importer.from')}**: ${msg.from}`,
-          info.description ? `> **${t('importer.summary')}**: ${info.description}` : '',
+          '---',
+          `title: ${JSON.stringify(title)}`,
+          `source: ${JSON.stringify(url)}`,
+          `received_at: ${receivedAt(msg.timeMs)}`,
+          `sender: ${JSON.stringify(msg.from)}`,
+          `description: ${JSON.stringify(info.description.replace(/\s+/g, ' ').trim())}`,
+          '---',
           '',
           body,
           '',

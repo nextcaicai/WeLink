@@ -176,6 +176,43 @@ test('importMessage: article note keeps the date prefix, daily note links it in 
   assert.ok(daily.includes('[[WeLink/articles/2026-08-27 测试文章标题|《测试文章标题》]]'), 'article linked with 《》 in the daily note');
 });
 
+test('importMessage: article metadata is stored as five properties before the body', async () => {
+  const v = new Vault();
+  const url = 'https://mp.weixin.qq.com/s/xyz';
+  const msg = ARTICLE_MSG(url, 'properties');
+  msg.timeMs = new Date(2026, 7, 27, 14, 30, 11).getTime();
+  const r = await importMessage(v.app, articleTransport(WECHAT_PAGE), msg, IMPORT_OPTS);
+  const note = v.files.get(r.articleAssets[0].note)!;
+
+  assert.ok(note.startsWith([
+    '---',
+    'title: "测试文章标题"',
+    `source: "${url}"`,
+    'received_at: 2026-08-27T14:30:11',
+    'sender: "user123"',
+    'description: "文章摘要"',
+    '---',
+    '',
+    '## 小节',
+  ].join('\n')), 'properties precede the original article body');
+  assert.ok(!note.includes('# 测试文章标题'), 'no repeated heading in the body');
+  assert.ok(!note.includes('> **来源**'), 'no metadata quote block in the body');
+});
+
+test('importMessage: property text safely handles punctuation and multiline descriptions', async () => {
+  const v = new Vault();
+  const page = `<html><head>
+    <meta property="og:title" content='标题: "引号"'>
+    <meta property="og:description" content="第一段\\n\\n第二段: 说明">
+  </head><body><div id="js_content"><p>正文</p></div></body></html>`;
+  const r = await importMessage(v.app, articleTransport(page), ARTICLE_MSG('https://mp.weixin.qq.com/s/xyz', 'escaped'), IMPORT_OPTS);
+  const note = v.files.get(r.articleAssets[0].note)!;
+
+  assert.ok(note.includes('title: "标题: \\"引号\\""'));
+  assert.ok(note.includes('description: "第一段 第二段: 说明"'));
+  assert.ok(note.endsWith('\n正文\n'));
+});
+
 test('importMessage: re-sending an article link overwrites the existing note', async () => {
   const v = new Vault();
   const url = 'https://mp.weixin.qq.com/s/xyz';
