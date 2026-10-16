@@ -10,7 +10,7 @@ import type { HttpTransport, HttpResponse } from '../src/core/http';
 import { lowerHeaders } from '../src/core/http';
 import { parseAesKey, encryptEcb, decryptEcb, encryptEcbInto, downloadUrl, detectImageExt, md5Hex, ecbPaddedSize } from '../src/core/crypto';
 import { extractLinks } from '../src/core/article';
-import { importMessage, sanitizeFileName, dayStamp, timeOfDay, quoteBlock, ensureFolder } from '../src/core/importer';
+import { importMessage, sanitizeFileName, dayStamp, timeOfDay, quoteBlock, ensureFolder, stripSingleNoteMarker } from '../src/core/importer';
 import { encode, silkToWav } from '../src/core/silk';
 import type { InboundMessage } from '../src/core/types';
 import {
@@ -25,9 +25,9 @@ import {
 import { Outbox } from '../src/outbox';
 import { StateStore } from '../src/core/store';
 import { IlinkClient } from '../src/core/ilink';
-import { agentGuideMeta } from '../src/core/agent-guide';
+import { agentGuideMeta, ensureAgentGuide } from '../src/core/agent-guide';
 import type { WeLinkSettings } from '../src/settings';
-import { DEFAULT_SETTINGS } from '../src/settings';
+import { DEFAULT_SETTINGS, isValidSingleNoteMarker } from '../src/settings';
 
 // Node has no `window`; some modules (StateStore, article) schedule via window.setTimeout
 (globalThis as { window?: unknown }).window = globalThis;
@@ -128,6 +128,8 @@ const IMPORT_OPTS = {
   inboxFolder: 'WeLink',
   attachmentFolder: 'WeLink/attachments',
   articleFolder: 'WeLink/articles',
+  singleNoteFolder: 'WeLink/notes',
+  singleNoteMarker: '#单独保存',
   fetchArticles: false,
   groupArticlesByAccount: false,
 };
@@ -230,6 +232,14 @@ test('quoteBlock prefixes every line', () => {
   assert.deepEqual(quoteBlock('  '), ['> ']); // an all-space body still renders as one empty bubble line
 });
 
+test('single-note marker only matches a complete first line and removes only that line', () => {
+  assert.equal(stripSingleNoteMarker('#单独保存\n正文\n仍是正文', '#单独保存'), '正文\n仍是正文');
+  assert.equal(stripSingleNoteMarker('#单独保存\r\n正文', '#单独保存'), '正文');
+  assert.equal(stripSingleNoteMarker('#单独保存 ', '#单独保存'), null, 'trailing whitespace is not a match');
+  assert.equal(stripSingleNoteMarker('前言\n#单独保存\n正文', '#单独保存'), null, 'marker only works on the first line');
+  assert.equal(stripSingleNoteMarker('#单独保存', '#单独保存'), '');
+});
+
 test('extractLinks strips trailing punctuation and CJK stops', () => {
   assert.deepEqual(extractLinks('see https://a.com/x. and more'), ['https://a.com/x']);
   assert.deepEqual(extractLinks('两个链接 http://a.com 和 http://b.com'), ['http://a.com', 'http://b.com']);
@@ -286,6 +296,12 @@ test('buildReceiptReplies: article note is reported as an article, no title echo
     },
   ]);
   assert.deepEqual(lines, ['收到文章, 记录到了: `articles/深度长文.md`']);
+});
+
+test('buildReceiptReplies: separately saved text points at its note', () => {
+  applyLanguage('zh');
+  const lines = buildReceiptReplies([{ ...RECEIPT_OK, singleNote: { note: 'WeLink/notes/2026-08-27 想法.md' } }]);
+  assert.deepEqual(lines, ['收到笔记, 记录到了: `notes/2026-08-27 想法.md`']);
 });
 
 test('buildReceiptReplies: import failure', () => {
@@ -357,6 +373,46 @@ test('importMessage: text message -> daily note with metadata and quote', async 
   assert.ok(note.startsWith('---\ndate: 2026-08-27\nsender: user123\n---'));
   assert.ok(note.includes('hello world'));
   assert.ok(note.includes('14:30'));
+  assert.equal(r.singleNote, null, 'ordinary text remains only in the daily note');
+});
+
+test('importMessage: marked plain text creates a separate note and daily link without duplicating its title', async () => {
+  const v = new FakeVault();
+  const r = await importMessage(v.app, new StubTransport(), MSG({ text: '#单独保存\n一个想法\n第二行' }), IMPORT_OPTS);
+  assert.deepEqual(r.singleNote, {
+    title: '一个想法',
+    note: 'WeLink/notes/2026-08-27 一个想法.md',
+    reused: false,
+  });
+  const saved = v.files.get(r.singleNote!.note)!;
+  assert.ok(saved.includes('welink_source_hash:'), 'source identity enables safe duplicate reuse');
+  assert.ok(saved.endsWith('\n\n一个想法\n第二行'), 'body remains intact after the marker line is removed');
+  assert.ok(!saved.includes('# 一个想法'), 'the first content line is not rendered twice as a generated heading');
+  const daily = v.files.get('WeLink/2026-08-27.md')!;
+  assert.ok(daily.includes('[[WeLink/notes/2026-08-27 一个想法|一个想法]]'));
+  assert.ok(!daily.includes('#单独保存'));
+});
+
+test('importMessage: same marked body reuses the note without overwriting user edits', async () => {
+  const v = new FakeVault();
+  const first = await importMessage(v.app, new StubTransport(), MSG({ text: '#单独保存\n一个想法' }), IMPORT_OPTS);
+  const path = first.singleNote!.note;
+  v.files.set(path, `${v.files.get(path)!}\n\n用户补充的内容`);
+
+  const second = await importMessage(v.app, new StubTransport(), MSG({ messageId: 'm2', text: '#单独保存\n一个想法' }), IMPORT_OPTS);
+  assert.equal(second.singleNote!.note, path);
+  assert.equal(second.singleNote!.reused, true);
+  assert.ok(v.files.get(path)!.includes('用户补充的内容'), 'existing note is linked, never rewritten');
+  assert.equal([...v.files.keys()].filter((p) => p.startsWith('WeLink/notes/')).length, 1);
+});
+
+test('importMessage: a colliding user file is preserved and a new safe note path is used', async () => {
+  const v = new FakeVault();
+  const collision = 'WeLink/notes/2026-08-27 一个想法.md';
+  v.files.set(collision, '用户已有笔记');
+  const r = await importMessage(v.app, new StubTransport(), MSG({ text: '#单独保存\n一个想法' }), IMPORT_OPTS);
+  assert.equal(r.singleNote!.note, 'WeLink/notes/2026-08-27 一个想法_1.md');
+  assert.equal(v.files.get(collision), '用户已有笔记', 'a filename collision must never overwrite user content');
 });
 
 test('importMessage: appends to an existing daily note', async () => {
@@ -591,11 +647,33 @@ test('agentGuideMeta parses frontmatter', () => {
   assert.equal(empty.lang, '');
 });
 
+test('agent guides document the current save-as-note marker in every language and refresh when it changes', async () => {
+  const v = new FakeVault();
+  const settings = SETTINGS({ singleNoteMarker: '#note' });
+  await ensureAgentGuide(v.app, settings, 'en');
+  const path = 'WeLink/Agent.md';
+  assert.ok(v.files.get(path)!.includes('first line exactly `#note`'));
+  const firstMeta = agentGuideMeta(v.files.get(path)!);
+
+  settings.singleNoteMarker = '#收录';
+  await ensureAgentGuide(v.app, settings, 'zh');
+  const zhGuide = v.files.get(path)!;
+  assert.ok(zhGuide.includes('完整写成 `#收录`'));
+  assert.notEqual(agentGuideMeta(zhGuide).paths, firstMeta.paths, 'the marker is part of the refresh fingerprint');
+
+  await ensureAgentGuide(v.app, settings, 'tw');
+  assert.ok(v.files.get(path)!.includes('完整寫成 `#收录`'));
+});
+
 /* ------------------------------------------------------------- settings */
 
 test('DEFAULT_SETTINGS: autoReply defaults on', () => {
   assert.equal(DEFAULT_SETTINGS.autoReply, true);
   assert.equal(DEFAULT_SETTINGS.language, 'system');
+  assert.equal(DEFAULT_SETTINGS.singleNoteMarker, '#单独保存');
+  assert.equal(isValidSingleNoteMarker('#capture'), true);
+  assert.equal(isValidSingleNoteMarker(''), false);
+  assert.equal(isValidSingleNoteMarker('two\nlines'), false);
 });
 
 /* -------------------------------------------------------------- cleanup */

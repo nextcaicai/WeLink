@@ -41,6 +41,9 @@ const en: Dict = {
   'set.articleFolder.desc': 'Folder for official-account/web article notes',
   'set.outboxFolder': 'Outbox folder',
   'set.outboxFolder.desc': 'A one-to-one channel to yourself: an agent writes files here — .md sends its content as text, images/videos/documents are sent as attachments — each file is deleted after a successful send',
+  'set.singleNoteMarker': 'Save-as-note marker',
+  'set.singleNoteMarker.desc': 'A received text message creates its own note in the notes subfolder of the inbox only when its first line exactly matches the marker above. Write the body on following lines; the marker is removed from the note body.',
+  'set.singleNoteMarker.invalid': 'The marker must be a non-empty single line.',
   'set.autoImport': 'Auto-import messages',
   'set.autoImport.desc': 'Write messages into the inbox as soon as they arrive',
   'set.fetchArticles': 'Fetch article info',
@@ -102,6 +105,7 @@ const en: Dict = {
   'reply.kind.audio': 'voice',
   'reply.kind.file': 'file',
   'reply.kind.article': 'article',
+  'reply.kind.note': 'note',
   'reply.attachment.failed': 'failed to save attachment',
   'reply.article.failed': 'failed to fetch article',
   'reply.recordFailed': 'Message received, but recording it to the vault failed.',
@@ -156,6 +160,9 @@ const zh: Dict = {
   'set.articleFolder.desc': '公众号/网页文章笔记存放目录',
   'set.outboxFolder': '发件箱目录',
   'set.outboxFolder.desc': '给自己的单向通道:agent 在此写入文件,.md 作为文本消息发送,图片/视频/文档作为附件发送,发送成功后删除文件',
+  'set.singleNoteMarker': '单独保存标记',
+  'set.singleNoteMarker.desc': '收到的纯文字消息仅在第一行完整等于上方标记时，才会在收件箱目录下的 notes 子目录新建独立笔记。换行后写正文；标记不会进入笔记正文。',
+  'set.singleNoteMarker.invalid': '标记必须是非空的单行文字。',
   'set.autoImport': '自动导入消息',
   'set.autoImport.desc': '收到消息后立即写入收件箱',
   'set.fetchArticles': '抓取文章信息',
@@ -217,6 +224,7 @@ const zh: Dict = {
   'reply.kind.audio': '语音',
   'reply.kind.file': '文件',
   'reply.kind.article': '文章',
+  'reply.kind.note': '笔记',
   'reply.attachment.failed': '附件保存失败',
   'reply.article.failed': '文章抓取失败',
   'reply.recordFailed': '消息已收到,但写入 vault 失败。',
@@ -271,6 +279,9 @@ const tw: Dict = {
   'set.articleFolder.desc': '公眾號/網頁文章筆記存放目錄',
   'set.outboxFolder': '發件匣目錄',
   'set.outboxFolder.desc': '給自己的單向通道:agent 在此寫入檔案,.md 作為文字訊息發送,圖片/影片/文件作為附件發送,發送成功後刪除檔案',
+  'set.singleNoteMarker': '單獨儲存標記',
+  'set.singleNoteMarker.desc': '收到的純文字訊息僅在第一行完整等於上方標記時，才會在收件匣目錄下的 notes 子目錄新建獨立筆記。換行後寫正文；標記不會進入筆記正文。',
+  'set.singleNoteMarker.invalid': '標記必須是非空的單行文字。',
   'set.autoImport': '自動匯入訊息',
   'set.autoImport.desc': '收到訊息後立即寫入收件匣',
   'set.fetchArticles': '抓取文章資訊',
@@ -332,6 +343,7 @@ const tw: Dict = {
   'reply.kind.audio': '語音',
   'reply.kind.file': '檔案',
   'reply.kind.article': '文章',
+  'reply.kind.note': '筆記',
   'reply.attachment.failed': '附件儲存失敗',
   'reply.article.failed': '文章抓取失敗',
   'reply.recordFailed': '訊息已收到,但寫入 vault 失敗。',
@@ -426,6 +438,8 @@ export interface ReceiptReplyInput {
   attachmentFailures: string[]; // failed attachments as "name (reason)"
   linkCount: number; // links found in the message text
   articleAssets: ArticleAsset[]; // saved article notes + where their images went
+  /** a marked plain-text message saved as a separate note */
+  singleNote?: { note: string } | null;
   articleFailures: string[]; // reasons the article notes could not be created
 }
 
@@ -465,7 +479,10 @@ export function buildReceiptReplies(results: ReceiptReplyInput[]): string[] {
     for (const art of r.articleAssets) {
       lines.push(t('reply.recorded', { what: t('reply.kind.article'), path: stripVaultRoot(art.note) }));
     }
-    if (!r.attachments.length && !r.articleAssets.length) {
+    if (r.singleNote) {
+      lines.push(t('reply.recorded', { what: t('reply.kind.note'), path: stripVaultRoot(r.singleNote.note) }));
+    }
+    if (!r.attachments.length && !r.articleAssets.length && !r.singleNote) {
       lines.push(t('reply.recorded', { what: t('reply.kind.message'), path: stripVaultRoot(r.dailyNote) }));
     }
     for (const f of r.attachmentFailures) lines.push(`${t('reply.attachment.failed')}: ${f}`);

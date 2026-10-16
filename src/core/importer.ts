@@ -16,6 +16,10 @@ export interface ImportSettings {
   inboxFolder: string; // inbox (daily notes)
   attachmentFolder: string; // attachments
   articleFolder: string; // official-account articles
+  /** folder for explicitly marked plain-text notes; defaults to <inboxFolder>/notes */
+  singleNoteFolder?: string;
+  /** first line must match this marker exactly to create a plain-text note */
+  singleNoteMarker?: string;
   fetchArticles: boolean;
   groupArticlesByAccount: boolean; // one subfolder per official account under articleFolder
   parseHtml?: HtmlParser; // injected in tests; the plugin uses the browser DOMParser
@@ -25,6 +29,8 @@ export interface ImportResult {
   appended: boolean;
   dailyNote: string; // path of the daily conversation note the entry was appended to
   articleAssets: ArticleAsset[]; // saved article notes with the directory holding their images
+  /** a marked plain-text message saved separately, while its daily entry links here */
+  singleNote: { title: string; note: string; reused: boolean } | null;
   /** saved attachments: media kind + vault path (the receipt names each by kind) */
   attachments: { kind: 'image' | 'video' | 'audio' | 'file'; path: string }[];
   /** failed attachments as "name (reason)" — CDN download failures and vault write failures alike */
@@ -49,7 +55,79 @@ export function timeOfDay(ts: number): string {
 
 /** Replace characters that are invalid in file names */
 export function sanitizeFileName(name: string): string {
-  return name.replace(/[\\/:*?"<>|#^[\]]/g, '_').trim() || 'untitled';
+  return name.replace(/[\r\n\\/:*?"<>|#^[\]]/g, '_').trim() || 'untitled';
+}
+
+/**
+ * Return the body after a complete first-line marker, or null when the first
+ * line is anything else. Only the line-ending that terminates the marker is
+ * removed; the rest of the text stays byte-for-byte as received.
+ */
+export function stripSingleNoteMarker(text: string, marker: string): string | null {
+  const newline = text.indexOf('\n');
+  const firstLine = (newline < 0 ? text : text.slice(0, newline)).replace(/\r$/, '');
+  if (!marker || firstLine !== marker) return null;
+  return newline < 0 ? '' : text.slice(newline + 1);
+}
+
+/** Stable content fingerprint used only to find a previously saved message. */
+async function sourceHash(text: string): Promise<string> {
+  const digest = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function noteTitle(body: string): string {
+  const first = body.split(/\r?\n/).find((line) => line.trim())?.trim() ?? 'untitled';
+  return first.replace(/^#+\s*/, '').slice(0, 100) || 'untitled';
+}
+
+function storedSourceHash(note: string): string {
+  const frontmatter = /^---\r?\n([\s\S]*?)\r?\n---/.exec(note)?.[1] ?? '';
+  return /^welink_source_hash:\s*([a-f0-9]+)\s*$/m.exec(frontmatter)?.[1] ?? '';
+}
+
+/** Find a same-day note created from the exact same incoming text, without reading or changing its body. */
+async function findExistingSingleNote(app: App, folder: string, date: string, hash: string): Promise<string | null> {
+  try {
+    const files = (await app.vault.adapter.list(folder)).files;
+    for (const path of files) {
+      if (!path.startsWith(`${folder}/${date} `) || !path.endsWith('.md')) continue;
+      try {
+        if (storedSourceHash(await app.vault.adapter.read(path)) === hash) return path;
+      } catch {
+        // A concurrently deleted/unreadable note cannot be reused. Continue to a new safe path.
+      }
+    }
+  } catch {
+    // Listing is only a reuse optimization. The create path below still avoids overwrites.
+  }
+  return null;
+}
+
+async function saveSingleNote(
+  app: App,
+  folder: string,
+  timeMs: number,
+  body: string,
+): Promise<{ title: string; note: string; reused: boolean }> {
+  await ensureFolder(app, folder);
+  const title = noteTitle(body);
+  const hash = await sourceHash(body);
+  const date = dayStamp(timeMs);
+  const existing = await findExistingSingleNote(app, folder, date, hash);
+  if (existing) return { title, note: existing, reused: true };
+
+  const rawPath = `${folder}/${date} ${sanitizeFileName(title)}.md`;
+  const notePath = await uniquePath(app, rawPath);
+  const note = [
+    '---',
+    `welink_source_hash: ${hash}`,
+    '---',
+    '',
+    body,
+  ].join('\n');
+  await app.vault.create(notePath, note);
+  return { title, note: notePath, reused: false };
 }
 
 /**
@@ -93,6 +171,7 @@ export async function importMessage(
     appended: false,
     dailyNote: '',
     articleAssets: [],
+    singleNote: null,
     attachments: [],
     attachmentFailures: msg.attachmentFailures.map((f) => `${f.name} (${f.reason})`),
     linkCount: 0,
@@ -106,9 +185,19 @@ export async function importMessage(
   const lines: string[] = [];
   lines.push(`**${timeOfDay(msg.timeMs)}** · ${t('importer.received')}`);
 
+  const singleNoteFolder = settings.singleNoteFolder ?? `${settings.inboxFolder}/notes`;
+  const markedBody = stripSingleNoteMarker(msg.text, settings.singleNoteMarker ?? '#单独保存');
+  // The marker is a plain-text capture command. Link and attachment messages keep
+  // their existing article/media handling, even if a marker was sent above them.
+  const importedText = markedBody ?? msg.text;
+
   // links -> full article notes first, so the body shows the title link instead of the raw URL
-  const links = extractLinks(msg.text);
-  let display = msg.text.trim();
+  const links = extractLinks(importedText);
+  let display = importedText.trim();
+  if (markedBody !== null && markedBody.trim() && !links.length && !msg.attachments.length) {
+    result.singleNote = await saveSingleNote(app, singleNoteFolder, msg.timeMs, markedBody);
+    display = `[[${result.singleNote.note.replace(/\.md$/, '')}|${result.singleNote.title}]]`;
+  }
   if (settings.fetchArticles && links.length) {
     // counted only when fetching is on: the receipt reports "failed: unknown"
     // for links that produced neither a note nor a reason, and a link nobody

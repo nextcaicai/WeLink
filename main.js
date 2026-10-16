@@ -1882,6 +1882,9 @@ var en = {
   "set.articleFolder.desc": "Folder for official-account/web article notes",
   "set.outboxFolder": "Outbox folder",
   "set.outboxFolder.desc": "A one-to-one channel to yourself: an agent writes files here \u2014 .md sends its content as text, images/videos/documents are sent as attachments \u2014 each file is deleted after a successful send",
+  "set.singleNoteMarker": "Save-as-note marker",
+  "set.singleNoteMarker.desc": "A received text message creates its own note in the notes subfolder of the inbox only when its first line exactly matches the marker above. Write the body on following lines; the marker is removed from the note body.",
+  "set.singleNoteMarker.invalid": "The marker must be a non-empty single line.",
   "set.autoImport": "Auto-import messages",
   "set.autoImport.desc": "Write messages into the inbox as soon as they arrive",
   "set.fetchArticles": "Fetch article info",
@@ -1936,6 +1939,7 @@ var en = {
   "reply.kind.audio": "voice",
   "reply.kind.file": "file",
   "reply.kind.article": "article",
+  "reply.kind.note": "note",
   "reply.attachment.failed": "failed to save attachment",
   "reply.article.failed": "failed to fetch article",
   "reply.recordFailed": "Message received, but recording it to the vault failed.",
@@ -1984,6 +1988,9 @@ var zh = {
   "set.articleFolder.desc": "\u516C\u4F17\u53F7/\u7F51\u9875\u6587\u7AE0\u7B14\u8BB0\u5B58\u653E\u76EE\u5F55",
   "set.outboxFolder": "\u53D1\u4EF6\u7BB1\u76EE\u5F55",
   "set.outboxFolder.desc": "\u7ED9\u81EA\u5DF1\u7684\u5355\u5411\u901A\u9053:agent \u5728\u6B64\u5199\u5165\u6587\u4EF6,.md \u4F5C\u4E3A\u6587\u672C\u6D88\u606F\u53D1\u9001,\u56FE\u7247/\u89C6\u9891/\u6587\u6863\u4F5C\u4E3A\u9644\u4EF6\u53D1\u9001,\u53D1\u9001\u6210\u529F\u540E\u5220\u9664\u6587\u4EF6",
+  "set.singleNoteMarker": "\u5355\u72EC\u4FDD\u5B58\u6807\u8BB0",
+  "set.singleNoteMarker.desc": "\u6536\u5230\u7684\u7EAF\u6587\u5B57\u6D88\u606F\u4EC5\u5728\u7B2C\u4E00\u884C\u5B8C\u6574\u7B49\u4E8E\u4E0A\u65B9\u6807\u8BB0\u65F6\uFF0C\u624D\u4F1A\u5728\u6536\u4EF6\u7BB1\u76EE\u5F55\u4E0B\u7684 notes \u5B50\u76EE\u5F55\u65B0\u5EFA\u72EC\u7ACB\u7B14\u8BB0\u3002\u6362\u884C\u540E\u5199\u6B63\u6587\uFF1B\u6807\u8BB0\u4E0D\u4F1A\u8FDB\u5165\u7B14\u8BB0\u6B63\u6587\u3002",
+  "set.singleNoteMarker.invalid": "\u6807\u8BB0\u5FC5\u987B\u662F\u975E\u7A7A\u7684\u5355\u884C\u6587\u5B57\u3002",
   "set.autoImport": "\u81EA\u52A8\u5BFC\u5165\u6D88\u606F",
   "set.autoImport.desc": "\u6536\u5230\u6D88\u606F\u540E\u7ACB\u5373\u5199\u5165\u6536\u4EF6\u7BB1",
   "set.fetchArticles": "\u6293\u53D6\u6587\u7AE0\u4FE1\u606F",
@@ -2038,6 +2045,7 @@ var zh = {
   "reply.kind.audio": "\u8BED\u97F3",
   "reply.kind.file": "\u6587\u4EF6",
   "reply.kind.article": "\u6587\u7AE0",
+  "reply.kind.note": "\u7B14\u8BB0",
   "reply.attachment.failed": "\u9644\u4EF6\u4FDD\u5B58\u5931\u8D25",
   "reply.article.failed": "\u6587\u7AE0\u6293\u53D6\u5931\u8D25",
   "reply.recordFailed": "\u6D88\u606F\u5DF2\u6536\u5230,\u4F46\u5199\u5165 vault \u5931\u8D25\u3002",
@@ -2086,6 +2094,9 @@ var tw = {
   "set.articleFolder.desc": "\u516C\u773E\u865F/\u7DB2\u9801\u6587\u7AE0\u7B46\u8A18\u5B58\u653E\u76EE\u9304",
   "set.outboxFolder": "\u767C\u4EF6\u5323\u76EE\u9304",
   "set.outboxFolder.desc": "\u7D66\u81EA\u5DF1\u7684\u55AE\u5411\u901A\u9053:agent \u5728\u6B64\u5BEB\u5165\u6A94\u6848,.md \u4F5C\u70BA\u6587\u5B57\u8A0A\u606F\u767C\u9001,\u5716\u7247/\u5F71\u7247/\u6587\u4EF6\u4F5C\u70BA\u9644\u4EF6\u767C\u9001,\u767C\u9001\u6210\u529F\u5F8C\u522A\u9664\u6A94\u6848",
+  "set.singleNoteMarker": "\u55AE\u7368\u5132\u5B58\u6A19\u8A18",
+  "set.singleNoteMarker.desc": "\u6536\u5230\u7684\u7D14\u6587\u5B57\u8A0A\u606F\u50C5\u5728\u7B2C\u4E00\u884C\u5B8C\u6574\u7B49\u65BC\u4E0A\u65B9\u6A19\u8A18\u6642\uFF0C\u624D\u6703\u5728\u6536\u4EF6\u5323\u76EE\u9304\u4E0B\u7684 notes \u5B50\u76EE\u9304\u65B0\u5EFA\u7368\u7ACB\u7B46\u8A18\u3002\u63DB\u884C\u5F8C\u5BEB\u6B63\u6587\uFF1B\u6A19\u8A18\u4E0D\u6703\u9032\u5165\u7B46\u8A18\u6B63\u6587\u3002",
+  "set.singleNoteMarker.invalid": "\u6A19\u8A18\u5FC5\u9808\u662F\u975E\u7A7A\u7684\u55AE\u884C\u6587\u5B57\u3002",
   "set.autoImport": "\u81EA\u52D5\u532F\u5165\u8A0A\u606F",
   "set.autoImport.desc": "\u6536\u5230\u8A0A\u606F\u5F8C\u7ACB\u5373\u5BEB\u5165\u6536\u4EF6\u5323",
   "set.fetchArticles": "\u6293\u53D6\u6587\u7AE0\u8CC7\u8A0A",
@@ -2140,6 +2151,7 @@ var tw = {
   "reply.kind.audio": "\u8A9E\u97F3",
   "reply.kind.file": "\u6A94\u6848",
   "reply.kind.article": "\u6587\u7AE0",
+  "reply.kind.note": "\u7B46\u8A18",
   "reply.attachment.failed": "\u9644\u4EF6\u5132\u5B58\u5931\u6557",
   "reply.article.failed": "\u6587\u7AE0\u6293\u53D6\u5931\u6557",
   "reply.recordFailed": "\u8A0A\u606F\u5DF2\u6536\u5230,\u4F46\u5BEB\u5165 vault \u5931\u6557\u3002",
@@ -2223,7 +2235,10 @@ function buildReceiptReplies(results) {
     for (const art of r.articleAssets) {
       lines.push(t("reply.recorded", { what: t("reply.kind.article"), path: stripVaultRoot(art.note) }));
     }
-    if (!r.attachments.length && !r.articleAssets.length) {
+    if (r.singleNote) {
+      lines.push(t("reply.recorded", { what: t("reply.kind.note"), path: stripVaultRoot(r.singleNote.note) }));
+    }
+    if (!r.attachments.length && !r.articleAssets.length && !r.singleNote) {
       lines.push(t("reply.recorded", { what: t("reply.kind.message"), path: stripVaultRoot(r.dailyNote) }));
     }
     for (const f of r.attachmentFailures) lines.push(`${t("reply.attachment.failed")}: ${f}`);
@@ -2250,7 +2265,58 @@ function timeOfDay(ts) {
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 function sanitizeFileName(name) {
-  return name.replace(/[\\/:*?"<>|#^[\]]/g, "_").trim() || "untitled";
+  return name.replace(/[\r\n\\/:*?"<>|#^[\]]/g, "_").trim() || "untitled";
+}
+function stripSingleNoteMarker(text, marker) {
+  const newline = text.indexOf("\n");
+  const firstLine = (newline < 0 ? text : text.slice(0, newline)).replace(/\r$/, "");
+  if (!marker || firstLine !== marker) return null;
+  return newline < 0 ? "" : text.slice(newline + 1);
+}
+async function sourceHash(text) {
+  const digest = await window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+function noteTitle(body) {
+  const first = body.split(/\r?\n/).find((line) => line.trim())?.trim() ?? "untitled";
+  return first.replace(/^#+\s*/, "").slice(0, 100) || "untitled";
+}
+function storedSourceHash(note) {
+  const frontmatter = /^---\r?\n([\s\S]*?)\r?\n---/.exec(note)?.[1] ?? "";
+  return /^welink_source_hash:\s*([a-f0-9]+)\s*$/m.exec(frontmatter)?.[1] ?? "";
+}
+async function findExistingSingleNote(app, folder, date, hash) {
+  try {
+    const files = (await app.vault.adapter.list(folder)).files;
+    for (const path of files) {
+      if (!path.startsWith(`${folder}/${date} `) || !path.endsWith(".md")) continue;
+      try {
+        if (storedSourceHash(await app.vault.adapter.read(path)) === hash) return path;
+      } catch {
+      }
+    }
+  } catch {
+  }
+  return null;
+}
+async function saveSingleNote(app, folder, timeMs, body) {
+  await ensureFolder(app, folder);
+  const title = noteTitle(body);
+  const hash = await sourceHash(body);
+  const date = dayStamp(timeMs);
+  const existing = await findExistingSingleNote(app, folder, date, hash);
+  if (existing) return { title, note: existing, reused: true };
+  const rawPath = `${folder}/${date} ${sanitizeFileName(title)}.md`;
+  const notePath = await uniquePath(app, rawPath);
+  const note = [
+    "---",
+    `welink_source_hash: ${hash}`,
+    "---",
+    "",
+    body
+  ].join("\n");
+  await app.vault.create(notePath, note);
+  return { title, note: notePath, reused: false };
 }
 async function uniquePath(app, path) {
   if (!await app.vault.adapter.exists(path)) return path;
@@ -2280,6 +2346,7 @@ async function importMessage(app, transport, msg, settings) {
     appended: false,
     dailyNote: "",
     articleAssets: [],
+    singleNote: null,
     attachments: [],
     attachmentFailures: msg.attachmentFailures.map((f) => `${f.name} (${f.reason})`),
     linkCount: 0,
@@ -2290,8 +2357,15 @@ async function importMessage(app, transport, msg, settings) {
   await ensureFolder(app, settings.articleFolder);
   const lines = [];
   lines.push(`**${timeOfDay(msg.timeMs)}** \xB7 ${t("importer.received")}`);
-  const links = extractLinks(msg.text);
-  let display = msg.text.trim();
+  const singleNoteFolder = settings.singleNoteFolder ?? `${settings.inboxFolder}/notes`;
+  const markedBody = stripSingleNoteMarker(msg.text, settings.singleNoteMarker ?? "#\u5355\u72EC\u4FDD\u5B58");
+  const importedText = markedBody ?? msg.text;
+  const links = extractLinks(importedText);
+  let display = importedText.trim();
+  if (markedBody !== null && markedBody.trim() && !links.length && !msg.attachments.length) {
+    result.singleNote = await saveSingleNote(app, singleNoteFolder, msg.timeMs, markedBody);
+    display = `[[${result.singleNote.note.replace(/\.md$/, "")}|${result.singleNote.title}]]`;
+  }
   if (settings.fetchArticles && links.length) {
     result.linkCount = links.length;
     const phaseDeadline = Date.now() + ARTICLE_PHASE_BUDGET_MS;
@@ -2412,7 +2486,7 @@ async function appendOutbound(app, inboxFolder, timeMs, sender, lines) {
 }
 
 // src/core/agent-guide.ts
-var GUIDE_REV = "2";
+var GUIDE_REV = "3";
 function agentGuideMeta(content) {
   const fm = /^---\s*\n([\s\S]*?)\n---/.exec(content)?.[1] ?? "";
   const lang = /lang:\s*"?(\w+)"?/.exec(fm)?.[1] ?? "";
@@ -2421,7 +2495,7 @@ function agentGuideMeta(content) {
   return { lang, paths, rev };
 }
 function pathsKey(s) {
-  return [s.inboxFolder, s.outboxFolder, s.attachmentFolder].join("|");
+  return encodeURIComponent([s.inboxFolder, s.outboxFolder, s.attachmentFolder, s.singleNoteMarker].join("|"));
 }
 function buildEn(s) {
   return `---
@@ -2446,6 +2520,8 @@ The plugin consumes the outbox on its next poll (~30-60 s). A successful send de
 ## Receiving
 
 Inbound WeChat messages are appended to the same daily conversation notes under \`${s.inboxFolder}/\` (marked "received"); media arrives under \`${s.attachmentFolder}/\`.
+
+To save a plain-text message as its own note, make its first line exactly \`${s.singleNoteMarker}\`, then write the body on the following lines. The marker is removed, a note is created under \`${s.inboxFolder}/notes/\`, and the daily note keeps a link to it. Messages with links or attachments keep their normal import behavior.
 
 ## Constraints
 
@@ -2476,6 +2552,8 @@ paths: "${pathsKey(s)}"
 
 \u6536\u5230\u7684\u5FAE\u4FE1\u6D88\u606F\u8FFD\u52A0\u5230\u540C\u4E00\u4EFD\u6BCF\u65E5\u5BF9\u8BDD\u7B14\u8BB0 \`${s.inboxFolder}/\`(\u6807\u8BB0"\u63A5\u6536"),\u5A92\u4F53\u9644\u4EF6\u4FDD\u5B58\u5728 \`${s.attachmentFolder}/\`\u3002
 
+\u5982\u9700\u628A\u7EAF\u6587\u5B57\u6D88\u606F\u5355\u72EC\u4FDD\u5B58\u4E3A\u7B14\u8BB0\uFF0C\u7B2C\u4E00\u884C\u5FC5\u987B\u5B8C\u6574\u5199\u6210 \`${s.singleNoteMarker}\`\uFF0C\u4E0B\u4E00\u884C\u5F00\u59CB\u5199\u6B63\u6587\u3002\u63D2\u4EF6\u4F1A\u53BB\u6389\u6807\u8BB0\uFF0C\u5728 \`${s.inboxFolder}/notes/\` \u521B\u5EFA\u7B14\u8BB0\uFF0C\u5E76\u5728\u6BCF\u65E5\u7B14\u8BB0\u4FDD\u7559\u94FE\u63A5\u3002\u5305\u542B\u94FE\u63A5\u6216\u9644\u4EF6\u7684\u6D88\u606F\u4ECD\u6309\u539F\u6709\u65B9\u5F0F\u5BFC\u5165\u3002
+
 ## \u9650\u5236
 
 \u7F51\u5173\u5BF9\u4E3B\u52A8\u6D88\u606F\u6709\u9650\u6D41\u3002\u7528\u4E8E\u901A\u77E5(\u4EFB\u52A1\u5B8C\u6210\u3001\u957F\u4EFB\u52A1\u7ED3\u675F),\u4E0D\u8981\u5F53\u804A\u5929\u901A\u9053\u3002
@@ -2504,6 +2582,8 @@ paths: "${pathsKey(s)}"
 ## \u63A5\u6536
 
 \u6536\u5230\u7684\u5FAE\u4FE1\u8A0A\u606F\u9644\u52A0\u5230\u540C\u4E00\u4EFD\u6BCF\u65E5\u5C0D\u8A71\u7B46\u8A18 \`${s.inboxFolder}/\`(\u6A19\u8A18"\u63A5\u6536"),\u5A92\u9AD4\u9644\u4EF6\u5132\u5B58\u5728 \`${s.attachmentFolder}/\`\u3002
+
+\u5982\u9700\u628A\u7D14\u6587\u5B57\u8A0A\u606F\u55AE\u7368\u5132\u5B58\u70BA\u7B46\u8A18\uFF0C\u7B2C\u4E00\u884C\u5FC5\u9808\u5B8C\u6574\u5BEB\u6210 \`${s.singleNoteMarker}\`\uFF0C\u4E0B\u4E00\u884C\u958B\u59CB\u5BEB\u6B63\u6587\u3002\u5916\u639B\u6703\u79FB\u9664\u6A19\u8A18\uFF0C\u5728 \`${s.inboxFolder}/notes/\` \u5EFA\u7ACB\u7B46\u8A18\uFF0C\u4E26\u5728\u6BCF\u65E5\u7B46\u8A18\u4FDD\u7559\u9023\u7D50\u3002\u5305\u542B\u9023\u7D50\u6216\u9644\u4EF6\u7684\u8A0A\u606F\u4ECD\u4F9D\u539F\u6709\u65B9\u5F0F\u532F\u5165\u3002
 
 ## \u9650\u5236
 
@@ -3002,6 +3082,7 @@ var DEFAULT_SETTINGS = {
   attachmentFolder: "WeLink/attachments",
   articleFolder: "WeLink/articles",
   outboxFolder: "WeLink/outbox",
+  singleNoteMarker: "#\u5355\u72EC\u4FDD\u5B58",
   fetchArticles: true,
   groupArticlesByAccount: true,
   autoImport: true,
@@ -3009,6 +3090,9 @@ var DEFAULT_SETTINGS = {
   autoReply: true
 };
 var FOLDER_KEYS = ["inboxFolder", "attachmentFolder", "articleFolder", "outboxFolder"];
+function isValidSingleNoteMarker(value) {
+  return typeof value === "string" && value.trim().length > 0 && !/[\r\n]/.test(value);
+}
 var WeLinkSettingTab = class extends import_obsidian4.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
@@ -3024,12 +3108,19 @@ var WeLinkSettingTab = class extends import_obsidian4.PluginSettingTab {
   }
   setControlValue(key, value) {
     if (FOLDER_KEYS.includes(key) && typeof value === "string") value = (0, import_obsidian4.normalizePath)(value);
+    if (key === "singleNoteMarker") {
+      if (!isValidSingleNoteMarker(value)) {
+        new import_obsidian4.Notice(t("set.singleNoteMarker.invalid"));
+        return;
+      }
+      value = value.trim();
+    }
     this.plugin.settings[key] = value;
     if (key === "language") {
       this.plugin.applyLanguage(value);
       this.update();
     }
-    if (FOLDER_KEYS.includes(key)) this.plugin.refreshAgentGuide();
+    if (FOLDER_KEYS.includes(key) || key === "singleNoteMarker") this.plugin.refreshAgentGuide();
     void this.plugin.saveSettings();
   }
   getSettingDefinitions() {
@@ -3070,6 +3161,11 @@ var WeLinkSettingTab = class extends import_obsidian4.PluginSettingTab {
         name: t("set.outboxFolder"),
         desc: t("set.outboxFolder.desc"),
         control: { type: "text", key: "outboxFolder", defaultValue: DEFAULT_SETTINGS.outboxFolder }
+      },
+      {
+        name: t("set.singleNoteMarker"),
+        desc: t("set.singleNoteMarker.desc"),
+        control: { type: "text", key: "singleNoteMarker", defaultValue: DEFAULT_SETTINGS.singleNoteMarker }
       },
       {
         name: t("set.autoImport"),
@@ -3500,6 +3596,11 @@ var WeLinkPlugin = class extends import_obsidian6.Plugin {
     for (const key of FOLDER_KEYS) {
       this.settings[key] = (0, import_obsidian6.normalizePath)(this.settings[key]);
     }
+    if (typeof this.settings.singleNoteMarker !== "string" || !this.settings.singleNoteMarker.trim() || /[\r\n]/.test(this.settings.singleNoteMarker)) {
+      this.settings.singleNoteMarker = DEFAULT_SETTINGS.singleNoteMarker;
+    } else {
+      this.settings.singleNoteMarker = this.settings.singleNoteMarker.trim();
+    }
   }
   async saveSettings() {
     await this.saveData(this.settings);
@@ -3518,7 +3619,7 @@ var WeLinkPlugin = class extends import_obsidian6.Plugin {
   /** Create the whole Wechat directory tree + Agent.md once the plugin is enabled */
   async ensureFolders() {
     const s = this.settings;
-    for (const folder of [s.inboxFolder, s.attachmentFolder, s.articleFolder, s.outboxFolder]) {
+    for (const folder of [s.inboxFolder, s.attachmentFolder, s.articleFolder, s.outboxFolder, `${s.inboxFolder}/notes`]) {
       try {
         await ensureFolder(this.app, folder);
       } catch {
@@ -3769,6 +3870,8 @@ var WeLinkPlugin = class extends import_obsidian6.Plugin {
           inboxFolder: this.settings.inboxFolder,
           attachmentFolder: this.settings.attachmentFolder,
           articleFolder: this.settings.articleFolder,
+          singleNoteFolder: `${this.settings.inboxFolder}/notes`,
+          singleNoteMarker: this.settings.singleNoteMarker,
           fetchArticles: this.settings.fetchArticles,
           groupArticlesByAccount: this.settings.groupArticlesByAccount
         });
@@ -3785,6 +3888,7 @@ var WeLinkPlugin = class extends import_obsidian6.Plugin {
             attachmentFailures: result.attachmentFailures,
             linkCount: result.linkCount,
             articleAssets: result.articleAssets,
+            singleNote: result.singleNote,
             articleFailures: result.articleFailures
           } : { ok: false, appended: false, dailyNote: "", attachments: [], attachmentFailures: [], linkCount: 0, articleAssets: [], articleFailures: [] }
         ];

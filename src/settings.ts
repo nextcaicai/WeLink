@@ -13,6 +13,7 @@ export interface WeLinkSettings {
   attachmentFolder: string;
   articleFolder: string;
   outboxFolder: string; // outbox folder (agents drop pending-send files here)
+  singleNoteMarker: string; // first-line marker that saves a received text message as its own note
   fetchArticles: boolean; // fetch link metadata and create article notes
   groupArticlesByAccount: boolean; // one subfolder per official account under the article folder
   autoImport: boolean;
@@ -27,6 +28,7 @@ export const DEFAULT_SETTINGS: WeLinkSettings = {
   attachmentFolder: 'WeLink/attachments',
   articleFolder: 'WeLink/articles',
   outboxFolder: 'WeLink/outbox',
+  singleNoteMarker: '#单独保存',
   fetchArticles: true,
   groupArticlesByAccount: true,
   autoImport: true,
@@ -35,6 +37,11 @@ export const DEFAULT_SETTINGS: WeLinkSettings = {
 };
 
 export const FOLDER_KEYS = ['inboxFolder', 'attachmentFolder', 'articleFolder', 'outboxFolder'] as const satisfies readonly (keyof WeLinkSettings)[];
+
+/** A marker must be one visible line, so matching it at the start of a message stays predictable. */
+export function isValidSingleNoteMarker(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0 && !/[\r\n]/.test(value);
+}
 
 export class WeLinkSettingTab extends PluginSettingTab {
   /** Liveness flag for the settings pane: aborts QR polling when switched away/closed */
@@ -57,12 +64,19 @@ export class WeLinkSettingTab extends PluginSettingTab {
 
   setControlValue(key: string, value: unknown): void {
     if ((FOLDER_KEYS as readonly string[]).includes(key) && typeof value === 'string') value = normalizePath(value);
+    if (key === 'singleNoteMarker') {
+      if (!isValidSingleNoteMarker(value)) {
+        new Notice(t('set.singleNoteMarker.invalid'));
+        return;
+      }
+      value = value.trim();
+    }
     (this.plugin.settings as unknown as Record<string, unknown>)[key] = value;
     if (key === 'language') {
       this.plugin.applyLanguage(value as WeLinkSettings['language']); // switch commands/status bar immediately
       this.update(); // re-render every label in the new language
     }
-    if ((FOLDER_KEYS as readonly string[]).includes(key)) this.plugin.refreshAgentGuide(); // paths changed -> Agent.md must point at the new folders
+    if ((FOLDER_KEYS as readonly string[]).includes(key) || key === 'singleNoteMarker') this.plugin.refreshAgentGuide(); // paths/marker changed -> Agent.md must stay current
     void this.plugin.saveSettings();
   }
 
@@ -104,6 +118,11 @@ export class WeLinkSettingTab extends PluginSettingTab {
         name: t('set.outboxFolder'),
         desc: t('set.outboxFolder.desc'),
         control: { type: 'text', key: 'outboxFolder', defaultValue: DEFAULT_SETTINGS.outboxFolder },
+      },
+      {
+        name: t('set.singleNoteMarker'),
+        desc: t('set.singleNoteMarker.desc'),
+        control: { type: 'text', key: 'singleNoteMarker', defaultValue: DEFAULT_SETTINGS.singleNoteMarker },
       },
       {
         name: t('set.autoImport'),

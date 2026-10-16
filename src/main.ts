@@ -92,6 +92,11 @@ export default class WeLinkPlugin extends Plugin {
     for (const key of FOLDER_KEYS) {
       this.settings[key] = normalizePath(this.settings[key]);
     }
+    if (typeof this.settings.singleNoteMarker !== 'string' || !this.settings.singleNoteMarker.trim() || /[\r\n]/.test(this.settings.singleNoteMarker)) {
+      this.settings.singleNoteMarker = DEFAULT_SETTINGS.singleNoteMarker;
+    } else {
+      this.settings.singleNoteMarker = this.settings.singleNoteMarker.trim();
+    }
   }
 
   async saveSettings(): Promise<void> {
@@ -114,7 +119,7 @@ export default class WeLinkPlugin extends Plugin {
   /** Create the whole Wechat directory tree + Agent.md once the plugin is enabled */
   private async ensureFolders(): Promise<void> {
     const s = this.settings;
-    for (const folder of [s.inboxFolder, s.attachmentFolder, s.articleFolder, s.outboxFolder]) {
+    for (const folder of [s.inboxFolder, s.attachmentFolder, s.articleFolder, s.outboxFolder, `${s.inboxFolder}/notes`]) {
       try {
         await ensureFolder(this.app, folder);
       } catch {
@@ -426,6 +431,8 @@ export default class WeLinkPlugin extends Plugin {
           inboxFolder: this.settings.inboxFolder,
           attachmentFolder: this.settings.attachmentFolder,
           articleFolder: this.settings.articleFolder,
+          singleNoteFolder: `${this.settings.inboxFolder}/notes`,
+          singleNoteMarker: this.settings.singleNoteMarker,
           fetchArticles: this.settings.fetchArticles,
           groupArticlesByAccount: this.settings.groupArticlesByAccount,
         });
@@ -443,6 +450,7 @@ export default class WeLinkPlugin extends Plugin {
                 attachmentFailures: result.attachmentFailures,
                 linkCount: result.linkCount,
                 articleAssets: result.articleAssets,
+                singleNote: result.singleNote,
                 articleFailures: result.articleFailures,
               }
             : { ok: false, appended: false, dailyNote: '', attachments: [], attachmentFailures: [], linkCount: 0, articleAssets: [], articleFailures: [] },
