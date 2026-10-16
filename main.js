@@ -1654,14 +1654,54 @@ async function fetchArticle(transport, url, parseHtml, deadline = Infinity) {
   const html = stripScripts(await bodyTextAuto(resp));
   const parse = parseHtml ?? ((h) => new DOMParser().parseFromString(h, "text/html"));
   const doc = parse(html);
-  const title = doc.querySelector('meta[property="og:title"]')?.getAttribute("content") ?? doc.title ?? "";
+  const titleRaw = doc.querySelector('meta[property="og:title"]')?.getAttribute("content") ?? doc.title ?? "";
+  const title = cleanText(decodeMetadataText(titleRaw));
   if (!title.trim()) throw new Error("no title found on page");
-  const description = doc.querySelector('meta[property="og:description"]')?.getAttribute("content") ?? doc.querySelector('meta[name="description"]')?.getAttribute("content") ?? "";
-  const root = doc.querySelector("#js_content") ?? doc.body;
+  const descriptionRaw = doc.querySelector('meta[property="og:description"]')?.getAttribute("content") ?? doc.querySelector('meta[name="description"]')?.getAttribute("content") ?? "";
+  const description = normalizeDescription(decodeMetadataText(descriptionRaw));
+  const isWeChat = isWeChatArticleUrl(url);
+  const root = doc.querySelector("#js_content") ?? doc.querySelector(".rich_media_content") ?? (isWeChat ? null : doc.body);
   const images = [];
-  const markdown = normalizeBlocks(toMd(root, images));
+  const markdown = root ? normalizeBlocks(toMd(root, images)) : "";
   await downloadImages(transport, images, deadline);
-  return { url, title: cleanText(title), description: cleanText(description), account: accountName(doc), markdown, images };
+  return { url, title, description, account: accountName(doc), markdown, images };
+}
+function decodeMetadataText(value) {
+  let text = value.replace(/\\x([\da-f]{2})/gi, (_match, hex) => String.fromCharCode(parseInt(hex, 16))).replace(/\\r\\n|\\n|\\r/g, "\n");
+  for (let i = 0; i < 3; i++) {
+    const decoded = text.replace(/&(#x[\da-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi, (_match, entity) => {
+      if (entity[0] === "#") {
+        const codePoint = entity[1]?.toLowerCase() === "x" ? parseInt(entity.slice(2), 16) : parseInt(entity.slice(1), 10);
+        try {
+          return String.fromCodePoint(codePoint);
+        } catch {
+          return _match;
+        }
+      }
+      const named = {
+        amp: "&",
+        lt: "<",
+        gt: ">",
+        quot: '"',
+        apos: "'",
+        nbsp: "\xA0"
+      };
+      return named[entity.toLowerCase()] ?? _match;
+    });
+    if (decoded === text) break;
+    text = decoded;
+  }
+  return text.replace(/<\/?[a-z][^>]*>/gi, " ");
+}
+function normalizeDescription(value) {
+  return value.replace(/\r\n?/g, "\n").split("\n").map((line) => line.replace(/[\t \u00a0]+/g, " ").trim()).filter(Boolean).join("\n\n");
+}
+function isWeChatArticleUrl(url) {
+  try {
+    return new URL(url).hostname.toLowerCase() === "mp.weixin.qq.com";
+  } catch {
+    return false;
+  }
 }
 function stripScripts(html) {
   return html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "").replace(/<script\b[^>]*>[\s\S]*$/i, "");
@@ -1724,7 +1764,7 @@ function toMd(node, images) {
   const inner = () => Array.from(el.childNodes).map((n) => toMd(n, images)).join("");
   switch (tag) {
     case "img": {
-      const src = el.getAttribute("data-src") ?? el.getAttribute("src") ?? "";
+      const src = el.getAttribute("data-src") ?? el.getAttribute("data-original") ?? el.getAttribute("data-lazy-src") ?? el.getAttribute("data-actualsrc") ?? el.getAttribute("src") ?? "";
       if (!src || src.startsWith("data:")) return "";
       if (images.length >= 10) {
         console.warn(`welink: article image cap (10) reached, keeping remote link: ${src}`);
@@ -3738,7 +3778,7 @@ var WeLinkPlugin = class extends import_obsidian6.Plugin {
       if (this.settings.autoReply) {
         return [
           result ? {
-            ok: true,
+            ok: result.appended,
             appended: result.appended,
             dailyNote: result.dailyNote,
             attachments: result.attachments,

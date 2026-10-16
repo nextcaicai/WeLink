@@ -16,3 +16,6 @@ data.json
 *.log
 .vscode/
 .idea/
+
+# 其它
+wechat-article-fetching-research.md

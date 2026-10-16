@@ -62,6 +62,29 @@ test('fetchArticle: WeChat page -> title/description/account/markdown/images', a
   assert.equal(info!.images[0].ext, 'png');
 });
 
+test('fetchArticle: image-led WeChat article keeps body text and images', async () => {
+  const page = `<html><head><meta property="og:title" content="图文消息"></head><body>
+    <div id="js_content"><p>这是一段简短说明。</p>
+      <img data-src="https://img.example/img/0.png"><img data-src="https://img.example/img/1.png">
+    </div>
+  </body></html>`;
+  const info = await fetchArticle(articleTransport(page), 'https://mp.weixin.qq.com/s/image-led', parseHtml);
+  assert.ok(info.markdown.includes('这是一段简短说明。'));
+  assert.equal(info.images.length, 2, 'body images are retained for download');
+  assert.ok(info.images.every((image) => image.data), 'image bytes were fetched');
+});
+
+test('fetchArticle: escaped WeChat metadata is made readable without page-shell text', async () => {
+  const page = `<html><head>
+    <meta property="og:title" content="第一行\\x0a第二行">
+    <meta property="og:description" content="第一段\\x0a\\x0a&lt;p&gt;第二&amp;nbsp;段&lt;/p&gt;">
+  </head><body><button>微信扫一扫</button><p>取消 允许</p></body></html>`;
+  const info = await fetchArticle(articleTransport(page), 'https://mp.weixin.qq.com/s/text-only', parseHtml);
+  assert.equal(info.title, '第一行 第二行');
+  assert.equal(info.description, '第一段\n\n第二 段');
+  assert.equal(info.markdown, '', 'body controls are not mistaken for article text');
+});
+
 test('fetchArticle: generic page without og tags uses <title> and body', async () => {
   const page = '<html><head><title>Plain Page</title></head><body><p>only body text</p></body></html>';
   const info = await fetchArticle(articleTransport(page), 'https://example.com/post', parseHtml);
