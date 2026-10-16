@@ -436,7 +436,7 @@ export default class WeLinkPlugin extends Plugin {
         return [
           result
             ? {
-                ok: true,
+                ok: result.appended,
                 appended: result.appended,
                 dailyNote: result.dailyNote,
                 attachments: result.attachments,
