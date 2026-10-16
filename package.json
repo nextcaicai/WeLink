@@ -1,0 +1,25 @@
+{
+  "name": "welink",
+  "version": "0.1.7",
+  "description": "WeChat messaging bridge: send and receive messages, attachments, and articles between WeChat and your vault.",
+  "scripts": {
+    "build": "node esbuild.config.js",
+    "watch": "node esbuild.config.js --watch",
+    "lint": "eslint src/",
+    "test": "npm run build && npx tsc --noEmit && node --test scripts/unit-test.js scripts/unit-ilink.js scripts/unit-article.js",
+    "smoke": "node scripts/smoke.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/parser": "^8.67.0",
+    "esbuild": "^0.25.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-obsidianmd": "^0.4.1",
+    "linkedom": "^0.18.13",
+    "obsidian": "^1.8.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "silk-wasm": "^3.7.1"
+  }
+}

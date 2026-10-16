@@ -1,0 +1,196 @@
+================================================================================
+iLink protocol reference (weixin.qq.com bot gateway)
+================================================================================
+
+Reference for future development on welink. Legend:
+  [tested]   verified against the live gateway, pinned by unit tests
+  [derived]  from @tencent-weixin/openclaw-weixin 1.0.2 teardown
+             (x1ah/wechat-ilink-demo); shape-checked, not live-verified
+
+
+--------------------------------------------------------------------------------
+endpoints (base: https://ilinkai.weixin.qq.com, or the per-login baseurl)
+--------------------------------------------------------------------------------
+
+  GET  ilink/bot/get_bot_qrcode?bot_type=3     login QR          [tested]
+  GET  ilink/bot/get_qrcode_status?qrcode=KEY  poll scan state   [tested]
+  POST ilink/bot/getupdates                    long-poll recv    [tested]
+  POST ilink/bot/sendmessage                   send text/media   [tested]
+  POST ilink/bot/getuploadurl                  CDN upload grant  [tested]
+  POST ilink/bot/getconfig                     fetch typing ticket [derived]
+  POST ilink/bot/sendtyping                    typing indicator    [derived]
+
+Every POST body needs base_info: { channel_version }. Official SDK sends
+"1.0.2"; welink sends "welink-weixin/1.0" -- purely an identifier,
+both work.
+
+
+--------------------------------------------------------------------------------
+headers (all requests)
+--------------------------------------------------------------------------------
+
+  AuthorizationType: ilink_bot_token
+  Authorization: Bearer <bot_token>            (post-login)
+  X-WECHAT-UIN: base64(decimal-string of a random uint32), fresh per request
+
+
+--------------------------------------------------------------------------------
+login
+--------------------------------------------------------------------------------
+
+  get_bot_qrcode returns TWO fields -- easy to mix up:
+    qrcode_img_content   the scannable content (render THIS)
+    qrcode               polling key for get_qrcode_status
+
+  get_qrcode_status: status waiting/scanned/confirmed/expired.
+  On confirm returns bot_token + baseurl + bot_id.
+  MUST switch to the returned baseurl for all later calls. [tested]
+
+
+--------------------------------------------------------------------------------
+receiving
+--------------------------------------------------------------------------------
+
+  POST getupdates { get_updates_buf: <cursor, "" first>, base_info }
+  Server holds ~35s; client timeout should exceed it (welink: 45s).
+  Client timeout = normal, loop again. Response carries new cursor in
+  get_updates_buf (empty = keep old).
+  HTTP 412 on getupdates = client rejection, not a message problem. Root cause
+  discovered by replay: the gateway TLS-fingerprints the HTTP client — Node's
+  http/https stack gets 412 on EVERY request (headers make no difference),
+  while the same body/headers through Obsidian's requestUrl (Chromium stack)
+  or fetch/undici get 200. All ilink + CDN traffic must therefore use
+  requestUrl; NodeTransport is only safe for third-party sites (articles).
+  Secondary use: if a STORED cursor ever 412s on a clean stack, an empty-
+  cursor poll re-establishes the stream (verified live: 200 + fresh cursor +
+  sync_buf), so clear the cursor and re-poll. 401/403 instead point at the
+  credentials themselves: only a QR re-scan fixes those. Retrying a rejected
+  cursor forever changes nothing (observed stuck loop: status bar spinning
+  while messages queued server-side).
+
+  message fields:
+    message_type   1 = user, 2 = bot itself (skip)
+    from_user_id   sender id (also skip *@im.bot)
+    message_id, create_time_ms     dedup keys
+    context_token  credential required for replying
+    item_list[]    type 1 text (text_item.text)
+                   type 2 image (image_item.media, image_item.aeskey?)
+                   type 3 voice (voice_item.media; .text = transcript if set)
+                   type 4 file  (file_item.media, file_name)
+                   type 5 video (video_item.media)
+
+  quoted messages: text item's ref_msg (title + message_item). READ-ONLY;
+  the gateway ignores ref_msg on send.
+
+  voice: if voice_item.text is empty the media is SILK audio (welink
+  stores .silk; official SDK transcodes via silk-wasm).
+
+
+--------------------------------------------------------------------------------
+sending
+--------------------------------------------------------------------------------
+
+  POST sendmessage
+  { msg: {
+      from_user_id: "",                    # empty
+      to_user_id, client_id,               # client_id: any unique string
+      message_type: 2, message_state: 2,   # bot / finished
+      context_token: <from last inbound message>,
+      item_list: [...]
+    }, base_info }
+
+  SUCCESS SHAPE VARIES [tested]: {"ret":0} | {"errcode":0} | {} | {"errmsg":""}.
+  Acceptance rule: ret==0, else errcode==0, else HTTP 200 && !errmsg.
+
+  context_token is THE constraint: no inbound message = no token = cannot
+  send. welink caches the latest token per user in state.json.
+
+  text: one text_item; gateway limit ~3800 chars. welink splits by
+  unicode code points at 3800, 100ms between chunks.
+
+
+--------------------------------------------------------------------------------
+media crypto -- the tricky part
+--------------------------------------------------------------------------------
+
+  AES-128-ECB, PKCS7, fresh random 16-byte key per file. Size cap 100MB.
+
+  SEND chain:
+    1. encrypt locally
+    2. POST getuploadurl {
+         filekey, media_type (1 image|2 video|3 file), to_user_id,
+         rawsize, rawfilemd5, filesize (= ECB-padded size),
+         no_need_thumb: true,
+         aeskey: <key as bare HEX string>            # <-- encoding (a)
+       }
+       response: upload_full_url (new gateways) OR upload_param (old:
+       build <cdn>/upload?encrypted_query_param=<param>&filekey=<filekey>)
+    3. POST ciphertext to that URL (octet-stream); response header
+       x-encrypted-param = download credential. 5xx retry x3, 4xx fail fast.
+    4. sendmessage item:
+         image: { type:2, image_item: { media, mid_size: <cipher size> } }
+         video: { type:5, video_item: { media, video_size: <cipher size> } }
+         file:  { type:4, file_item: { media, file_name, len: "<raw size>" } }
+       media = { encrypt_query_param: <credential>, aes_key: <K>, encrypt_type: 1 }
+
+  THE ASYMMETRY [tested, regression-tested]:
+    getuploadurl.aeskey         = bare hex ("0123...ef")
+    sendmessage.media.aes_key   = base64(hex string)
+    Mixing these up => recipient cannot decrypt.
+
+  RECV chain:
+    download from cdn with encrypt_query_param; decrypt with aes_key.
+    key encoding varies, normalize both [tested]:
+      - 16 raw bytes in base64
+      - base64 of a 32-char hex string
+      - image items also carry a top-level aeskey field: BARE HEX,
+        takes precedence when it decodes to 16 bytes.
+    inbound images arrive nameless: sniff magic bytes (jpg/png/gif/webp).
+    welink caps downloads at 100MB (hostile-gateway guard).
+
+
+--------------------------------------------------------------------------------
+typing
+--------------------------------------------------------------------------------
+
+  Cannot send directly; fetch a ticket first. [derived]
+
+  POST getconfig  { ilink_user_id, context_token, base_info }
+       -> { typing_ticket }
+  POST sendtyping { ilink_user_id, typing_ticket, status: 1|2, base_info }
+       1 = typing, 2 = cancel
+
+  Official SDK: ticket cached 24h/user; getconfig failures back off
+  2s -> ... -> 1h. welink: 24h cache in state.json, one refetch-retry
+  on send failure, everything best-effort/silent.
+
+
+--------------------------------------------------------------------------------
+errors
+--------------------------------------------------------------------------------
+
+  errcode -14    session expired. Both official SDK and welink pause
+                 the account 60min before requiring re-login.
+  ret != 0       send rejected; errmsg carries the reason. Rate-limited
+                 sends: leave file in outbox, retry next round.
+  HTTP 5xx       media upload: retry x3; poll loop: backoff 1s->30s.
+
+
+--------------------------------------------------------------------------------
+limits
+--------------------------------------------------------------------------------
+
+  cannot: push without a fresh context_token; send quoted replies;
+  group chat; fetch social graph. one-to-one bind to the scanning account.
+  Tencent may throttle/block/terminate at will.
+
+
+--------------------------------------------------------------------------------
+open questions
+--------------------------------------------------------------------------------
+
+  [ ] typing flow on the live gateway (getconfig response, real ticket TTL)
+  [ ] context_token cleanup after session expiry
+  [ ] whether the 35s long-poll hold shifts across gateway versions
+
+================================================================================

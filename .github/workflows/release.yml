@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  # Fires when a release is created/published on GitHub (web UI or API),
+  # so the flow is: push commits -> create the release -> assets get uploaded.
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to upload assets to'
+        required: true
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # Build from the tag the release/dispatch points at, not the default branch
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.tag || github.event.release.tag_name }}
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Attest main.js provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: main.js
+
+      - name: Attest styles.css provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: styles.css
+
+      - name: Upload release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # versions.json lives at the repo root only (Obsidian reads it via raw URL);
+        # putting it in the release assets makes Obsidian flag the release as unsupported.
+        run: |
+          TAG="${{ inputs.tag || github.event.release.tag_name }}"
+          gh release upload "$TAG" main.js manifest.json styles.css --clobber
