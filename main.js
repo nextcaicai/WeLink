@@ -2282,7 +2282,8 @@ async function sourceHash(text) {
 }
 function noteTitle(body) {
   const first = body.split(/\r?\n/).find((line) => line.trim())?.trim() ?? "untitled";
-  return first.replace(/^#+\s*/, "").slice(0, 100) || "untitled";
+  const chars = Array.from(first);
+  return chars.length > 20 ? `${chars.slice(0, 20).join("")}\u2026` : first || "untitled";
 }
 function storedSourceHash(note) {
   const frontmatter = /^---\r?\n([\s\S]*?)\r?\n---/.exec(note)?.[1] ?? "";

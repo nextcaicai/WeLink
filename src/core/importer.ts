@@ -83,7 +83,8 @@ async function sourceHash(text: string): Promise<string> {
 
 function noteTitle(body: string): string {
   const first = body.split(/\r?\n/).find((line) => line.trim())?.trim() ?? 'untitled';
-  return first.replace(/^#+\s*/, '').slice(0, 100) || 'untitled';
+  const chars = Array.from(first);
+  return chars.length > 20 ? `${chars.slice(0, 20).join('')}…` : first || 'untitled';
 }
 
 function storedSourceHash(note: string): string {

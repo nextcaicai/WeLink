@@ -393,6 +393,18 @@ test('importMessage: marked plain text creates a separate note and daily link wi
   assert.ok(!daily.includes('#单独保存'));
 });
 
+test('importMessage: a long Unicode first line is truncated for the file title while the body stays complete', async () => {
+  const v = new FakeVault();
+  const firstLine = '😀'.repeat(21);
+  const expectedTitle = `${'😀'.repeat(20)}…`;
+  const r = await importMessage(v.app, new StubTransport(), MSG({ text: `#单独保存\n${firstLine}\n完整正文` }), IMPORT_OPTS);
+
+  assert.equal(r.singleNote!.title, expectedTitle);
+  assert.equal(Array.from(r.singleNote!.title).length, 21, '20 Unicode characters plus an ellipsis');
+  assert.equal(r.singleNote!.note, `WeLink/notes/2026-08-27 ${expectedTitle}.md`);
+  assert.ok(v.files.get(r.singleNote!.note)!.endsWith(`\n\n${firstLine}\n完整正文`), 'the note body is never truncated');
+});
+
 test('importMessage: same marked body reuses the note without overwriting user edits', async () => {
   const v = new FakeVault();
   const first = await importMessage(v.app, new StubTransport(), MSG({ text: '#单独保存\n一个想法' }), IMPORT_OPTS);
