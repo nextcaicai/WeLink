@@ -58,9 +58,10 @@ receiving
   HTTP 412 on getupdates = client rejection, not a message problem. Root cause
   discovered by replay: the gateway TLS-fingerprints the HTTP client — Node's
   http/https stack gets 412 on EVERY request (headers make no difference),
-  while the same body/headers through Obsidian's requestUrl (Chromium stack)
-  or fetch/undici get 200. All ilink + CDN traffic must therefore use
-  requestUrl; NodeTransport is only safe for third-party sites (articles).
+  while the same body/headers through fetch/undici get 200. WeLink now uses
+  bundled undici for ilink + CDN requests; requestUrl could leave the QR login
+  loading and the receive loop idle on this host. NodeTransport is only safe
+  for third-party sites (articles).
   Secondary use: if a STORED cursor ever 412s on a clean stack, an empty-
   cursor poll re-establishes the stream (verified live: 200 + fresh cursor +
   sync_buf), so clear the cursor and re-poll. 401/403 instead point at the

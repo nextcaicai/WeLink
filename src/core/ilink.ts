@@ -89,10 +89,7 @@ export class IlinkClient {
       });
   }
 
-  /**
-   * One long-poll round. Network timeouts are not treated as errors
-   * (normal for long polling) and return an empty result.
-   */
+  /** One long-poll round. A server reply with no messages is normal; a client timeout is a connection failure. */
   async poll(cursor: string): Promise<PollResult> {
     try {
       const resp = await this.post<GetUpdatesResult>(
@@ -103,6 +100,14 @@ export class IlinkClient {
 
       if (resp.errcode === ERRCODE_SESSION_EXPIRED) {
         return { messages: [], sessionExpired: true };
+      }
+      if ((typeof resp.ret === 'number' && resp.ret !== 0) ||
+          (typeof resp.errcode === 'number' && resp.errcode !== 0)) {
+        return {
+          messages: [],
+          sessionExpired: false,
+          error: `getupdates rejected (ret ${resp.ret ?? '?'}, errcode ${resp.errcode ?? '?'})`,
+        };
       }
       const messages: InboundMessage[] = [];
       for (const m of resp.msgs ?? []) {
@@ -116,7 +121,7 @@ export class IlinkClient {
       };
     } catch (e) {
       if (e instanceof HttpError && e.timeout) {
-        return { messages: [], sessionExpired: false };
+        return { messages: [], sessionExpired: false, error: 'getupdates request timeout' };
       }
       // 412: the gateway rejects the stored cursor outright, but the session
       // itself is fine — a fresh empty-cursor poll re-establishes the stream

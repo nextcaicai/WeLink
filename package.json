@@ -20,6 +20,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "silk-wasm": "^3.7.1"
+    "silk-wasm": "^3.7.1",
+    "undici": "^6.29.1"
   }
 }

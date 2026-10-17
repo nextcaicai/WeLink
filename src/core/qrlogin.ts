@@ -71,7 +71,13 @@ export async function loginLoop(
     return { qrKey: qr.qrcode, qrUrl: url };
   };
 
-  let cur = await fetchQr();
+  let cur: { qrKey: string; qrUrl: string };
+  try {
+    cur = await fetchQr();
+  } catch (e) {
+    cb.onError(t('qr.fetchFailed', { err: String((e as Error)?.message ?? e) }));
+    return null;
+  }
   let fetchedAt = Date.now();
   let refreshCount = 1;
   let scannedPrinted = false;

@@ -2,7 +2,7 @@
 import { normalizePath, Notice, Plugin, TFile } from 'obsidian';
 import { IlinkClient, type PollResult, sleep } from './core/ilink';
 import type { InboundMessage } from './core/types';
-import { ObsidianTransport } from './core/transport-obsidian';
+import { UndiciTransport } from './core/transport-undici';
 import { NodeTransport } from './core/transport-node';
 import { StateStore, type BotState } from './core/store';
 import { appendOutbound, ensureFolder, importMessage, quoteBlock, timeOfDay, type ImportResult } from './core/importer';
@@ -23,13 +23,10 @@ export default class WeLinkPlugin extends Plugin {
   settings: WeLinkSettings = DEFAULT_SETTINGS;
   store!: StateStore;
   private client: IlinkClient | null = null;
-  /** gateway + CDN traffic runs on requestUrl (Chromium's network stack).
-   * The ilink gateway rejects Node's http/https client at the TLS layer —
-   * every getupdates answers 412 no matter which headers we send, while the
-   * same request through requestUrl (or any Chromium/undici stack) passes.
-   * NodeTransport is kept for article fetches (mp.weixin.qq.com), where its
-   * real abort + idle timeout protects against slow-drip hosts. */
-  private transport = new ObsidianTransport();
+  /** The gateway accepts undici's fetch stack; Node's http/https stack gets 412.
+   * Unlike requestUrl, undici can abort a stalled request. Article fetching
+   * keeps NodeTransport's idle timeout for slow third-party hosts. */
+  private transport = new UndiciTransport();
   private articleTransport = new NodeTransport();
   private polling = false;
   private stopRequested = false;
@@ -169,7 +166,7 @@ export default class WeLinkPlugin extends Plugin {
   }
 
   /** HTTP transport layer (used for scanning in the settings page) */
-  getTransport(): ObsidianTransport {
+  getTransport(): UndiciTransport {
     return this.transport;
   }
 

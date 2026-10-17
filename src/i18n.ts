@@ -82,6 +82,7 @@ const en: Dict = {
   'outbox.failedNote': 'WeLink send failed: ret={{ret}} {{msg}}',
 
   'qr.missingInResponse': 'get_bot_qrcode response missing QR code: {{resp}}',
+  'qr.fetchFailed': 'Failed to fetch QR code: {{err}}',
   'qr.refreshFailed': 'Failed to refresh QR code: {{err}}',
   'qr.queryFailed': 'Failed to query scan status: {{err}}',
   'qr.expiredMultiple': 'QR code expired multiple times, please retry',
@@ -201,6 +202,7 @@ const zh: Dict = {
   'outbox.failedNote': 'WeLink 发送失败: ret={{ret}} {{msg}}',
 
   'qr.missingInResponse': 'get_bot_qrcode 响应缺少二维码: {{resp}}',
+  'qr.fetchFailed': '获取二维码失败: {{err}}',
   'qr.refreshFailed': '二维码刷新失败: {{err}}',
   'qr.queryFailed': '查询扫码状态失败: {{err}}',
   'qr.expiredMultiple': '二维码多次过期,请重试',
@@ -320,6 +322,7 @@ const tw: Dict = {
   'outbox.failedNote': 'WeLink 發送失敗: ret={{ret}} {{msg}}',
 
   'qr.missingInResponse': 'get_bot_qrcode 回應缺少二維碼: {{resp}}',
+  'qr.fetchFailed': '取得二維碼失敗: {{err}}',
   'qr.refreshFailed': '二維碼重新整理失敗: {{err}}',
   'qr.queryFailed': '查詢掃碼狀態失敗: {{err}}',
   'qr.expiredMultiple': '二維碼多次過期,請重試',

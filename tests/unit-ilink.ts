@@ -7,7 +7,8 @@ import { Buffer } from 'node:buffer';
 import { test } from 'node:test';
 import type { App } from 'obsidian';
 import type { HttpTransport, HttpResponse } from '../src/core/http';
-import { lowerHeaders, bodyTextAuto } from '../src/core/http';
+import { HttpError, lowerHeaders, bodyTextAuto } from '../src/core/http';
+import { loginLoop } from '../src/core/qrlogin';
 import { encryptEcb, decryptEcb } from '../src/core/crypto';
 import {
   IlinkClient,
@@ -85,6 +86,22 @@ const client = (tr: HttpTransport) =>
 
 const jsonBody = (r: { body?: string | ArrayBuffer }): Record<string, unknown> =>
   JSON.parse(Buffer.from(r.body as ArrayBuffer).toString('utf8'));
+
+test('loginLoop: initial QR failure is shown instead of leaving the loading state', async () => {
+  const tr: HttpTransport = {
+    get: async () => { throw new HttpError('request timeout', 0, true); },
+    post: async () => { throw new Error('unexpected POST'); },
+  };
+  let error = '';
+  const result = await loginLoop(tr, 'https://gw.example', {
+    onQr: () => { throw new Error('unexpected QR'); },
+    onScanned: () => {},
+    onError: (message) => { error = message; },
+    cancelled: () => false,
+  });
+  assert.equal(result, null);
+  assert.match(error, /request timeout/);
+});
 
 /* ------------------------------------------------------------ extractText */
 
@@ -195,6 +212,24 @@ test('poll: session expired errcode', async () => {
   const tr = new ScriptableTransport().on(/getupdates/, { body: JSON.stringify({ ret: -1, errcode: -14 }) });
   const r = await client(tr).poll('');
   assert.equal(r.sessionExpired, true);
+});
+
+test('poll: nonzero gateway ret is an error, not an online idle round', async () => {
+  const tr = new ScriptableTransport().on(/getupdates/, { body: JSON.stringify({ ret: -1, errcode: -20 }) });
+  const r = await client(tr).poll('cursor-1');
+  assert.equal(r.sessionExpired, false);
+  assert.match(r.error ?? '', /ret -1, errcode -20/);
+  assert.equal(r.cursor, undefined);
+});
+
+test('poll: client timeout is an error, not an online idle round', async () => {
+  const tr: HttpTransport = {
+    get: async () => { throw new Error('unexpected GET'); },
+    post: async () => { throw new HttpError('request timeout', 0, true); },
+  };
+  const r = await client(tr).poll('cursor-1');
+  assert.equal(r.sessionExpired, false);
+  assert.equal(r.error, 'getupdates request timeout');
 });
 
 test('poll: gateway http error surfaces as error string', async () => {

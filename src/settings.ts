@@ -220,7 +220,7 @@ export class WeLinkSettingTab extends PluginSettingTab {
               new Notice(t('sendTest.ok'));
             } else {
               // categorized reason + fix hint instead of a bare error string
-              new Notice(t('sendTest.failed', { err: buildSendFailure(res.errmsg, res.ret) }), 10000);
+              new Notice(t('sendTest.failed', { err: buildSendFailure(res.errmsg, res.ret, res.contextToken) }), 10000);
             }
           });
         });
