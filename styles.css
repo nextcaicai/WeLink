@@ -1,3 +1,38 @@
+/* Inline section markers keep every setting at the same level. */
+.welink-settings-section.setting-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 0;
+  margin-top: 20px;
+  padding: 8px 0 4px;
+  border: 0;
+  background: transparent;
+}
+
+.setting-item + .welink-settings-section.setting-item,
+.welink-settings-section.setting-item + .setting-item {
+  border-top: 0;
+}
+
+.welink-settings-section.setting-item:first-child {
+  margin-top: 0;
+}
+
+.welink-settings-section-label {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.welink-settings-section.setting-item::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--background-modifier-border);
+}
+
 /* The state is secondary to the normal-sized setting title. */
 .welink-bot-status {
   margin-inline-start: 8px;

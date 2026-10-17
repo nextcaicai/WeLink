@@ -81,6 +81,7 @@ export class WeLinkSettingTab extends PluginSettingTab {
 
   getSettingDefinitions(): SettingDefinitionItem[] {
     return [
+      this.sectionHeading('set.group.connection'),
       {
         name: t('set.autoConnect'),
         desc: t('set.autoConnect.desc'),
@@ -90,45 +91,16 @@ export class WeLinkSettingTab extends PluginSettingTab {
       ...(this.plugin.getState().token
         ? [{ name: t('sendTest.name'), render: (setting: Setting) => this.renderTestSetting(setting) } satisfies SettingDefinitionItem]
         : []),
+      this.sectionHeading('set.group.messages'),
       {
-        name: t('set.language'),
-        desc: t('set.language.desc'),
-        control: {
-          type: 'dropdown',
-          key: 'language',
-          defaultValue: DEFAULT_SETTINGS.language,
-          options: { system: t('set.language.system'), en: 'English', zh: '中文（简体）', tw: '中文（繁體）' },
-        },
-      },
-      {
-        name: t('set.inboxFolder'),
-        desc: t('set.inboxFolder.desc'),
-        control: { type: 'text', key: 'inboxFolder', defaultValue: DEFAULT_SETTINGS.inboxFolder },
-      },
-      {
-        name: t('set.attachmentFolder'),
-        desc: t('set.attachmentFolder.desc'),
-        control: { type: 'text', key: 'attachmentFolder', defaultValue: DEFAULT_SETTINGS.attachmentFolder },
-      },
-      {
-        name: t('set.articleFolder'),
-        desc: t('set.articleFolder.desc'),
-        control: { type: 'text', key: 'articleFolder', defaultValue: DEFAULT_SETTINGS.articleFolder },
-      },
-      {
-        name: t('set.outboxFolder'),
-        desc: t('set.outboxFolder.desc'),
-        control: { type: 'text', key: 'outboxFolder', defaultValue: DEFAULT_SETTINGS.outboxFolder },
+        name: t('set.autoImport'),
+        desc: t('set.autoImport.desc'),
+        control: { type: 'toggle', key: 'autoImport', defaultValue: DEFAULT_SETTINGS.autoImport },
       },
       {
         name: t('set.singleNoteMarker'),
         desc: t('set.singleNoteMarker.desc'),
         control: { type: 'text', key: 'singleNoteMarker', defaultValue: DEFAULT_SETTINGS.singleNoteMarker },
-      },
-      {
-        name: t('set.autoImport'),
-        desc: t('set.autoImport.desc'),
-        control: { type: 'toggle', key: 'autoImport', defaultValue: DEFAULT_SETTINGS.autoImport },
       },
       {
         name: t('set.fetchArticles'),
@@ -153,19 +125,60 @@ export class WeLinkSettingTab extends PluginSettingTab {
         desc: t('set.autoReply.desc'),
         control: { type: 'toggle', key: 'autoReply', defaultValue: DEFAULT_SETTINGS.autoReply },
       },
+      this.sectionHeading('set.group.files'),
       {
-        name: '',
-        searchable: false,
-        render: (setting) => {
-          setting.settingEl.createEl('p', { text: t('set.footer'), cls: 'setting-item-description' });
-        },
+        name: t('set.inboxFolder'),
+        desc: t('set.inboxFolder.desc'),
+        control: { type: 'text', key: 'inboxFolder', defaultValue: DEFAULT_SETTINGS.inboxFolder },
+      },
+      {
+        name: t('set.attachmentFolder'),
+        desc: t('set.attachmentFolder.desc'),
+        control: { type: 'text', key: 'attachmentFolder', defaultValue: DEFAULT_SETTINGS.attachmentFolder },
+      },
+      {
+        name: t('set.articleFolder'),
+        desc: t('set.articleFolder.desc'),
+        control: { type: 'text', key: 'articleFolder', defaultValue: DEFAULT_SETTINGS.articleFolder },
+      },
+      {
+        name: t('set.outboxFolder'),
+        desc: t('set.outboxFolder.desc'),
+        control: { type: 'text', key: 'outboxFolder', defaultValue: DEFAULT_SETTINGS.outboxFolder },
       },
       // Where agents learn the outbox protocol: a note file maintained inside the vault
       {
         name: t('set.agentGuide'),
         desc: t('set.agentGuide.desc', { path: `${this.plugin.settings.inboxFolder}/Agent.md` }),
       },
+      this.sectionHeading('set.group.general'),
+      {
+        name: t('set.language'),
+        desc: t('set.language.desc'),
+        control: {
+          type: 'dropdown',
+          key: 'language',
+          defaultValue: DEFAULT_SETTINGS.language,
+          options: { system: t('set.language.system'), en: 'English', zh: '中文（简体）', tw: '中文（繁體）' },
+        },
+      },
+      {
+        name: t('set.about'),
+        desc: t('set.footer'),
+      },
     ];
+  }
+
+  private sectionHeading(key: string): SettingDefinitionItem {
+    return {
+      name: t(key),
+      searchable: false,
+      render: (setting) => {
+        setting.settingEl.addClass('welink-settings-section');
+        setting.settingEl.empty();
+        setting.settingEl.createSpan({ cls: 'welink-settings-section-label', text: t(key) });
+      },
+    };
   }
 
   private renderBotSetting(setting: Setting): void {

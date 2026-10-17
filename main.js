@@ -20813,6 +20813,11 @@ var en = {
   "set.language": "Language",
   "set.language.desc": "Interface language for settings, commands, and notifications",
   "set.language.system": "Follow Obsidian",
+  "set.group.connection": "WeChat connection",
+  "set.group.messages": "Message capture and organization",
+  "set.group.files": "Files and sending",
+  "set.group.general": "General",
+  "set.about": "About",
   "set.wechatBot": "WeChat Bot",
   "set.wechatBot.desc": "Send messages from WeChat to Obsidian",
   "set.autoConnect": "Auto-connect on startup",
@@ -20837,7 +20842,7 @@ var en = {
   "set.notify": "Notify on message",
   "set.autoReply": "Always reply on receipt",
   "set.autoReply.desc": "After a message is recorded, send a confirmation reply back to WeChat \u2014 e.g. where an image or article was saved. May be rate-limited by the gateway if you receive many messages.",
-  "set.footer": "Note: this plugin talks to the WeChat ilink gateway directly; messages are stored only in this vault. Proactive sends are rate-limited by the gateway.",
+  "set.footer": "This plugin talks to the WeChat ilink gateway directly; messages are stored only in this vault. Proactive sends are rate-limited by the gateway.",
   "login.status": "Connection status",
   "login.connect": "Connect WeChat",
   "botState.unbound": "Not connected",
@@ -20935,6 +20940,11 @@ var zh = {
   "set.language": "\u8BED\u8A00",
   "set.language.desc": "\u8BBE\u7F6E\u9875\u3001\u547D\u4EE4\u4E0E\u901A\u77E5\u7684\u754C\u9762\u8BED\u8A00",
   "set.language.system": "\u8DDF\u968F Obsidian",
+  "set.group.connection": "\u5FAE\u4FE1\u8FDE\u63A5",
+  "set.group.messages": "\u6D88\u606F\u63A5\u6536\u4E0E\u6574\u7406",
+  "set.group.files": "\u6587\u4EF6\u5B58\u653E\u4E0E\u53D1\u9001",
+  "set.group.general": "\u901A\u7528",
+  "set.about": "\u8BF4\u660E",
   "set.wechatBot": "\u5FAE\u4FE1Bot",
   "set.wechatBot.desc": "\u901A\u8FC7\u5FAE\u4FE1\u5411 Obsidian \u53D1\u9001\u6D88\u606F",
   "set.autoConnect": "\u542F\u52A8\u65F6\u81EA\u52A8\u8FDE\u63A5",
@@ -20959,7 +20969,7 @@ var zh = {
   "set.notify": "\u6765\u6D88\u606F\u65F6\u901A\u77E5",
   "set.autoReply": "\u603B\u662F\u56DE\u590D",
   "set.autoReply.desc": "\u6D88\u606F\u8BB0\u5F55\u5165\u5E93\u540E\uFF0C\u81EA\u52A8\u56DE\u590D\u4E00\u6761\u786E\u8BA4\u6D88\u606F\uFF08\u5982\u56FE\u7247\u3001\u6587\u7AE0\u7684\u4FDD\u5B58\u4F4D\u7F6E\uFF09\u3002\u6D88\u606F\u8F83\u591A\u65F6\u53EF\u80FD\u89E6\u53D1\u7F51\u5173\u9650\u6D41\u3002",
-  "set.footer": "\u8BF4\u660E\uFF1A\u672C\u63D2\u4EF6\u76F4\u63A5\u4E0E\u5FAE\u4FE1 ilink \u7F51\u5173\u901A\u4FE1\uFF0C\u6D88\u606F\u4EC5\u4FDD\u5B58\u5728\u672C vault\u3002\u4E3B\u52A8\u53D1\u9001\u53D7\u7F51\u5173\u9650\u6D41\u3002",
+  "set.footer": "\u672C\u63D2\u4EF6\u76F4\u63A5\u4E0E\u5FAE\u4FE1 ilink \u7F51\u5173\u901A\u4FE1\uFF0C\u6D88\u606F\u4EC5\u4FDD\u5B58\u5728\u672C vault\u3002\u4E3B\u52A8\u53D1\u9001\u53D7\u7F51\u5173\u9650\u6D41\u3002",
   "login.status": "\u8FDE\u63A5\u72B6\u6001",
   "login.connect": "\u8FDE\u63A5\u5FAE\u4FE1",
   "botState.unbound": "\u672A\u8FDE\u63A5",
@@ -21057,6 +21067,11 @@ var tw = {
   "set.language": "\u8A9E\u8A00",
   "set.language.desc": "\u8A2D\u5B9A\u9801\u3001\u6307\u4EE4\u8207\u901A\u77E5\u7684\u4ECB\u9762\u8A9E\u8A00",
   "set.language.system": "\u8DDF\u96A8 Obsidian",
+  "set.group.connection": "\u5FAE\u4FE1\u9023\u63A5",
+  "set.group.messages": "\u8A0A\u606F\u63A5\u6536\u8207\u6574\u7406",
+  "set.group.files": "\u6A94\u6848\u5B58\u653E\u8207\u767C\u9001",
+  "set.group.general": "\u901A\u7528",
+  "set.about": "\u8AAA\u660E",
   "set.wechatBot": "\u5FAE\u4FE1Bot",
   "set.wechatBot.desc": "\u900F\u904E\u5FAE\u4FE1\u5411 Obsidian \u50B3\u9001\u8A0A\u606F",
   "set.autoConnect": "\u555F\u52D5\u6642\u81EA\u52D5\u9023\u63A5",
@@ -21081,7 +21096,7 @@ var tw = {
   "set.notify": "\u4F86\u8A0A\u606F\u6642\u901A\u77E5",
   "set.autoReply": "\u7E3D\u662F\u56DE\u8986",
   "set.autoReply.desc": "\u8A0A\u606F\u8A18\u9304\u5165\u5EAB\u5F8C\uFF0C\u81EA\u52D5\u56DE\u8986\u4E00\u689D\u78BA\u8A8D\u8A0A\u606F\uFF08\u5982\u5716\u7247\u3001\u6587\u7AE0\u7684\u5132\u5B58\u4F4D\u7F6E\uFF09\u3002\u8A0A\u606F\u8F03\u591A\u6642\u53EF\u80FD\u89F8\u767C\u9598\u9053\u5668\u9650\u6D41\u3002",
-  "set.footer": "\u8AAA\u660E\uFF1A\u672C\u5916\u639B\u76F4\u63A5\u8207\u5FAE\u4FE1 ilink \u9598\u9053\u5668\u901A\u8A0A\uFF0C\u8A0A\u606F\u50C5\u5132\u5B58\u5728\u672C vault\u3002\u4E3B\u52D5\u767C\u9001\u53D7\u9598\u9053\u5668\u9650\u6D41\u3002",
+  "set.footer": "\u672C\u5916\u639B\u76F4\u63A5\u8207\u5FAE\u4FE1 ilink \u9598\u9053\u5668\u901A\u8A0A\uFF0C\u8A0A\u606F\u50C5\u5132\u5B58\u5728\u672C vault\u3002\u4E3B\u52D5\u767C\u9001\u53D7\u9598\u9053\u5668\u9650\u6D41\u3002",
   "login.status": "\u9023\u63A5\u72C0\u614B",
   "login.connect": "\u9023\u63A5\u5FAE\u4FE1",
   "botState.unbound": "\u672A\u9023\u63A5",
@@ -21651,6 +21666,7 @@ var WeLinkSettingTab = class extends import_obsidian3.PluginSettingTab {
   }
   getSettingDefinitions() {
     return [
+      this.sectionHeading("set.group.connection"),
       {
         name: t("set.autoConnect"),
         desc: t("set.autoConnect.desc"),
@@ -21658,45 +21674,16 @@ var WeLinkSettingTab = class extends import_obsidian3.PluginSettingTab {
       },
       { name: t("set.wechatBot"), render: (setting) => this.renderBotSetting(setting) },
       ...this.plugin.getState().token ? [{ name: t("sendTest.name"), render: (setting) => this.renderTestSetting(setting) }] : [],
+      this.sectionHeading("set.group.messages"),
       {
-        name: t("set.language"),
-        desc: t("set.language.desc"),
-        control: {
-          type: "dropdown",
-          key: "language",
-          defaultValue: DEFAULT_SETTINGS.language,
-          options: { system: t("set.language.system"), en: "English", zh: "\u4E2D\u6587\uFF08\u7B80\u4F53\uFF09", tw: "\u4E2D\u6587\uFF08\u7E41\u9AD4\uFF09" }
-        }
-      },
-      {
-        name: t("set.inboxFolder"),
-        desc: t("set.inboxFolder.desc"),
-        control: { type: "text", key: "inboxFolder", defaultValue: DEFAULT_SETTINGS.inboxFolder }
-      },
-      {
-        name: t("set.attachmentFolder"),
-        desc: t("set.attachmentFolder.desc"),
-        control: { type: "text", key: "attachmentFolder", defaultValue: DEFAULT_SETTINGS.attachmentFolder }
-      },
-      {
-        name: t("set.articleFolder"),
-        desc: t("set.articleFolder.desc"),
-        control: { type: "text", key: "articleFolder", defaultValue: DEFAULT_SETTINGS.articleFolder }
-      },
-      {
-        name: t("set.outboxFolder"),
-        desc: t("set.outboxFolder.desc"),
-        control: { type: "text", key: "outboxFolder", defaultValue: DEFAULT_SETTINGS.outboxFolder }
+        name: t("set.autoImport"),
+        desc: t("set.autoImport.desc"),
+        control: { type: "toggle", key: "autoImport", defaultValue: DEFAULT_SETTINGS.autoImport }
       },
       {
         name: t("set.singleNoteMarker"),
         desc: t("set.singleNoteMarker.desc"),
         control: { type: "text", key: "singleNoteMarker", defaultValue: DEFAULT_SETTINGS.singleNoteMarker }
-      },
-      {
-        name: t("set.autoImport"),
-        desc: t("set.autoImport.desc"),
-        control: { type: "toggle", key: "autoImport", defaultValue: DEFAULT_SETTINGS.autoImport }
       },
       {
         name: t("set.fetchArticles"),
@@ -21721,19 +21708,59 @@ var WeLinkSettingTab = class extends import_obsidian3.PluginSettingTab {
         desc: t("set.autoReply.desc"),
         control: { type: "toggle", key: "autoReply", defaultValue: DEFAULT_SETTINGS.autoReply }
       },
+      this.sectionHeading("set.group.files"),
       {
-        name: "",
-        searchable: false,
-        render: (setting) => {
-          setting.settingEl.createEl("p", { text: t("set.footer"), cls: "setting-item-description" });
-        }
+        name: t("set.inboxFolder"),
+        desc: t("set.inboxFolder.desc"),
+        control: { type: "text", key: "inboxFolder", defaultValue: DEFAULT_SETTINGS.inboxFolder }
+      },
+      {
+        name: t("set.attachmentFolder"),
+        desc: t("set.attachmentFolder.desc"),
+        control: { type: "text", key: "attachmentFolder", defaultValue: DEFAULT_SETTINGS.attachmentFolder }
+      },
+      {
+        name: t("set.articleFolder"),
+        desc: t("set.articleFolder.desc"),
+        control: { type: "text", key: "articleFolder", defaultValue: DEFAULT_SETTINGS.articleFolder }
+      },
+      {
+        name: t("set.outboxFolder"),
+        desc: t("set.outboxFolder.desc"),
+        control: { type: "text", key: "outboxFolder", defaultValue: DEFAULT_SETTINGS.outboxFolder }
       },
       // Where agents learn the outbox protocol: a note file maintained inside the vault
       {
         name: t("set.agentGuide"),
         desc: t("set.agentGuide.desc", { path: `${this.plugin.settings.inboxFolder}/Agent.md` })
+      },
+      this.sectionHeading("set.group.general"),
+      {
+        name: t("set.language"),
+        desc: t("set.language.desc"),
+        control: {
+          type: "dropdown",
+          key: "language",
+          defaultValue: DEFAULT_SETTINGS.language,
+          options: { system: t("set.language.system"), en: "English", zh: "\u4E2D\u6587\uFF08\u7B80\u4F53\uFF09", tw: "\u4E2D\u6587\uFF08\u7E41\u9AD4\uFF09" }
+        }
+      },
+      {
+        name: t("set.about"),
+        desc: t("set.footer")
       }
     ];
+  }
+  sectionHeading(key) {
+    return {
+      name: t(key),
+      searchable: false,
+      render: (setting) => {
+        setting.settingEl.addClass("welink-settings-section");
+        setting.settingEl.empty();
+        setting.settingEl.createSpan({ cls: "welink-settings-section-label", text: t(key) });
+      }
+    };
   }
   renderBotSetting(setting) {
     setting.setName(t("set.wechatBot")).setDesc(t("set.wechatBot.desc"));
