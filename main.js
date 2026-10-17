@@ -21760,6 +21760,8 @@ var WeLinkSettingTab = class extends import_obsidian3.PluginSettingTab {
           } else {
             new import_obsidian3.Notice(t("sendTest.failed", { err: buildSendFailure(result.errmsg, result.ret, result.contextToken) }), 1e4);
           }
+        } catch (error) {
+          new import_obsidian3.Notice(t("sendTest.failed", { err: String(error?.message ?? error) }), 1e4);
         } finally {
           button.setDisabled(false);
         }
@@ -22504,6 +22506,7 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
   articleTransport = new NodeTransport();
   polling = false;
   stopRequested = false;
+  pollGeneration = 0;
   connState = "disconnected";
   connectionListeners = /* @__PURE__ */ new Set();
   statusBar = null;
@@ -22602,10 +22605,12 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
     this.statusBar.setAttribute("aria-label", this.store.get().lastError || "");
   }
   setConn(s) {
-    if (this.connState === s) return;
+    const changed = this.connState !== s;
     this.connState = s;
     this.renderStatus();
-    for (const listener of this.connectionListeners) listener();
+    if (changed) {
+      for (const listener of this.connectionListeners) listener();
+    }
   }
   /** Keep the settings status in sync with the polling state. */
   onConnectionStateChange(listener) {
@@ -22634,6 +22639,7 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
   }
   /** Persist the scan-login result and start polling */
   applyLogin(out) {
+    if (this.polling) this.disconnect();
     this.store.update((st) => {
       st.token = out.token;
       st.botId = out.botId;
@@ -22687,6 +22693,7 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
     this.stopAllTyping().catch(() => {
     });
     this.stopRequested = true;
+    this.pollGeneration++;
     this.polling = false;
     this.client = null;
     this.setConn("disconnected");
@@ -22723,6 +22730,7 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
   /** Main long-poll loop */
   async startPollLoop() {
     if (this.polling) return;
+    const generation = ++this.pollGeneration;
     this.polling = true;
     this.stopRequested = false;
     this.client = this.makeClient();
@@ -22730,7 +22738,7 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
     let backoff = 1e3;
     let resetStreak = 0;
     let typingFor = "";
-    while (this.polling && !this.stopRequested) {
+    while (this.polling && !this.stopRequested && generation === this.pollGeneration) {
       const store = this.store;
       if (!store) break;
       const st = store.get();
@@ -22740,6 +22748,7 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
         continue;
       }
       const result = await this.client.poll(st.cursor);
+      if (generation !== this.pollGeneration || this.stopRequested) break;
       if (result.sessionExpired) {
         store.update((s) => {
           if (s.pausedUntil <= Date.now()) {
@@ -22784,17 +22793,21 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
       }
       const receipts = [];
       for (const msg of result.messages) {
+        if (generation !== this.pollGeneration || this.stopRequested) break;
         receipts.push(...await this.handleInbound(msg));
         typingFor = msg.from;
       }
+      if (generation !== this.pollGeneration || this.stopRequested) break;
       if (typingFor) {
         const tFor = typingFor;
         typingFor = "";
         await this.stopTypingFor(tFor);
       }
+      if (generation !== this.pollGeneration || this.stopRequested) break;
       if (receipts.length) {
         await this.sendReceiptReplies(receipts);
       }
+      if (generation !== this.pollGeneration || this.stopRequested) break;
       try {
         await this.outbox?.flush(
           this.client,
@@ -22807,7 +22820,7 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
       }
       void store.saveNow();
     }
-    this.polling = false;
+    if (generation === this.pollGeneration) this.polling = false;
   }
   /** Handle a single inbound message; returns a receipt entry when one should be sent */
   async handleInbound(msg) {

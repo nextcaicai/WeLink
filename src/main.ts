@@ -30,6 +30,7 @@ export default class WeLinkPlugin extends Plugin {
   private articleTransport = new NodeTransport();
   private polling = false;
   private stopRequested = false;
+  private pollGeneration = 0;
   private connState: ConnState = 'disconnected';
   private connectionListeners = new Set<() => void>();
   private statusBar: HTMLElement | null = null;
@@ -188,6 +189,9 @@ export default class WeLinkPlugin extends Plugin {
 
   /** Persist the scan-login result and start polling */
   applyLogin(out: LoginOutcome): void {
+    // Re-scanning can replace an active token. Retire its poll loop before
+    // creating a client with the new credentials.
+    if (this.polling) this.disconnect();
     this.store.update((st) => {
       st.token = out.token;
       st.botId = out.botId;
@@ -246,6 +250,7 @@ export default class WeLinkPlugin extends Plugin {
     // best-effort: don't leave the "typing" indicator lit after disconnect
     this.stopAllTyping().catch(() => {});
     this.stopRequested = true;
+    this.pollGeneration++;
     this.polling = false;
     this.client = null;
     this.setConn('disconnected');
@@ -285,6 +290,7 @@ export default class WeLinkPlugin extends Plugin {
   /** Main long-poll loop */
   private async startPollLoop(): Promise<void> {
     if (this.polling) return;
+    const generation = ++this.pollGeneration;
     this.polling = true;
     this.stopRequested = false;
     this.client = this.makeClient();
@@ -296,7 +302,7 @@ export default class WeLinkPlugin extends Plugin {
     let resetStreak = 0;
     // user we currently show "typing" for; cleared once the round finishes processing
     let typingFor = '';
-    while (this.polling && !this.stopRequested) {
+    while (this.polling && !this.stopRequested && generation === this.pollGeneration) {
       const store = this.store;
       if (!store) break;
       const st = store.get();
@@ -308,6 +314,7 @@ export default class WeLinkPlugin extends Plugin {
       }
 
       const result: PollResult = await this.client.poll(st.cursor);
+      if (generation !== this.pollGeneration || this.stopRequested) break;
 
       if (result.sessionExpired) {
         // state changes once, on the transition: without the guard every
@@ -366,9 +373,11 @@ export default class WeLinkPlugin extends Plugin {
 
       const receipts: ReceiptReplyInput[] = [];
       for (const msg of result.messages) {
+        if (generation !== this.pollGeneration || this.stopRequested) break;
         receipts.push(...(await this.handleInbound(msg)));
         typingFor = msg.from; // showTyping fired in handleInbound; remember who
       }
+      if (generation !== this.pollGeneration || this.stopRequested) break;
       // processing finished: hide "typing" before any outbound send (even when
       // no receipt goes out), best-effort
       if (typingFor) {
@@ -376,10 +385,12 @@ export default class WeLinkPlugin extends Plugin {
         typingFor = '';
         await this.stopTypingFor(tFor);
       }
+      if (generation !== this.pollGeneration || this.stopRequested) break;
       // one batched receipt reply per polling round, not one per message
       if (receipts.length) {
         await this.sendReceiptReplies(receipts);
       }
+      if (generation !== this.pollGeneration || this.stopRequested) break;
 
       // Consume the outbox (pending-send files written by agents)
       try {
@@ -396,7 +407,7 @@ export default class WeLinkPlugin extends Plugin {
 
       void store.saveNow();
     }
-    this.polling = false;
+    if (generation === this.pollGeneration) this.polling = false;
   }
 
   /** Handle a single inbound message; returns a receipt entry when one should be sent */

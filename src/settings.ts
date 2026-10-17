@@ -231,6 +231,8 @@ export class WeLinkSettingTab extends PluginSettingTab {
             } else {
               new Notice(t('sendTest.failed', { err: buildSendFailure(result.errmsg, result.ret, result.contextToken) }), 10000);
             }
+          } catch (error) {
+            new Notice(t('sendTest.failed', { err: String((error as Error)?.message ?? error) }), 10000);
           } finally {
             button.setDisabled(false);
           }
