@@ -1,6 +1,6 @@
 # WeLink
 
-[Obsidian](https://obsidian.md) 桌面插件。通过腾讯官方 **ilink** 机器人网关收发消息，不改装微信客户端，不需要关注任何服务号或小程序，也不经过作者的个人服务器。安全、稳定。
+Obsidian 桌面端插件。通过腾讯官方 **ilink** 机器人网关收发消息，不改装微信客户端，不需要关注任何服务号或小程序，也不经过作者的个人服务器。安全、稳定。
 
 你只需要扫码绑定自己常用的微信账号，就可以把「发到微信 Clawbot 的文字、图片、语音、文件、公众号文章链接」收进Obsidian 知识库。
 
@@ -48,7 +48,7 @@
 
 **方法二：从 Releases 安装**
 
-1. 打开本仓库的 Releases，下载 `main.js`、`manifest.json`、`styles.css`。
+1. 打开本仓库的 [Releases](https://github.com/nextcaicai/WeLink/releases/)，下载 `main.js`、`manifest.json`、`styles.css`。
 2. 放到 `<你的库>/.obsidian/plugins/welink/`（三个文件直接在这个文件夹里，不要多套一层目录）。
 3. Obsidian → 设置 → 第三方插件 → 关闭安全模式 → 刷新 → 启用 **WeLink**。
 4. 改完文件后重新加载插件，或重启 Obsidian。
@@ -70,7 +70,6 @@ OBSIDIAN_PLUGIN_DIR=/path/to/vault/.obsidian/plugins/welink npm run build
 
 未设置 `OBSIDIAN_PLUGIN_DIR` 时，构建只生成仓库根目录的 `main.js`，不会写入任何 vault。
 
-不要用主力知识库测试未信任或正在开发的插件。源码安装只会写入上面的插件目录，不会改你的笔记内容。
 
 ## 快速上手
 
@@ -81,7 +80,6 @@ OBSIDIAN_PLUGIN_DIR=/path/to/vault/.obsidian/plugins/welink npm run build
 3. **先从微信给这个机器人发任意一条消息**（例如「你好」）。网关只在绑定账号发过消息后，才下发发送凭证；跳过这一步，测试发送会失败。
 4. 回到设置页，在「测试连通性」里点 **发送**。手机收到测试消息，说明双向通道已经通了。
 
-命令面板里还有：`连接微信`、`断开微信`、`重新扫码登录`、`打开今日收件箱`。
 
 ## 使用
 
