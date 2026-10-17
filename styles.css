@@ -24,6 +24,7 @@
 .welink-qr-modal {
   width: min(320px, calc(100vw - 32px));
   max-width: 320px;
+  border-radius: 10px;
 }
 
 .welink-qr-modal .modal-content {
