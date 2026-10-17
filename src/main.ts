@@ -24,8 +24,8 @@ export default class WeLinkPlugin extends Plugin {
   store!: StateStore;
   private client: IlinkClient | null = null;
   /** The gateway accepts undici's fetch stack; Node's http/https stack gets 412.
-   * Unlike requestUrl, undici can abort a stalled request. Article fetching
-   * keeps NodeTransport's idle timeout for slow third-party hosts. */
+   * CDN downloads use NodeTransport: the live voice CDN response hangs in
+   * undici but completes through Node's https stack. */
   private transport = new UndiciTransport();
   private articleTransport = new NodeTransport();
   private polling = false;
@@ -78,6 +78,7 @@ export default class WeLinkPlugin extends Plugin {
 
   onunload(): void {
     this.disconnect();
+    this.transport.shutdown();
   }
 
   async loadSettings(): Promise<void> {
@@ -284,6 +285,7 @@ export default class WeLinkPlugin extends Plugin {
         cdnBase: CDN_BASE,
       },
       st.token,
+      this.articleTransport,
     );
   }
 

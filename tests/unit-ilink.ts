@@ -349,6 +349,61 @@ test('poll: voice with an ASR transcript keeps both the text and the audio', asy
   assert.ok(att.name.endsWith('.wav'), 'audio still downloaded and transcoded');
 });
 
+test('poll: voice uses the gateway full URL and a separate CDN download transport', async () => {
+  const key = Buffer.from('0123456789abcdef');
+  const cipher = encryptEcb(await silkFixture(), key);
+  const gateway = new ScriptableTransport().on(/getupdates/, {
+    body: JSON.stringify({
+      ret: 0,
+      msgs: [{
+        message_type: MSG_TYPE_USER,
+        from_user_id: 'alice',
+        message_id: 12,
+        item_list: [{
+          type: ITEM_VOICE,
+          voice_item: {
+            text: 'gateway transcript',
+            media: {
+              encrypt_query_param: 'enc-param',
+              full_url: 'https://cdn.example/c2c/download?encrypted_query_param=enc-param&taskid=one',
+              aes_key: key.toString('base64'),
+            },
+          },
+        }],
+      }],
+    }),
+  });
+  const cdn = new ScriptableTransport().on(/cdn\.example\/c2c\/download/, { body: cipher });
+  const r = await new IlinkClient(gateway, { baseUrl: 'https://gw.example', cdnBase: 'https://cdn.example' }, 'bot', cdn).poll('');
+  assert.equal(r.messages[0].text, 'gateway transcript');
+  assert.ok(r.messages[0].attachments[0].name.endsWith('.wav'));
+  assert.equal(gateway.requests.length, 1, 'gateway transport handles only getupdates');
+  assert.equal(cdn.requests[0].url, 'https://cdn.example/c2c/download?encrypted_query_param=enc-param&taskid=one');
+});
+
+test('poll: voice rejects a full URL outside the configured CDN origin', async () => {
+  const gateway = new ScriptableTransport().on(/getupdates/, {
+    body: JSON.stringify({
+      ret: 0,
+      msgs: [{
+        message_type: MSG_TYPE_USER,
+        from_user_id: 'alice',
+        message_id: 13,
+        item_list: [{ type: ITEM_VOICE, voice_item: {
+          text: 'gateway transcript',
+          media: { full_url: 'https://other.example/download' },
+        } }],
+      }],
+    }),
+  });
+  const cdn = new ScriptableTransport();
+  const r = await new IlinkClient(gateway, { baseUrl: 'https://gw.example', cdnBase: 'https://cdn.example' }, 'bot', cdn).poll('');
+  assert.equal(r.messages[0].text, 'gateway transcript');
+  assert.equal(r.messages[0].attachments.length, 0);
+  assert.equal(r.messages[0].attachmentFailures[0].reason, 'unexpected media URL origin');
+  assert.equal(cdn.requests.length, 0);
+});
+
 test('poll: non-silk voice bytes are kept raw instead of failing the import', async () => {
   const key = Buffer.from('0123456789abcdef');
   const plain = Buffer.from('#!AMR\nfake-amr-frame');

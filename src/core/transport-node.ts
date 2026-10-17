@@ -7,8 +7,8 @@
  * Redirects are followed manually.
  *
  * NEVER point this at the ilink gateway: it TLS-fingerprints clients and 412s
- * every request from Node's http/https stack (undici passes). Gateway + CDN
- * traffic stays on UndiciTransport; this one is for article fetches only.
+ * every request from Node's http/https stack (undici passes). CDN downloads
+ * and article fetches use this transport.
  */
 import * as http from 'http';
 import * as https from 'https';

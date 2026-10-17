@@ -62,6 +62,7 @@ export class IlinkClient {
     private transport: HttpTransport,
     private opts: IlinkClientOptions,
     private token: string,
+    private downloadTransport: HttpTransport = transport,
   ) {}
 
   private get channelVersion(): string {
@@ -179,11 +180,25 @@ export class IlinkClient {
       mime: string,
     ) => {
       const enc = (media?.encrypt_query_param ?? '').trim();
-      if (!enc) return;
+      const fullUrl = (media?.full_url ?? '').trim();
+      if (!enc && !fullUrl) return;
       const key = aesKeyB64 ? parseAesKey(aesKeyB64) : null;
-      const url = downloadUrl(cdnBase, enc);
+      let url = downloadUrl(cdnBase, enc);
+      if (fullUrl) {
+        try {
+          const direct = new URL(fullUrl);
+          if (direct.protocol !== 'https:' || direct.origin !== new URL(cdnBase).origin) {
+            failures.push({ kind, name, reason: 'unexpected media URL origin' });
+            return;
+          }
+          url = direct.toString();
+        } catch {
+          failures.push({ kind, name, reason: 'invalid media URL' });
+          return;
+        }
+      }
       tasks.push(
-        this.transport
+        this.downloadTransport
           .get(url, {}, 60_000)
           .then(async (r) => {
             if (r.status !== 200) {

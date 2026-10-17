@@ -2,6 +2,7 @@
 
 export interface IlinkMedia {
   encrypt_query_param?: string;
+  full_url?: string;
   aes_key?: string;
   encrypt_type?: number;
 }

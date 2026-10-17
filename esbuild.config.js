@@ -16,6 +16,12 @@ async function build() {
     target: 'es2022',
     platform: 'browser',
     outfile: 'main.js',
+    // Obsidian runs the bundle in an Electron renderer. Undici needs Node's
+    // Timeout.unref() and performance.markResourceTiming(), while the renderer
+    // globals expose browser timers/performance without those methods.
+    banner: {
+      js: "const { setTimeout, clearTimeout, setInterval, clearInterval } = require('node:timers'); const { performance } = require('node:perf_hooks');",
+    },
     sourcemap: false,
     logLevel: 'info',
   };

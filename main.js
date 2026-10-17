@@ -1,3 +1,4 @@
+const { setTimeout, clearTimeout, setInterval, clearInterval } = require('node:timers'); const { performance } = require('node:perf_hooks');
 "use strict";
 var __create = Object.create;
 var __defProp = Object.defineProperty;
@@ -8376,7 +8377,7 @@ var require_agent = __commonJS({
     function defaultFactory(origin, opts) {
       return opts && opts.connections === 1 ? new Client(origin, opts) : new Pool(origin, opts);
     }
-    var Agent = class extends DispatcherBase {
+    var Agent2 = class extends DispatcherBase {
       constructor({ factory = defaultFactory, maxRedirections = 0, connect, tls, ...options } = {}) {
         if (typeof factory !== "function") {
           throw new InvalidArgumentError("factory must be a function.");
@@ -8451,7 +8452,7 @@ var require_agent = __commonJS({
         await Promise.all(destroyPromises);
       }
     };
-    module2.exports = Agent;
+    module2.exports = Agent2;
   }
 });
 
@@ -8461,7 +8462,7 @@ var require_proxy_agent = __commonJS({
     "use strict";
     var { kProxy, kClose, kDestroy, kDispatch, kInterceptors } = require_symbols();
     var { URL: URL2 } = require("node:url");
-    var Agent = require_agent();
+    var Agent2 = require_agent();
     var Pool = require_pool();
     var DispatcherBase = require_dispatcher_base();
     var { InvalidArgumentError, RequestAbortedError, SecureProxyConnectionError } = require_errors();
@@ -8576,7 +8577,7 @@ var require_proxy_agent = __commonJS({
           return agentFactory(origin2, options);
         };
         this[kClient] = clientFactory(url, { connect });
-        this[kAgent] = new Agent({
+        this[kAgent] = new Agent2({
           ...opts,
           factory,
           connect: async (opts2, callback) => {
@@ -8685,7 +8686,7 @@ var require_env_http_proxy_agent = __commonJS({
     var DispatcherBase = require_dispatcher_base();
     var { kClose, kDestroy, kClosed, kDestroyed, kDispatch, kNoProxyAgent, kHttpProxyAgent, kHttpsProxyAgent } = require_symbols();
     var ProxyAgent = require_proxy_agent();
-    var Agent = require_agent();
+    var Agent2 = require_agent();
     var DEFAULT_PORTS = {
       "http:": 80,
       "https:": 443
@@ -8705,7 +8706,7 @@ var require_env_http_proxy_agent = __commonJS({
           });
         }
         const { httpProxy, httpsProxy, noProxy, ...agentOpts } = opts;
-        this[kNoProxyAgent] = new Agent(agentOpts);
+        this[kNoProxyAgent] = new Agent2(agentOpts);
         const HTTP_PROXY = httpProxy ?? process.env.http_proxy ?? process.env.HTTP_PROXY;
         if (HTTP_PROXY) {
           this[kHttpProxyAgent] = new ProxyAgent({ ...agentOpts, uri: HTTP_PROXY });
@@ -11050,7 +11051,7 @@ var require_mock_agent = __commonJS({
   "node_modules/undici/lib/mock/mock-agent.js"(exports, module2) {
     "use strict";
     var { kClients } = require_symbols();
-    var Agent = require_agent();
+    var Agent2 = require_agent();
     var {
       kAgent,
       kMockAgentSet,
@@ -11077,7 +11078,7 @@ var require_mock_agent = __commonJS({
         if (opts?.agent && typeof opts.agent.dispatch !== "function") {
           throw new InvalidArgumentError("Argument opts.agent must implement Agent");
         }
-        const agent = opts?.agent ? opts.agent : new Agent(opts);
+        const agent = opts?.agent ? opts.agent : new Agent2(opts);
         this[kAgent] = agent;
         this[kClients] = agent[kClients];
         this[kOptions] = buildMockOptions(opts);
@@ -11181,9 +11182,9 @@ var require_global2 = __commonJS({
     "use strict";
     var globalDispatcher = Symbol.for("undici.globalDispatcher.1");
     var { InvalidArgumentError } = require_errors();
-    var Agent = require_agent();
+    var Agent2 = require_agent();
     if (getGlobalDispatcher() === void 0) {
-      setGlobalDispatcher(new Agent());
+      setGlobalDispatcher(new Agent2());
     }
     function setGlobalDispatcher(agent) {
       if (!agent || typeof agent.dispatch !== "function") {
@@ -18773,7 +18774,7 @@ var require_undici = __commonJS({
     var Dispatcher = require_dispatcher();
     var Pool = require_pool();
     var BalancedPool = require_balanced_pool();
-    var Agent = require_agent();
+    var Agent2 = require_agent();
     var ProxyAgent = require_proxy_agent();
     var EnvHttpProxyAgent = require_env_http_proxy_agent();
     var RetryAgent = require_retry_agent();
@@ -18796,7 +18797,7 @@ var require_undici = __commonJS({
     module2.exports.Client = Client;
     module2.exports.Pool = Pool;
     module2.exports.BalancedPool = BalancedPool;
-    module2.exports.Agent = Agent;
+    module2.exports.Agent = Agent2;
     module2.exports.ProxyAgent = ProxyAgent;
     module2.exports.EnvHttpProxyAgent = EnvHttpProxyAgent;
     module2.exports.RetryAgent = RetryAgent;
@@ -19829,10 +19830,11 @@ var UPLOAD_MEDIA_FILE = 3;
 
 // src/core/ilink.ts
 var IlinkClient = class {
-  constructor(transport, opts, token) {
+  constructor(transport, opts, token, downloadTransport = transport) {
     this.transport = transport;
     this.opts = opts;
     this.token = token;
+    this.downloadTransport = downloadTransport;
   }
   get channelVersion() {
     return this.opts.channelVersion ?? "welink-weixin/1.0";
@@ -19923,11 +19925,25 @@ var IlinkClient = class {
     const tasks = [];
     const grab = (media, aesKeyB64, kind, name, mime) => {
       const enc = (media?.encrypt_query_param ?? "").trim();
-      if (!enc) return;
+      const fullUrl = (media?.full_url ?? "").trim();
+      if (!enc && !fullUrl) return;
       const key = aesKeyB64 ? parseAesKey(aesKeyB64) : null;
-      const url = downloadUrl(cdnBase, enc);
+      let url = downloadUrl(cdnBase, enc);
+      if (fullUrl) {
+        try {
+          const direct = new URL(fullUrl);
+          if (direct.protocol !== "https:" || direct.origin !== new URL(cdnBase).origin) {
+            failures.push({ kind, name, reason: "unexpected media URL origin" });
+            return;
+          }
+          url = direct.toString();
+        } catch {
+          failures.push({ kind, name, reason: "invalid media URL" });
+          return;
+        }
+      }
       tasks.push(
-        this.transport.get(url, {}, 6e4).then(async (r) => {
+        this.downloadTransport.get(url, {}, 6e4).then(async (r) => {
           if (r.status !== 200) {
             failures.push({ kind, name, reason: `http ${r.status}` });
             return;
@@ -20261,6 +20277,13 @@ function buildMediaItem(att, ref) {
 // src/core/transport-undici.ts
 var import_undici = __toESM(require_undici());
 var UndiciTransport = class {
+  // Keep this bundle's Node-compatible Undici runtime separate from a global
+  // dispatcher that may have been created by another Electron renderer bundle.
+  dispatcher = new import_undici.Agent();
+  shutdown() {
+    void this.dispatcher.destroy().catch(() => {
+    });
+  }
   get(url, headers, timeoutMs) {
     return this.run("GET", url, headers, void 0, timeoutMs);
   }
@@ -20275,7 +20298,8 @@ var UndiciTransport = class {
         method,
         headers,
         body: body instanceof ArrayBuffer ? new Uint8Array(body) : body,
-        signal: controller.signal
+        signal: controller.signal,
+        dispatcher: this.dispatcher
       });
       return {
         status: resp.status,
@@ -22503,8 +22527,8 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
   store;
   client = null;
   /** The gateway accepts undici's fetch stack; Node's http/https stack gets 412.
-   * Unlike requestUrl, undici can abort a stalled request. Article fetching
-   * keeps NodeTransport's idle timeout for slow third-party hosts. */
+   * CDN downloads use NodeTransport: the live voice CDN response hangs in
+   * undici but completes through Node's https stack. */
   transport = new UndiciTransport();
   articleTransport = new NodeTransport();
   polling = false;
@@ -22548,6 +22572,7 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
   }
   onunload() {
     this.disconnect();
+    this.transport.shutdown();
   }
   async loadSettings() {
     const raw = await this.loadData();
@@ -22727,7 +22752,8 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
         baseUrl: st.baseUrl || ILINK_DEFAULT_BASE,
         cdnBase: CDN_BASE
       },
-      st.token
+      st.token,
+      this.articleTransport
     );
   }
   /** Main long-poll loop */
