@@ -43,9 +43,9 @@ export function extractLinks(text: string): string[] {
 
 /**
  * Fetch an article and convert it to markdown. WeChat official-account pages keep
- * the body in #js_content and lazy-load images via data-src; generic pages fall
- * back to <body>. Throws an Error with a short reason on failure, so callers
- * can tell the user why (e.g. "http 503", "no title found on page").
+ * the body in #js_content or text_page_info.content and lazy-load images via
+ * data-src; generic pages fall back to <body>. Throws an Error with a short
+ * reason on failure, so callers can tell the user why (e.g. "http 503").
  *
  * `deadline` (absolute ms) bounds the whole fetch: per-request idle timeouts do
  * not bound the total, so without it one message could occupy the importer for
@@ -70,7 +70,8 @@ export async function fetchArticle(
     budget,
   );
   if (resp.status !== 200) throw new Error(`http ${resp.status}`);
-  const html = stripScripts(await bodyTextAuto(resp));
+  const rawHtml = await bodyTextAuto(resp);
+  const html = stripScripts(rawHtml);
   const parse = parseHtml ?? ((h: string) => new DOMParser().parseFromString(h, 'text/html'));
   const doc = parse(html);
 
@@ -92,7 +93,11 @@ export async function fetchArticle(
     doc.querySelector('.rich_media_content') ??
     (isWeChat ? null : doc.body);
   const images: ArticleImage[] = [];
-  const markdown = root ? normalizeBlocks(toMd(root, images)) : '';
+  // WeChat text pages render #js_article in the browser; their actual text is
+  // embedded in text_page_info.content rather than a #js_content element.
+  const markdown = (root ? normalizeBlocks(toMd(root, images)) : '') ||
+    (isWeChat ? extractWeChatTextPage(rawHtml) : '');
+  if (!markdown.trim()) throw new Error('no article body found on page');
   await downloadImages(transport, images, deadline);
 
   return { url, title, description, account: accountName(doc), markdown, images };
@@ -144,6 +149,29 @@ function isWeChatArticleUrl(url: string): boolean {
   } catch {
     return false;
   }
+}
+
+/** Read the plain-text body of a WeChat text page without evaluating its script. */
+function extractWeChatTextPage(html: string): string {
+  const match = /\btext_page_info\s*:\s*\{\s*content\s*:\s*'((?:\\[\s\S]|[^'\\])*)'/.exec(html);
+  if (!match) return '';
+  return decodeJsString(match[1]).replace(/\r\n?/g, '\n').trim();
+}
+
+function decodeJsString(value: string): string {
+  return value.replace(/\\(?:x([\da-fA-F]{2})|u\{([\da-fA-F]{1,6})\}|u([\da-fA-F]{4})|([\\'"/nrtbfv0]))/g,
+    (_match, hex: string | undefined, codePoint: string | undefined, unicode: string | undefined, escaped: string | undefined) => {
+      if (hex) return String.fromCharCode(parseInt(hex, 16));
+      if (codePoint) {
+        const parsed = parseInt(codePoint, 16);
+        return parsed <= 0x10ffff ? String.fromCodePoint(parsed) : _match;
+      }
+      if (unicode) return String.fromCharCode(parseInt(unicode, 16));
+      const chars: Record<string, string> = {
+        n: '\n', r: '\r', t: '\t', b: '\b', f: '\f', v: '\v', '0': '\0',
+      };
+      return chars[escaped ?? ''] ?? escaped ?? _match;
+    });
 }
 
 /**

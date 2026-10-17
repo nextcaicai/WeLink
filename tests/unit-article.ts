@@ -74,15 +74,23 @@ test('fetchArticle: image-led WeChat article keeps body text and images', async 
   assert.ok(info.images.every((image) => image.data), 'image bytes were fetched');
 });
 
-test('fetchArticle: escaped WeChat metadata is made readable without page-shell text', async () => {
+test('fetchArticle: WeChat text page reads script data without page-shell controls', async () => {
+  const page = String.raw`<html><head><meta property="og:title" content="纯文字文章"></head><body>
+    <div id="js_article"></div><button>微信扫一扫</button>
+    <script>var article = { text_page_info: { content: '第一段\x0a第二段，it\'s here.\x0a\x0a结束。' } };</script>
+  </body></html>`;
+  const info = await fetchArticle(articleTransport(page), 'https://mp.weixin.qq.com/s/text-page', parseHtml);
+  assert.equal(info.markdown, "第一段\n第二段，it's here.\n\n结束。");
+  assert.ok(!info.markdown.includes('微信扫一扫'), 'page controls are not article content');
+});
+
+test('fetchArticle: metadata-only WeChat shell rejects instead of saving an empty article', async () => {
   const page = `<html><head>
     <meta property="og:title" content="第一行\\x0a第二行">
     <meta property="og:description" content="第一段\\x0a\\x0a&lt;p&gt;第二&amp;nbsp;段&lt;/p&gt;">
   </head><body><button>微信扫一扫</button><p>取消 允许</p></body></html>`;
-  const info = await fetchArticle(articleTransport(page), 'https://mp.weixin.qq.com/s/text-only', parseHtml);
-  assert.equal(info.title, '第一行 第二行');
-  assert.equal(info.description, '第一段\n\n第二 段');
-  assert.equal(info.markdown, '', 'body controls are not mistaken for article text');
+  await assert.rejects(fetchArticle(articleTransport(page), 'https://mp.weixin.qq.com/s/text-only', parseHtml),
+    /no article body found on page/);
 });
 
 test('fetchArticle: generic page without og tags uses <title> and body', async () => {
@@ -231,6 +239,23 @@ test('importMessage: re-sending an article link overwrites the existing note', a
   assert.ok(v.files.get(notePath)!.includes('这是正文'), 'note content rewritten');
   // no orphaned image files accumulate from the first import
   assert.deepEqual([...v.bins.keys()].sort(), firstImages.sort(), 'old images replaced one-for-one');
+});
+
+test('importMessage: empty-body response reports failure and preserves the existing article', async () => {
+  const v = new Vault();
+  const url = 'https://mp.weixin.qq.com/s/xyz';
+  const first = await importMessage(v.app, articleTransport(WECHAT_PAGE), ARTICLE_MSG(url, 'm1'), IMPORT_OPTS);
+  const notePath = first.articleAssets[0].note;
+  const savedNote = v.files.get(notePath);
+  const savedImages = [...v.bins.keys()];
+  const shell = '<html><head><meta property="og:title" content="测试文章标题"></head><body><button>微信扫一扫</button></body></html>';
+
+  const second = await importMessage(v.app, articleTransport(shell), ARTICLE_MSG(url, 'm2'), IMPORT_OPTS);
+  assert.equal(second.articleAssets.length, 0);
+  assert.deepEqual(second.articleFailures, ['no article body found on page']);
+  assert.equal(v.files.get(notePath), savedNote, 'a failed re-fetch must not overwrite the article');
+  assert.deepEqual([...v.bins.keys()], savedImages, 'a failed re-fetch must not delete images');
+  assert.ok(v.files.get('WeLink/2026-08-27.md')!.includes(url), 'raw link remains in the daily note');
 });
 
 /* ---------------------------------------------- script stripping */

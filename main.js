@@ -1651,7 +1651,8 @@ async function fetchArticle(transport, url, parseHtml, deadline = Infinity) {
     budget
   );
   if (resp.status !== 200) throw new Error(`http ${resp.status}`);
-  const html = stripScripts(await bodyTextAuto(resp));
+  const rawHtml = await bodyTextAuto(resp);
+  const html = stripScripts(rawHtml);
   const parse = parseHtml ?? ((h) => new DOMParser().parseFromString(h, "text/html"));
   const doc = parse(html);
   const titleRaw = doc.querySelector('meta[property="og:title"]')?.getAttribute("content") ?? doc.title ?? "";
@@ -1662,7 +1663,8 @@ async function fetchArticle(transport, url, parseHtml, deadline = Infinity) {
   const isWeChat = isWeChatArticleUrl(url);
   const root = doc.querySelector("#js_content") ?? doc.querySelector(".rich_media_content") ?? (isWeChat ? null : doc.body);
   const images = [];
-  const markdown = root ? normalizeBlocks(toMd(root, images)) : "";
+  const markdown = (root ? normalizeBlocks(toMd(root, images)) : "") || (isWeChat ? extractWeChatTextPage(rawHtml) : "");
+  if (!markdown.trim()) throw new Error("no article body found on page");
   await downloadImages(transport, images, deadline);
   return { url, title, description, account: accountName(doc), markdown, images };
 }
@@ -1702,6 +1704,34 @@ function isWeChatArticleUrl(url) {
   } catch {
     return false;
   }
+}
+function extractWeChatTextPage(html) {
+  const match = /\btext_page_info\s*:\s*\{\s*content\s*:\s*'((?:\\[\s\S]|[^'\\])*)'/.exec(html);
+  if (!match) return "";
+  return decodeJsString(match[1]).replace(/\r\n?/g, "\n").trim();
+}
+function decodeJsString(value) {
+  return value.replace(
+    /\\(?:x([\da-fA-F]{2})|u\{([\da-fA-F]{1,6})\}|u([\da-fA-F]{4})|([\\'"/nrtbfv0]))/g,
+    (_match, hex, codePoint, unicode, escaped) => {
+      if (hex) return String.fromCharCode(parseInt(hex, 16));
+      if (codePoint) {
+        const parsed = parseInt(codePoint, 16);
+        return parsed <= 1114111 ? String.fromCodePoint(parsed) : _match;
+      }
+      if (unicode) return String.fromCharCode(parseInt(unicode, 16));
+      const chars = {
+        n: "\n",
+        r: "\r",
+        t: "	",
+        b: "\b",
+        f: "\f",
+        v: "\v",
+        "0": "\0"
+      };
+      return chars[escaped ?? ""] ?? escaped ?? _match;
+    }
+  );
 }
 function stripScripts(html) {
   return html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "").replace(/<script\b[^>]*>[\s\S]*$/i, "");
