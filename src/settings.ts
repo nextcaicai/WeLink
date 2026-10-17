@@ -9,8 +9,9 @@ export interface WeLinkSettings {
   language: 'system' | 'en' | 'zh' | 'tw'; // UI language; system follows Obsidian
   enabled: boolean; // auto-connect on startup
   inboxFolder: string;
-  attachmentFolder: string;
+  singleNoteFolder: string; // plain-text notes created via the standalone note trigger
   articleFolder: string;
+  attachmentFolder: string;
   outboxFolder: string; // outbox folder (agents drop pending-send files here)
   singleNoteMarker: string; // first-line marker that saves a received text message as its own note
   fetchArticles: boolean; // fetch link metadata and create article notes
@@ -24,8 +25,9 @@ export const DEFAULT_SETTINGS: WeLinkSettings = {
   language: 'system',
   enabled: true,
   inboxFolder: 'WeLink',
-  attachmentFolder: 'WeLink/attachments',
+  singleNoteFolder: 'WeLink/notes',
   articleFolder: 'WeLink/articles',
+  attachmentFolder: 'WeLink/attachments',
   outboxFolder: 'WeLink/outbox',
   singleNoteMarker: '#单独保存',
   fetchArticles: true,
@@ -35,7 +37,7 @@ export const DEFAULT_SETTINGS: WeLinkSettings = {
   autoReply: true,
 };
 
-export const FOLDER_KEYS = ['inboxFolder', 'attachmentFolder', 'articleFolder', 'outboxFolder'] as const satisfies readonly (keyof WeLinkSettings)[];
+export const FOLDER_KEYS = ['inboxFolder', 'singleNoteFolder', 'articleFolder', 'attachmentFolder', 'outboxFolder'] as const satisfies readonly (keyof WeLinkSettings)[];
 
 /** A marker must be one visible line, so matching it at the start of a message stays predictable. */
 export function isValidSingleNoteMarker(value: unknown): value is string {
@@ -150,14 +152,19 @@ export class WeLinkSettingTab extends PluginSettingTab {
             control: { type: 'text', key: 'inboxFolder', defaultValue: DEFAULT_SETTINGS.inboxFolder },
           },
           {
-            name: t('set.attachmentFolder'),
-            desc: t('set.attachmentFolder.desc'),
-            control: { type: 'text', key: 'attachmentFolder', defaultValue: DEFAULT_SETTINGS.attachmentFolder },
+            name: t('set.singleNoteFolder'),
+            desc: t('set.singleNoteFolder.desc'),
+            control: { type: 'text', key: 'singleNoteFolder', defaultValue: DEFAULT_SETTINGS.singleNoteFolder },
           },
           {
             name: t('set.articleFolder'),
             desc: t('set.articleFolder.desc'),
             control: { type: 'text', key: 'articleFolder', defaultValue: DEFAULT_SETTINGS.articleFolder },
+          },
+          {
+            name: t('set.attachmentFolder'),
+            desc: t('set.attachmentFolder.desc'),
+            control: { type: 'text', key: 'attachmentFolder', defaultValue: DEFAULT_SETTINGS.attachmentFolder },
           },
           {
             name: t('set.outboxFolder'),

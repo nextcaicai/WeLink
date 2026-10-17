@@ -92,6 +92,10 @@ export default class WeLinkPlugin extends Plugin {
     for (const key of FOLDER_KEYS) {
       this.settings[key] = normalizePath(this.settings[key]);
     }
+    // legacy installs inferred standalone notes under <inbox>/notes before this setting existed
+    if (raw && !('singleNoteFolder' in raw)) {
+      this.settings.singleNoteFolder = normalizePath(`${this.settings.inboxFolder}/notes`);
+    }
     if (typeof this.settings.singleNoteMarker !== 'string' || !this.settings.singleNoteMarker.trim() || /[\r\n]/.test(this.settings.singleNoteMarker)) {
       this.settings.singleNoteMarker = DEFAULT_SETTINGS.singleNoteMarker;
     } else {
@@ -119,7 +123,7 @@ export default class WeLinkPlugin extends Plugin {
   /** Create the whole Wechat directory tree + Agent.md once the plugin is enabled */
   private async ensureFolders(): Promise<void> {
     const s = this.settings;
-    for (const folder of [s.inboxFolder, s.attachmentFolder, s.articleFolder, s.outboxFolder, `${s.inboxFolder}/notes`]) {
+    for (const folder of [s.inboxFolder, s.singleNoteFolder, s.articleFolder, s.attachmentFolder, s.outboxFolder]) {
       try {
         await ensureFolder(this.app, folder);
       } catch {
@@ -453,7 +457,7 @@ export default class WeLinkPlugin extends Plugin {
           inboxFolder: this.settings.inboxFolder,
           attachmentFolder: this.settings.attachmentFolder,
           articleFolder: this.settings.articleFolder,
-          singleNoteFolder: `${this.settings.inboxFolder}/notes`,
+          singleNoteFolder: this.settings.singleNoteFolder,
           singleNoteMarker: this.settings.singleNoteMarker,
           fetchArticles: this.settings.fetchArticles,
           groupArticlesByAccount: this.settings.groupArticlesByAccount,

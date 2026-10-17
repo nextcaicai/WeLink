@@ -4,7 +4,7 @@ import type { WeLinkSettings } from '../settings';
 import { ensureFolder } from './importer';
 
 /** Bump whenever the guide template content changes, so already-installed vaults regenerate their Agent.md */
-const GUIDE_REV = '3';
+const GUIDE_REV = '4';
 
 /** Generation fingerprint of an Agent.md: regenerated whenever the language, rev or any path changes */
 export function agentGuideMeta(content: string): { lang: string; paths: string; rev: string } {
@@ -16,7 +16,7 @@ export function agentGuideMeta(content: string): { lang: string; paths: string; 
 }
 
 function pathsKey(s: WeLinkSettings): string {
-  return encodeURIComponent([s.inboxFolder, s.outboxFolder, s.attachmentFolder, s.singleNoteMarker].join('|'));
+  return encodeURIComponent([s.inboxFolder, s.singleNoteFolder, s.outboxFolder, s.attachmentFolder, s.singleNoteMarker].join('|'));
 }
 
 function buildEn(s: WeLinkSettings): string {
@@ -43,7 +43,7 @@ The plugin consumes the outbox on its next poll (~30-60 s). A successful send de
 
 Inbound WeChat messages are appended to the same daily conversation notes under \`${s.inboxFolder}/\` (marked "received"); media arrives under \`${s.attachmentFolder}/\`.
 
-To save a plain-text message as its own note, make its first line exactly \`${s.singleNoteMarker}\`, then write the body on the following lines. The marker is removed, a note is created under \`${s.inboxFolder}/notes/\`, and the daily note keeps a link to it. Messages with links or attachments keep their normal import behavior.
+To save a plain-text message as its own note, make its first line exactly \`${s.singleNoteMarker}\`, then write the body on the following lines. The marker is removed, a note is created under \`${s.singleNoteFolder}/\`, and the daily note keeps a link to it. Messages with links or attachments keep their normal import behavior.
 
 ## Constraints
 
@@ -75,7 +75,7 @@ paths: "${pathsKey(s)}"
 
 收到的微信消息追加到同一份每日对话笔记 \`${s.inboxFolder}/\`(标记"接收"),媒体附件保存在 \`${s.attachmentFolder}/\`。
 
-如需把纯文字消息单独保存为笔记，第一行必须完整写成 \`${s.singleNoteMarker}\`，下一行开始写正文。插件会去掉标记，在 \`${s.inboxFolder}/notes/\` 创建笔记，并在每日笔记保留链接。包含链接或附件的消息仍按原有方式导入。
+如需把纯文字消息单独保存为笔记，第一行必须完整写成 \`${s.singleNoteMarker}\`，下一行开始写正文。插件会去掉标记，在 \`${s.singleNoteFolder}/\` 创建笔记，并在每日笔记保留链接。包含链接或附件的消息仍按原有方式导入。
 
 ## 限制
 
@@ -107,7 +107,7 @@ paths: "${pathsKey(s)}"
 
 收到的微信訊息附加到同一份每日對話筆記 \`${s.inboxFolder}/\`(標記"接收"),媒體附件儲存在 \`${s.attachmentFolder}/\`。
 
-如需把純文字訊息單獨儲存為筆記，第一行必須完整寫成 \`${s.singleNoteMarker}\`，下一行開始寫正文。外掛會移除標記，在 \`${s.inboxFolder}/notes/\` 建立筆記，並在每日筆記保留連結。包含連結或附件的訊息仍依原有方式匯入。
+如需把純文字訊息單獨儲存為筆記，第一行必須完整寫成 \`${s.singleNoteMarker}\`，下一行開始寫正文。外掛會移除標記，在 \`${s.singleNoteFolder}/\` 建立筆記，並在每日筆記保留連結。包含連結或附件的訊息仍依原有方式匯入。
 
 ## 限制
 
