@@ -20836,7 +20836,7 @@ var en = {
   "login.scanned": "Scanned \u2014 please confirm on your phone\u2026",
   "login.success": "Logged in",
   "modal.title": "Connect WeChat",
-  "modal.hint": "Scan the QR code with WeChat and confirm on your phone.",
+  "modal.hint": "Scan with WeChat to connect.",
   "modal.cancel": "Cancel",
   "modal.renderFailed": "Failed to render QR code: {{err}}",
   "modal.openLink": "or tap this link to open on your phone",
@@ -20958,7 +20958,7 @@ var zh = {
   "login.scanned": "\u5DF2\u626B\u7801,\u8BF7\u5728\u624B\u673A\u4E0A\u786E\u8BA4\u2026",
   "login.success": "\u767B\u5F55\u6210\u529F",
   "modal.title": "\u8FDE\u63A5\u5FAE\u4FE1",
-  "modal.hint": "\u4F7F\u7528\u5FAE\u4FE1\u626B\u63CF\u4E8C\u7EF4\u7801\uFF0C\u5E76\u5728\u624B\u673A\u4E0A\u786E\u8BA4\u8FDE\u63A5\u3002",
+  "modal.hint": "\u4F7F\u7528\u5FAE\u4FE1\u626B\u63CF\u4E8C\u7EF4\u7801\u5B8C\u6210\u8FDE\u63A5",
   "modal.cancel": "\u53D6\u6D88",
   "modal.renderFailed": "\u4E8C\u7EF4\u7801\u6E32\u67D3\u5931\u8D25: {{err}}",
   "modal.openLink": "\u6216\u70B9\u51FB\u6B64\u94FE\u63A5\u5728\u624B\u673A\u6253\u5F00",
@@ -21080,7 +21080,7 @@ var tw = {
   "login.scanned": "\u5DF2\u6383\u78BC,\u8ACB\u5728\u624B\u6A5F\u4E0A\u78BA\u8A8D\u2026",
   "login.success": "\u767B\u5165\u6210\u529F",
   "modal.title": "\u9023\u63A5\u5FAE\u4FE1",
-  "modal.hint": "\u4F7F\u7528\u5FAE\u4FE1\u6383\u63CF\u4E8C\u7DAD\u78BC\uFF0C\u4E26\u5728\u624B\u6A5F\u4E0A\u78BA\u8A8D\u9023\u63A5\u3002",
+  "modal.hint": "\u4F7F\u7528\u5FAE\u4FE1\u6383\u63CF\u4E8C\u7DAD\u78BC\u5B8C\u6210\u9023\u63A5",
   "modal.cancel": "\u53D6\u6D88",
   "modal.renderFailed": "\u4E8C\u7DAD\u78BC\u7522\u751F\u5931\u6557: {{err}}",
   "modal.openLink": "\u6216\u9EDE\u6B64\u9023\u7D50\u5728\u624B\u6A5F\u958B\u555F",
@@ -22262,10 +22262,11 @@ var QrLoginModal = class extends import_obsidian4.Modal {
     const { contentEl } = this;
     this.modalEl.addClass("welink-qr-modal");
     contentEl.empty();
-    contentEl.createEl("h3", { text: t("modal.title") });
-    contentEl.createEl("p", { text: t("modal.hint"), cls: "welink-qr-hint" });
+    contentEl.createEl("h3", { text: t("modal.title"), cls: "welink-qr-title" });
     this.qrEl = contentEl.createDiv({ cls: "welink-qr welink-qr-center" });
+    contentEl.createEl("p", { text: t("modal.hint"), cls: "welink-qr-hint" });
     this.statusEl = contentEl.createEl("p", { text: t("login.fetching"), cls: "welink-qr-status" });
+    this.statusEl.setAttribute("aria-live", "polite");
     const actions = contentEl.createDiv({ cls: "welink-qr-actions" });
     this.retryEl = actions.createEl("button", { text: t("login.retry") });
     this.retryEl.hidden = true;
@@ -22284,7 +22285,7 @@ var QrLoginModal = class extends import_obsidian4.Modal {
       onQr: (url) => {
         if (this.cancelled) return;
         this.attemptCancelled = !this.renderQr(url);
-        this.setStatus(this.attemptCancelled ? t("login.renderFailed") : t("login.waiting"));
+        this.setStatus(this.attemptCancelled ? t("login.renderFailed") : "");
       },
       onScanned: () => this.setStatus(t("login.scanned")),
       onError: (msg) => this.setStatus(msg),
@@ -22311,7 +22312,7 @@ var QrLoginModal = class extends import_obsidian4.Modal {
     this.qrEl.empty();
     try {
       const qr = encodeQr(url);
-      const cell = 6;
+      const cell = 3;
       const quiet = 4;
       const n = qr.size + quiet * 2;
       const canvas = this.qrEl.createEl("canvas", { cls: "welink-qr-canvas" });
@@ -22337,7 +22338,9 @@ var QrLoginModal = class extends import_obsidian4.Modal {
     }
   }
   setStatus(text) {
-    if (this.statusEl) this.statusEl.setText(text);
+    if (!this.statusEl) return;
+    this.statusEl.setText(text);
+    this.statusEl.hidden = !text;
   }
   onClose() {
     this.cancelled = true;

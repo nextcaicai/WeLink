@@ -22,33 +22,51 @@
 
 /* QR code is requested and shown only in the scan modal. */
 .welink-qr-modal {
-  max-width: 420px;
+  width: min(320px, calc(100vw - 32px));
+  max-width: 320px;
+}
+
+.welink-qr-modal .modal-content {
+  text-align: center;
+}
+
+.welink-qr-title {
+  margin: 0 0 14px;
+  font-size: var(--font-ui-medium);
+  font-weight: var(--font-semibold);
 }
 
 .welink-qr canvas {
   image-rendering: pixelated;
-  border: 8px solid #fff;
+  border: 6px solid #fff;
   border-radius: 4px;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.12);
   max-width: 100%;
   height: auto;
 }
 
 .welink-qr-hint {
-  margin: 8px 0 12px;
+  margin: 12px 0 0;
   color: var(--text-muted);
+  font-size: var(--font-ui-small);
 }
 
 .welink-qr-status {
+  margin: 8px 0 0;
   text-align: center;
   color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.welink-qr-status[hidden] {
+  display: none;
 }
 
 .welink-qr-center {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 16px 0;
+  margin: 0;
 }
 
 .welink-qr-actions {

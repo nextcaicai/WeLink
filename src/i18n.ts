@@ -80,7 +80,7 @@ const en: Dict = {
   'login.success': 'Logged in',
 
   'modal.title': 'Connect WeChat',
-  'modal.hint': 'Scan the QR code with WeChat and confirm on your phone.',
+  'modal.hint': 'Scan with WeChat to connect.',
   'modal.cancel': 'Cancel',
   'modal.renderFailed': 'Failed to render QR code: {{err}}',
   'modal.openLink': 'or tap this link to open on your phone',
@@ -215,7 +215,7 @@ const zh: Dict = {
   'login.success': '登录成功',
 
   'modal.title': '连接微信',
-  'modal.hint': '使用微信扫描二维码，并在手机上确认连接。',
+  'modal.hint': '使用微信扫描二维码完成连接',
   'modal.cancel': '取消',
   'modal.renderFailed': '二维码渲染失败: {{err}}',
   'modal.openLink': '或点击此链接在手机打开',
@@ -350,7 +350,7 @@ const tw: Dict = {
   'login.success': '登入成功',
 
   'modal.title': '連接微信',
-  'modal.hint': '使用微信掃描二維碼，並在手機上確認連接。',
+  'modal.hint': '使用微信掃描二維碼完成連接',
   'modal.cancel': '取消',
   'modal.renderFailed': '二維碼產生失敗: {{err}}',
   'modal.openLink': '或點此連結在手機開啟',

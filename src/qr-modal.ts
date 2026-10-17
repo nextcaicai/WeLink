@@ -25,10 +25,11 @@ export class QrLoginModal extends Modal {
     const { contentEl } = this;
     this.modalEl.addClass('welink-qr-modal');
     contentEl.empty();
-    contentEl.createEl('h3', { text: t('modal.title') });
-    contentEl.createEl('p', { text: t('modal.hint'), cls: 'welink-qr-hint' });
+    contentEl.createEl('h3', { text: t('modal.title'), cls: 'welink-qr-title' });
     this.qrEl = contentEl.createDiv({ cls: 'welink-qr welink-qr-center' });
+    contentEl.createEl('p', { text: t('modal.hint'), cls: 'welink-qr-hint' });
     this.statusEl = contentEl.createEl('p', { text: t('login.fetching'), cls: 'welink-qr-status' });
+    this.statusEl.setAttribute('aria-live', 'polite');
     const actions = contentEl.createDiv({ cls: 'welink-qr-actions' });
     this.retryEl = actions.createEl('button', { text: t('login.retry') });
     this.retryEl.hidden = true;
@@ -49,7 +50,7 @@ export class QrLoginModal extends Modal {
       onQr: (url) => {
         if (this.cancelled) return;
         this.attemptCancelled = !this.renderQr(url);
-        this.setStatus(this.attemptCancelled ? t('login.renderFailed') : t('login.waiting'));
+        this.setStatus(this.attemptCancelled ? t('login.renderFailed') : '');
       },
       onScanned: () => this.setStatus(t('login.scanned')),
       onError: (msg) => this.setStatus(msg),
@@ -79,7 +80,7 @@ export class QrLoginModal extends Modal {
     this.qrEl.empty();
     try {
       const qr = encodeQr(url);
-      const cell = 6;
+      const cell = 3;
       const quiet = 4;
       const n = qr.size + quiet * 2;
       const canvas = this.qrEl.createEl('canvas', { cls: 'welink-qr-canvas' });
@@ -106,7 +107,9 @@ export class QrLoginModal extends Modal {
   }
 
   private setStatus(text: string): void {
-    if (this.statusEl) this.statusEl.setText(text);
+    if (!this.statusEl) return;
+    this.statusEl.setText(text);
+    this.statusEl.hidden = !text;
   }
 
   onClose(): void {
