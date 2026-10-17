@@ -1,20 +1,42 @@
-/* QR code styling for the scan modal */
+/* The state is secondary to the normal-sized setting title. */
+.welink-bot-status {
+  margin-inline-start: 8px;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.welink-bot-status[data-state='connected'] {
+  color: var(--color-green);
+}
+
+.welink-bot-status[data-state='connecting'],
+.welink-bot-status[data-state='expired'] {
+  color: var(--color-orange);
+}
+
+.welink-bot-status[data-state='error'] {
+  color: var(--text-error);
+}
+
+/* QR code is requested and shown only in the scan modal. */
+.welink-qr-modal {
+  max-width: 420px;
+}
+
 .welink-qr canvas {
   image-rendering: pixelated;
   border: 8px solid #fff;
   border-radius: 4px;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+  max-width: 100%;
+  height: auto;
 }
 
-/* Login section on the settings page */
-.welink-login-section {
-  margin-bottom: 16px;
-}
-
-.welink-login-section .welink-qr {
-  display: flex;
-  justify-content: center;
-  margin: 12px 0;
+.welink-qr-hint {
+  margin: 8px 0 12px;
+  color: var(--text-muted);
 }
 
 .welink-qr-status {
@@ -22,36 +44,22 @@
   color: var(--text-muted);
 }
 
-.welink-qr-url {
-  font-size: 11px;
-  color: var(--text-faint);
-  word-break: break-all;
-  max-width: 320px;
-  margin: 8px auto 0;
-  text-align: center;
-}
-
-/* Modal hint paragraph */
-.welink-qr-hint {
-  margin-bottom: 12px;
-}
-
-/* QR container centered inside the scan modal */
 .welink-qr-center {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 12px 0;
+  margin: 16px 0;
 }
 
-/* "Open on phone" fallback link below the QR canvas */
-.welink-qr-link {
-  font-size: 11px;
-  color: var(--text-faint);
-  word-break: break-all;
-  max-width: 300px;
-  margin-top: 8px;
-  text-align: center;
+.welink-qr-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.welink-qr-actions button[hidden] {
+  display: none;
 }
 
 /* Test-send input on the settings page */

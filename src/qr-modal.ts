@@ -7,8 +7,10 @@ import { t } from './i18n';
 
 export class QrLoginModal extends Modal {
   private cancelled = false;
+  private attemptCancelled = false;
   private qrEl: HTMLElement | null = null;
   private statusEl: HTMLElement | null = null;
+  private retryEl: HTMLButtonElement | null = null;
 
   constructor(
     app: App,
@@ -21,36 +23,59 @@ export class QrLoginModal extends Modal {
 
   onOpen(): void {
     const { contentEl } = this;
+    this.modalEl.addClass('welink-qr-modal');
     contentEl.empty();
     contentEl.createEl('h3', { text: t('modal.title') });
     contentEl.createEl('p', { text: t('modal.hint'), cls: 'welink-qr-hint' });
     this.qrEl = contentEl.createDiv({ cls: 'welink-qr welink-qr-center' });
     this.statusEl = contentEl.createEl('p', { text: t('login.fetching'), cls: 'welink-qr-status' });
+    const actions = contentEl.createDiv({ cls: 'welink-qr-actions' });
+    this.retryEl = actions.createEl('button', { text: t('login.retry') });
+    this.retryEl.hidden = true;
+    this.retryEl.addEventListener('click', () => this.startLogin());
+    const cancel = actions.createEl('button', { text: t('modal.cancel') });
+    cancel.addEventListener('click', () => this.close());
 
+    this.startLogin();
+  }
+
+  private startLogin(): void {
+    if (this.cancelled) return;
+    this.attemptCancelled = false;
+    this.qrEl?.empty();
+    this.setStatus(t('login.fetching'));
+    if (this.retryEl) this.retryEl.hidden = true;
     void loginLoop(this.transport, this.baseUrl, {
       onQr: (url) => {
-        this.renderQr(url);
-        this.setStatus(t('login.waiting'));
+        if (this.cancelled) return;
+        this.attemptCancelled = !this.renderQr(url);
+        this.setStatus(this.attemptCancelled ? t('login.renderFailed') : t('login.waiting'));
       },
       onScanned: () => this.setStatus(t('login.scanned')),
       onError: (msg) => this.setStatus(msg),
-      cancelled: () => this.cancelled,
+      cancelled: () => this.cancelled || this.attemptCancelled,
     })
       .then((out) => {
-        if (!out || this.cancelled) return;
+        if (this.cancelled) return;
+        if (!out) {
+          this.qrEl?.empty();
+          if (this.retryEl) this.retryEl.hidden = false;
+          return;
+        }
         this.setStatus(t('login.success'));
         this.close();
         this.onDone(out);
       })
       .catch((e: unknown) => {
-        // without this an early network error would become an unhandled
-        // rejection and leave the modal stuck on "fetching QR code"
+        if (this.cancelled) return;
+        this.qrEl?.empty();
         this.setStatus(String((e as Error)?.message ?? e));
+        if (this.retryEl) this.retryEl.hidden = false;
       });
   }
 
-  private renderQr(url: string): void {
-    if (!this.qrEl) return;
+  private renderQr(url: string): boolean {
+    if (!this.qrEl) return false;
     this.qrEl.empty();
     try {
       const qr = encodeQr(url);
@@ -61,7 +86,7 @@ export class QrLoginModal extends Modal {
       canvas.width = n * cell;
       canvas.height = n * cell;
       const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      if (!ctx) throw new Error('Canvas is unavailable');
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#000000';
@@ -72,10 +97,11 @@ export class QrLoginModal extends Modal {
           }
         }
       }
-      // Fallback: URL link (open directly on the phone when scanning is inconvenient)
-      this.qrEl.createEl('a', { text: t('modal.openLink'), href: url, cls: 'welink-qr-link' });
+      return true;
     } catch (e) {
-      this.qrEl.createEl('p', { text: t('modal.renderFailed', { err: String((e as Error)?.message ?? e) }) });
+      this.qrEl.empty();
+      this.setStatus(t('modal.renderFailed', { err: String((e as Error)?.message ?? e) }));
+      return false;
     }
   }
 
@@ -85,6 +111,7 @@ export class QrLoginModal extends Modal {
 
   onClose(): void {
     this.cancelled = true;
+    this.attemptCancelled = true;
     this.contentEl.empty();
   }
 }

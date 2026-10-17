@@ -17,7 +17,7 @@ import { applyLanguage, buildReceiptReplies, buildSendFailure, resolvedLanguage,
 /** typing tickets stay valid ~24h (the official SDK caches them a day); refetch after that */
 const TICKET_TTL_MS = 24 * 3600_000;
 
-type ConnState = 'disconnected' | 'connecting' | 'connected' | 'expired' | 'error';
+export type ConnState = 'disconnected' | 'connecting' | 'connected' | 'expired' | 'error';
 
 export default class WeLinkPlugin extends Plugin {
   settings: WeLinkSettings = DEFAULT_SETTINGS;
@@ -31,6 +31,7 @@ export default class WeLinkPlugin extends Plugin {
   private polling = false;
   private stopRequested = false;
   private connState: ConnState = 'disconnected';
+  private connectionListeners = new Set<() => void>();
   private statusBar: HTMLElement | null = null;
   private outbox: Outbox | null = null;
   /** command id -> i18n key, so names can be re-rendered when the language changes */
@@ -146,8 +147,18 @@ export default class WeLinkPlugin extends Plugin {
   }
 
   private setConn(s: ConnState): void {
+    const changed = this.connState !== s;
     this.connState = s;
     this.renderStatus();
+    if (changed) {
+      for (const listener of this.connectionListeners) listener();
+    }
+  }
+
+  /** Keep the settings status in sync with the polling state. */
+  onConnectionStateChange(listener: () => void): () => void {
+    this.connectionListeners.add(listener);
+    return () => this.connectionListeners.delete(listener);
   }
 
   /** Current connection state */
@@ -206,10 +217,11 @@ export default class WeLinkPlugin extends Plugin {
   }
 
   /** Start scan-login (for the command palette) */
-  startLogin(): void {
+  startLogin(onDone?: () => void): void {
     new QrLoginModal(this.app, this.transport, ILINK_DEFAULT_BASE, (out) => {
       this.applyLogin(out);
       new Notice(t('notice.loggedIn'));
+      onDone?.();
     }).open();
   }
 

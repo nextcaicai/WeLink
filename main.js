@@ -20789,6 +20789,8 @@ var en = {
   "set.language": "Language",
   "set.language.desc": "Interface language for settings, commands, and notifications",
   "set.language.system": "Follow Obsidian",
+  "set.wechatBot": "WeChat Bot",
+  "set.wechatBot.desc": "Send messages from WeChat to Obsidian",
   "set.autoConnect": "Auto-connect on startup",
   "set.autoConnect.desc": "Automatically log in and start receiving WeChat messages when Obsidian launches",
   "set.inboxFolder": "Inbox folder",
@@ -20812,8 +20814,20 @@ var en = {
   "set.autoReply": "Always reply on receipt",
   "set.autoReply.desc": "After a message is recorded, send a confirmation reply back to WeChat \u2014 e.g. where an image or article was saved. May be rate-limited by the gateway if you receive many messages.",
   "set.footer": "Note: this plugin talks to the WeChat ilink gateway directly; messages are stored only in this vault. Proactive sends are rate-limited by the gateway.",
-  "login.status": "Login status",
-  "login.bound": "Bound \xB7 bot {{bot}} \xB7 scanning user {{user}}",
+  "login.status": "Connection status",
+  "login.connect": "Connect WeChat",
+  "botState.unbound": "Not connected",
+  "botState.bound": "Bound",
+  "botState.disconnected": "Disconnected",
+  "botState.connecting": "Connecting",
+  "botState.connected": "Connected",
+  "botState.expired": "Session expired",
+  "botState.error": "Connection error",
+  "login.bound": "Bound \xB7 bot {{bot}}",
+  "login.scanGuide": "Scan the QR code with WeChat to connect.",
+  "login.connectedGuide": "Once connected, send messages from WeChat to Obsidian.",
+  "login.renderFailed": "Could not display the QR code. Please retry.",
+  "login.retry": "Get a new QR code",
   "login.rescan": "Re-scan",
   "login.logout": "Log out",
   "login.notLoggedIn": "Not logged in to WeChat yet. Scan the QR code below to bind:",
@@ -20821,8 +20835,9 @@ var en = {
   "login.waiting": "Waiting for scan\u2026",
   "login.scanned": "Scanned \u2014 please confirm on your phone\u2026",
   "login.success": "Logged in",
-  "modal.title": "WeChat Scan Login",
-  "modal.hint": "Scan the QR code below with WeChat, then confirm login on your phone.",
+  "modal.title": "Connect WeChat",
+  "modal.hint": "Scan the QR code with WeChat and confirm on your phone.",
+  "modal.cancel": "Cancel",
   "modal.renderFailed": "Failed to render QR code: {{err}}",
   "modal.openLink": "or tap this link to open on your phone",
   "importer.attachFailed": "Failed to save attachment: {{name}}",
@@ -20841,8 +20856,8 @@ var en = {
   "qr.expiredMultiple": "QR code expired multiple times, please retry",
   "qr.confirmMissingCreds": "Login confirmed but credentials missing",
   "qr.timeout": "Timed out waiting for scan, please retry",
-  "sendTest.name": "Test send",
-  "sendTest.desc": "Sends to your own bound WeChat account (one-to-one channel)",
+  "sendTest.name": "Test connection",
+  "sendTest.desc": "Send a test message to WeChat (checks sending only)",
   "sendTest.send": "Send",
   "sendTest.placeholder": "Type a message",
   "sendTest.ok": "Message sent",
@@ -20896,6 +20911,8 @@ var zh = {
   "set.language": "\u8BED\u8A00",
   "set.language.desc": "\u8BBE\u7F6E\u9875\u3001\u547D\u4EE4\u4E0E\u901A\u77E5\u7684\u754C\u9762\u8BED\u8A00",
   "set.language.system": "\u8DDF\u968F Obsidian",
+  "set.wechatBot": "\u5FAE\u4FE1Bot",
+  "set.wechatBot.desc": "\u901A\u8FC7\u5FAE\u4FE1\u5411 Obsidian \u53D1\u9001\u6D88\u606F",
   "set.autoConnect": "\u542F\u52A8\u65F6\u81EA\u52A8\u8FDE\u63A5",
   "set.autoConnect.desc": "Obsidian \u542F\u52A8\u540E\u81EA\u52A8\u767B\u5F55\u5E76\u5F00\u59CB\u63A5\u6536\u5FAE\u4FE1\u6D88\u606F",
   "set.inboxFolder": "\u6536\u4EF6\u7BB1\u76EE\u5F55",
@@ -20919,8 +20936,20 @@ var zh = {
   "set.autoReply": "\u603B\u662F\u56DE\u590D",
   "set.autoReply.desc": "\u6D88\u606F\u8BB0\u5F55\u5165\u5E93\u540E,\u81EA\u52A8\u56DE\u590D\u4E00\u6761\u786E\u8BA4\u6D88\u606F(\u5982\u56FE\u7247/\u6587\u7AE0\u7684\u4FDD\u5B58\u4F4D\u7F6E)\u3002\u6D88\u606F\u8F83\u591A\u65F6\u53EF\u80FD\u89E6\u53D1\u7F51\u5173\u9650\u6D41\u3002",
   "set.footer": "\u8BF4\u660E:\u672C\u63D2\u4EF6\u76F4\u63A5\u4E0E\u5FAE\u4FE1 ilink \u7F51\u5173\u901A\u4FE1,\u6D88\u606F\u4EC5\u4FDD\u5B58\u5728\u672C vault\u3002\u4E3B\u52A8\u53D1\u9001\u53D7\u7F51\u5173\u9650\u6D41\u3002",
-  "login.status": "\u767B\u5F55\u72B6\u6001",
-  "login.bound": "\u5DF2\u7ED1\u5B9A \xB7 \u673A\u5668\u4EBA {{bot}} \xB7 \u626B\u7801\u7528\u6237 {{user}}",
+  "login.status": "\u8FDE\u63A5\u72B6\u6001",
+  "login.connect": "\u8FDE\u63A5\u5FAE\u4FE1",
+  "botState.unbound": "\u672A\u8FDE\u63A5",
+  "botState.bound": "\u5DF2\u7ED1\u5B9A",
+  "botState.disconnected": "\u672A\u8FDE\u63A5",
+  "botState.connecting": "\u8FDE\u63A5\u4E2D",
+  "botState.connected": "\u5DF2\u8FDE\u63A5",
+  "botState.expired": "\u4F1A\u8BDD\u8FC7\u671F",
+  "botState.error": "\u8FDE\u63A5\u5F02\u5E38",
+  "login.bound": "\u5DF2\u7ED1\u5B9A \xB7 \u673A\u5668\u4EBA {{bot}}",
+  "login.scanGuide": "\u4F7F\u7528\u5FAE\u4FE1\u626B\u63CF\u4E8C\u7EF4\u7801\u5B8C\u6210\u8FDE\u63A5\u3002",
+  "login.connectedGuide": "\u8FDE\u63A5\u6210\u529F\u540E\uFF0C\u5373\u53EF\u901A\u8FC7\u5FAE\u4FE1\u53D1\u9001\u6D88\u606F\u5230 Obsidian\u3002",
+  "login.renderFailed": "\u4E8C\u7EF4\u7801\u663E\u793A\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5\u3002",
+  "login.retry": "\u91CD\u65B0\u83B7\u53D6\u4E8C\u7EF4\u7801",
   "login.rescan": "\u91CD\u65B0\u626B\u7801",
   "login.logout": "\u9000\u51FA\u767B\u5F55",
   "login.notLoggedIn": "\u5C1A\u672A\u767B\u5F55\u5FAE\u4FE1\u3002\u626B\u63CF\u4E0B\u65B9\u4E8C\u7EF4\u7801\u7ED1\u5B9A:",
@@ -20928,8 +20957,9 @@ var zh = {
   "login.waiting": "\u7B49\u5F85\u626B\u7801\u2026",
   "login.scanned": "\u5DF2\u626B\u7801,\u8BF7\u5728\u624B\u673A\u4E0A\u786E\u8BA4\u2026",
   "login.success": "\u767B\u5F55\u6210\u529F",
-  "modal.title": "\u5FAE\u4FE1\u626B\u7801\u767B\u5F55",
-  "modal.hint": "\u7528\u5FAE\u4FE1\u626B\u63CF\u4E0B\u65B9\u4E8C\u7EF4\u7801,\u7136\u540E\u5728\u624B\u673A\u4E0A\u786E\u8BA4\u767B\u5F55\u3002",
+  "modal.title": "\u8FDE\u63A5\u5FAE\u4FE1",
+  "modal.hint": "\u4F7F\u7528\u5FAE\u4FE1\u626B\u63CF\u4E8C\u7EF4\u7801\uFF0C\u5E76\u5728\u624B\u673A\u4E0A\u786E\u8BA4\u8FDE\u63A5\u3002",
+  "modal.cancel": "\u53D6\u6D88",
   "modal.renderFailed": "\u4E8C\u7EF4\u7801\u6E32\u67D3\u5931\u8D25: {{err}}",
   "modal.openLink": "\u6216\u70B9\u51FB\u6B64\u94FE\u63A5\u5728\u624B\u673A\u6253\u5F00",
   "importer.attachFailed": "\u9644\u4EF6\u4FDD\u5B58\u5931\u8D25: {{name}}",
@@ -20948,8 +20978,8 @@ var zh = {
   "qr.expiredMultiple": "\u4E8C\u7EF4\u7801\u591A\u6B21\u8FC7\u671F,\u8BF7\u91CD\u8BD5",
   "qr.confirmMissingCreds": "\u767B\u5F55\u786E\u8BA4\u4F46\u7F3A\u5C11\u51ED\u636E",
   "qr.timeout": "\u7B49\u5F85\u626B\u7801\u8D85\u65F6,\u8BF7\u91CD\u8BD5",
-  "sendTest.name": "\u6D4B\u8BD5\u53D1\u9001",
-  "sendTest.desc": "\u53D1\u9001\u5230\u4F60\u7ED1\u5B9A\u7684\u5FAE\u4FE1(\u4E00\u5BF9\u4E00\u901A\u9053,\u6536\u4EF6\u4EBA\u5C31\u662F\u4F60\u81EA\u5DF1)",
+  "sendTest.name": "\u6D4B\u8BD5\u8FDE\u901A\u6027",
+  "sendTest.desc": "\u5411\u5FAE\u4FE1\u53D1\u9001\u4E00\u6761\u6D4B\u8BD5\u6D88\u606F\uFF08\u4EC5\u9A8C\u8BC1\u53D1\u9001\uFF09",
   "sendTest.send": "\u53D1\u9001",
   "sendTest.placeholder": "\u8F93\u5165\u8981\u53D1\u9001\u7684\u5185\u5BB9",
   "sendTest.ok": "\u6D88\u606F\u5DF2\u53D1\u9001",
@@ -21003,6 +21033,8 @@ var tw = {
   "set.language": "\u8A9E\u8A00",
   "set.language.desc": "\u8A2D\u5B9A\u9801\u3001\u6307\u4EE4\u8207\u901A\u77E5\u7684\u4ECB\u9762\u8A9E\u8A00",
   "set.language.system": "\u8DDF\u96A8 Obsidian",
+  "set.wechatBot": "\u5FAE\u4FE1Bot",
+  "set.wechatBot.desc": "\u900F\u904E\u5FAE\u4FE1\u5411 Obsidian \u50B3\u9001\u8A0A\u606F",
   "set.autoConnect": "\u555F\u52D5\u6642\u81EA\u52D5\u9023\u63A5",
   "set.autoConnect.desc": "Obsidian \u555F\u52D5\u5F8C\u81EA\u52D5\u767B\u5165\u4E26\u958B\u59CB\u63A5\u6536\u5FAE\u4FE1\u8A0A\u606F",
   "set.inboxFolder": "\u6536\u4EF6\u5323\u76EE\u9304",
@@ -21026,8 +21058,20 @@ var tw = {
   "set.autoReply": "\u7E3D\u662F\u56DE\u8986",
   "set.autoReply.desc": "\u8A0A\u606F\u8A18\u9304\u5165\u5EAB\u5F8C,\u81EA\u52D5\u56DE\u8986\u4E00\u689D\u78BA\u8A8D\u8A0A\u606F(\u5982\u5716\u7247/\u6587\u7AE0\u7684\u5132\u5B58\u4F4D\u7F6E)\u3002\u8A0A\u606F\u8F03\u591A\u6642\u53EF\u80FD\u89F8\u767C\u9598\u9053\u5668\u9650\u6D41\u3002",
   "set.footer": "\u8AAA\u660E:\u672C\u5916\u639B\u76F4\u63A5\u8207\u5FAE\u4FE1 ilink \u9598\u9053\u5668\u901A\u8A0A,\u8A0A\u606F\u50C5\u5132\u5B58\u5728\u672C vault\u3002\u4E3B\u52D5\u767C\u9001\u53D7\u9598\u9053\u5668\u9650\u6D41\u3002",
-  "login.status": "\u767B\u5165\u72C0\u614B",
-  "login.bound": "\u5DF2\u7D81\u5B9A \xB7 \u6A5F\u5668\u4EBA {{bot}} \xB7 \u6383\u78BC\u4F7F\u7528\u8005 {{user}}",
+  "login.status": "\u9023\u63A5\u72C0\u614B",
+  "login.connect": "\u9023\u63A5\u5FAE\u4FE1",
+  "botState.unbound": "\u672A\u9023\u63A5",
+  "botState.bound": "\u5DF2\u7D81\u5B9A",
+  "botState.disconnected": "\u672A\u9023\u63A5",
+  "botState.connecting": "\u9023\u63A5\u4E2D",
+  "botState.connected": "\u5DF2\u9023\u63A5",
+  "botState.expired": "\u5DE5\u4F5C\u968E\u6BB5\u904E\u671F",
+  "botState.error": "\u9023\u63A5\u7570\u5E38",
+  "login.bound": "\u5DF2\u7D81\u5B9A \xB7 \u6A5F\u5668\u4EBA {{bot}}",
+  "login.scanGuide": "\u4F7F\u7528\u5FAE\u4FE1\u6383\u63CF\u4E8C\u7DAD\u78BC\u5B8C\u6210\u9023\u63A5\u3002",
+  "login.connectedGuide": "\u9023\u63A5\u6210\u529F\u5F8C\uFF0C\u5373\u53EF\u900F\u904E\u5FAE\u4FE1\u50B3\u9001\u8A0A\u606F\u5230 Obsidian\u3002",
+  "login.renderFailed": "\u4E8C\u7DAD\u78BC\u986F\u793A\u5931\u6557\uFF0C\u8ACB\u91CD\u8A66\u3002",
+  "login.retry": "\u91CD\u65B0\u53D6\u5F97\u4E8C\u7DAD\u78BC",
   "login.rescan": "\u91CD\u65B0\u6383\u78BC",
   "login.logout": "\u767B\u51FA",
   "login.notLoggedIn": "\u5C1A\u672A\u767B\u5165\u5FAE\u4FE1\u3002\u6383\u63CF\u4E0B\u65B9\u4E8C\u7DAD\u78BC\u7D81\u5B9A:",
@@ -21035,8 +21079,9 @@ var tw = {
   "login.waiting": "\u7B49\u5F85\u6383\u78BC\u2026",
   "login.scanned": "\u5DF2\u6383\u78BC,\u8ACB\u5728\u624B\u6A5F\u4E0A\u78BA\u8A8D\u2026",
   "login.success": "\u767B\u5165\u6210\u529F",
-  "modal.title": "\u5FAE\u4FE1\u6383\u78BC\u767B\u5165",
-  "modal.hint": "\u7528\u5FAE\u4FE1\u6383\u63CF\u4E0B\u65B9\u4E8C\u7DAD\u78BC,\u7136\u5F8C\u5728\u624B\u6A5F\u4E0A\u78BA\u8A8D\u767B\u5165\u3002",
+  "modal.title": "\u9023\u63A5\u5FAE\u4FE1",
+  "modal.hint": "\u4F7F\u7528\u5FAE\u4FE1\u6383\u63CF\u4E8C\u7DAD\u78BC\uFF0C\u4E26\u5728\u624B\u6A5F\u4E0A\u78BA\u8A8D\u9023\u63A5\u3002",
+  "modal.cancel": "\u53D6\u6D88",
   "modal.renderFailed": "\u4E8C\u7DAD\u78BC\u7522\u751F\u5931\u6557: {{err}}",
   "modal.openLink": "\u6216\u9EDE\u6B64\u9023\u7D50\u5728\u624B\u6A5F\u958B\u555F",
   "importer.attachFailed": "\u9644\u4EF6\u5132\u5B58\u5931\u6557: {{name}}",
@@ -21055,8 +21100,8 @@ var tw = {
   "qr.expiredMultiple": "\u4E8C\u7DAD\u78BC\u591A\u6B21\u904E\u671F,\u8ACB\u91CD\u8A66",
   "qr.confirmMissingCreds": "\u767B\u5165\u78BA\u8A8D\u4F46\u7F3A\u5C11\u6191\u8B49",
   "qr.timeout": "\u7B49\u5F85\u6383\u78BC\u903E\u6642,\u8ACB\u91CD\u8A66",
-  "sendTest.name": "\u6E2C\u8A66\u767C\u9001",
-  "sendTest.desc": "\u767C\u9001\u5230\u4F60\u7D81\u5B9A\u7684\u5FAE\u4FE1(\u4E00\u5C0D\u4E00\u901A\u9053,\u6536\u4EF6\u4EBA\u5C31\u662F\u4F60\u81EA\u5DF1)",
+  "sendTest.name": "\u6E2C\u8A66\u9023\u901A\u6027",
+  "sendTest.desc": "\u5411\u5FAE\u4FE1\u50B3\u9001\u4E00\u5247\u6E2C\u8A66\u8A0A\u606F\uFF08\u50C5\u9A57\u8B49\u50B3\u9001\uFF09",
   "sendTest.send": "\u767C\u9001",
   "sendTest.placeholder": "\u8F38\u5165\u8981\u767C\u9001\u7684\u5167\u5BB9",
   "sendTest.ok": "\u8A0A\u606F\u5DF2\u767C\u9001",
@@ -21532,6 +21577,199 @@ async function ensureAgentGuide(app, s, lang) {
 
 // src/settings.ts
 var import_obsidian3 = require("obsidian");
+var DEFAULT_SETTINGS = {
+  language: "system",
+  enabled: true,
+  inboxFolder: "WeLink",
+  attachmentFolder: "WeLink/attachments",
+  articleFolder: "WeLink/articles",
+  outboxFolder: "WeLink/outbox",
+  singleNoteMarker: "#\u5355\u72EC\u4FDD\u5B58",
+  fetchArticles: true,
+  groupArticlesByAccount: true,
+  autoImport: true,
+  notifyOnMessage: true,
+  autoReply: true
+};
+var FOLDER_KEYS = ["inboxFolder", "attachmentFolder", "articleFolder", "outboxFolder"];
+function isValidSingleNoteMarker(value) {
+  return typeof value === "string" && value.trim().length > 0 && !/[\r\n]/.test(value);
+}
+var WeLinkSettingTab = class extends import_obsidian3.PluginSettingTab {
+  constructor(app, plugin) {
+    super(app, plugin);
+    this.plugin = plugin;
+    this.plugin.onConnectionStateChange(() => this.updateBotStatus());
+  }
+  botStatusEl = null;
+  hide() {
+    this.botStatusEl = null;
+  }
+  getControlValue(key) {
+    return this.plugin.settings[key];
+  }
+  setControlValue(key, value) {
+    if (FOLDER_KEYS.includes(key) && typeof value === "string") value = (0, import_obsidian3.normalizePath)(value);
+    if (key === "singleNoteMarker") {
+      if (!isValidSingleNoteMarker(value)) {
+        new import_obsidian3.Notice(t("set.singleNoteMarker.invalid"));
+        return;
+      }
+      value = value.trim();
+    }
+    this.plugin.settings[key] = value;
+    if (key === "language") {
+      this.plugin.applyLanguage(value);
+      this.update();
+    }
+    if (FOLDER_KEYS.includes(key) || key === "singleNoteMarker") this.plugin.refreshAgentGuide();
+    void this.plugin.saveSettings();
+  }
+  getSettingDefinitions() {
+    return [
+      {
+        name: t("set.autoConnect"),
+        desc: t("set.autoConnect.desc"),
+        control: { type: "toggle", key: "enabled", defaultValue: DEFAULT_SETTINGS.enabled }
+      },
+      { name: t("set.wechatBot"), render: (setting) => this.renderBotSetting(setting) },
+      ...this.plugin.getState().token ? [{ name: t("sendTest.name"), render: (setting) => this.renderTestSetting(setting) }] : [],
+      {
+        name: t("set.language"),
+        desc: t("set.language.desc"),
+        control: {
+          type: "dropdown",
+          key: "language",
+          defaultValue: DEFAULT_SETTINGS.language,
+          options: { system: t("set.language.system"), en: "English", zh: "\u4E2D\u6587\uFF08\u7B80\u4F53\uFF09", tw: "\u4E2D\u6587\uFF08\u7E41\u9AD4\uFF09" }
+        }
+      },
+      {
+        name: t("set.inboxFolder"),
+        desc: t("set.inboxFolder.desc"),
+        control: { type: "text", key: "inboxFolder", defaultValue: DEFAULT_SETTINGS.inboxFolder }
+      },
+      {
+        name: t("set.attachmentFolder"),
+        desc: t("set.attachmentFolder.desc"),
+        control: { type: "text", key: "attachmentFolder", defaultValue: DEFAULT_SETTINGS.attachmentFolder }
+      },
+      {
+        name: t("set.articleFolder"),
+        desc: t("set.articleFolder.desc"),
+        control: { type: "text", key: "articleFolder", defaultValue: DEFAULT_SETTINGS.articleFolder }
+      },
+      {
+        name: t("set.outboxFolder"),
+        desc: t("set.outboxFolder.desc"),
+        control: { type: "text", key: "outboxFolder", defaultValue: DEFAULT_SETTINGS.outboxFolder }
+      },
+      {
+        name: t("set.singleNoteMarker"),
+        desc: t("set.singleNoteMarker.desc"),
+        control: { type: "text", key: "singleNoteMarker", defaultValue: DEFAULT_SETTINGS.singleNoteMarker }
+      },
+      {
+        name: t("set.autoImport"),
+        desc: t("set.autoImport.desc"),
+        control: { type: "toggle", key: "autoImport", defaultValue: DEFAULT_SETTINGS.autoImport }
+      },
+      {
+        name: t("set.fetchArticles"),
+        desc: t("set.fetchArticles.desc"),
+        control: { type: "toggle", key: "fetchArticles", defaultValue: DEFAULT_SETTINGS.fetchArticles }
+      },
+      {
+        name: t("set.groupByAccount"),
+        desc: t("set.groupByAccount.desc"),
+        control: {
+          type: "toggle",
+          key: "groupArticlesByAccount",
+          defaultValue: DEFAULT_SETTINGS.groupArticlesByAccount
+        }
+      },
+      {
+        name: t("set.notify"),
+        control: { type: "toggle", key: "notifyOnMessage", defaultValue: DEFAULT_SETTINGS.notifyOnMessage }
+      },
+      {
+        name: t("set.autoReply"),
+        desc: t("set.autoReply.desc"),
+        control: { type: "toggle", key: "autoReply", defaultValue: DEFAULT_SETTINGS.autoReply }
+      },
+      {
+        name: "",
+        searchable: false,
+        render: (setting) => {
+          setting.settingEl.createEl("p", { text: t("set.footer"), cls: "setting-item-description" });
+        }
+      },
+      // Where agents learn the outbox protocol: a note file maintained inside the vault
+      {
+        name: t("set.agentGuide"),
+        desc: t("set.agentGuide.desc", { path: `${this.plugin.settings.inboxFolder}/Agent.md` })
+      }
+    ];
+  }
+  renderBotSetting(setting) {
+    setting.setName(t("set.wechatBot")).setDesc(t("set.wechatBot.desc"));
+    this.botStatusEl = setting.nameEl.createSpan({ cls: "welink-bot-status" });
+    this.botStatusEl.setAttribute("aria-live", "polite");
+    this.updateBotStatus();
+    if (this.plugin.getState().token) {
+      setting.addButton((button) => button.setButtonText(t("login.rescan")).onClick(() => this.openLoginModal())).addButton(
+        (button) => button.setButtonText(t("login.logout")).setDestructive().onClick(async () => {
+          await this.plugin.logout();
+          this.update();
+        })
+      );
+    } else {
+      setting.addButton((button) => button.setButtonText(t("login.connect")).setCta().onClick(() => this.openLoginModal()));
+    }
+  }
+  updateBotStatus() {
+    if (!this.botStatusEl) return;
+    const state = !this.plugin.getState().token ? "unbound" : this.plugin.getConnState() === "disconnected" ? "bound" : this.plugin.getConnState();
+    const key = `botState.${state}`;
+    this.botStatusEl.setText(t(key));
+    this.botStatusEl.dataset.state = state;
+  }
+  openLoginModal() {
+    this.plugin.startLogin(() => this.update());
+  }
+  /** A separate peer setting row, shown after a successful QR binding. */
+  renderTestSetting(setting) {
+    let testInput = null;
+    setting.setName(t("sendTest.name")).setDesc(t("sendTest.desc")).addText((txt) => {
+      txt.setPlaceholder(t("sendTest.placeholder")).setValue("Hello from WeLink");
+      txt.inputEl.addClass("welink-send-input");
+      testInput = txt;
+    }).addButton((button) => {
+      button.setButtonText(t("sendTest.send")).setCta();
+      button.onClick(async () => {
+        const text = (testInput?.getValue() ?? "").trim();
+        if (!text) {
+          new import_obsidian3.Notice(t("sendTest.empty"));
+          return;
+        }
+        button.setDisabled(true);
+        try {
+          const result = await this.plugin.sendTestMessage(text);
+          if (result.ok) {
+            new import_obsidian3.Notice(t("sendTest.ok"));
+          } else {
+            new import_obsidian3.Notice(t("sendTest.failed", { err: buildSendFailure(result.errmsg, result.ret, result.contextToken) }), 1e4);
+          }
+        } finally {
+          button.setDisabled(false);
+        }
+      });
+    });
+  }
+};
+
+// src/qr-modal.ts
+var import_obsidian4 = require("obsidian");
 
 // src/core/qrlogin.ts
 var QR_POLL_TIMEOUT = 35e3;
@@ -22005,246 +22243,7 @@ function encodeQr(text) {
   };
 }
 
-// src/settings.ts
-var DEFAULT_SETTINGS = {
-  language: "system",
-  enabled: true,
-  inboxFolder: "WeLink",
-  attachmentFolder: "WeLink/attachments",
-  articleFolder: "WeLink/articles",
-  outboxFolder: "WeLink/outbox",
-  singleNoteMarker: "#\u5355\u72EC\u4FDD\u5B58",
-  fetchArticles: true,
-  groupArticlesByAccount: true,
-  autoImport: true,
-  notifyOnMessage: true,
-  autoReply: true
-};
-var FOLDER_KEYS = ["inboxFolder", "attachmentFolder", "articleFolder", "outboxFolder"];
-function isValidSingleNoteMarker(value) {
-  return typeof value === "string" && value.trim().length > 0 && !/[\r\n]/.test(value);
-}
-var WeLinkSettingTab = class extends import_obsidian3.PluginSettingTab {
-  constructor(app, plugin) {
-    super(app, plugin);
-    this.plugin = plugin;
-  }
-  /** Liveness flag for the settings pane: aborts QR polling when switched away/closed */
-  alive = false;
-  hide() {
-    this.alive = false;
-  }
-  getControlValue(key) {
-    return this.plugin.settings[key];
-  }
-  setControlValue(key, value) {
-    if (FOLDER_KEYS.includes(key) && typeof value === "string") value = (0, import_obsidian3.normalizePath)(value);
-    if (key === "singleNoteMarker") {
-      if (!isValidSingleNoteMarker(value)) {
-        new import_obsidian3.Notice(t("set.singleNoteMarker.invalid"));
-        return;
-      }
-      value = value.trim();
-    }
-    this.plugin.settings[key] = value;
-    if (key === "language") {
-      this.plugin.applyLanguage(value);
-      this.update();
-    }
-    if (FOLDER_KEYS.includes(key) || key === "singleNoteMarker") this.plugin.refreshAgentGuide();
-    void this.plugin.saveSettings();
-  }
-  getSettingDefinitions() {
-    return [
-      {
-        name: t("set.autoConnect"),
-        desc: t("set.autoConnect.desc"),
-        control: { type: "toggle", key: "enabled", defaultValue: DEFAULT_SETTINGS.enabled }
-      },
-      {
-        name: t("set.language"),
-        desc: t("set.language.desc"),
-        control: {
-          type: "dropdown",
-          key: "language",
-          defaultValue: DEFAULT_SETTINGS.language,
-          options: { system: t("set.language.system"), en: "English", zh: "\u4E2D\u6587\uFF08\u7B80\u4F53\uFF09", tw: "\u4E2D\u6587\uFF08\u7E41\u9AD4\uFF09" }
-        }
-      },
-      // Login section: dynamic QR flow, rendered imperatively via the escape hatch
-      { name: t("login.status"), render: (setting) => this.renderLoginSection(setting.settingEl) },
-      {
-        name: t("set.inboxFolder"),
-        desc: t("set.inboxFolder.desc"),
-        control: { type: "text", key: "inboxFolder", defaultValue: DEFAULT_SETTINGS.inboxFolder }
-      },
-      {
-        name: t("set.attachmentFolder"),
-        desc: t("set.attachmentFolder.desc"),
-        control: { type: "text", key: "attachmentFolder", defaultValue: DEFAULT_SETTINGS.attachmentFolder }
-      },
-      {
-        name: t("set.articleFolder"),
-        desc: t("set.articleFolder.desc"),
-        control: { type: "text", key: "articleFolder", defaultValue: DEFAULT_SETTINGS.articleFolder }
-      },
-      {
-        name: t("set.outboxFolder"),
-        desc: t("set.outboxFolder.desc"),
-        control: { type: "text", key: "outboxFolder", defaultValue: DEFAULT_SETTINGS.outboxFolder }
-      },
-      {
-        name: t("set.singleNoteMarker"),
-        desc: t("set.singleNoteMarker.desc"),
-        control: { type: "text", key: "singleNoteMarker", defaultValue: DEFAULT_SETTINGS.singleNoteMarker }
-      },
-      {
-        name: t("set.autoImport"),
-        desc: t("set.autoImport.desc"),
-        control: { type: "toggle", key: "autoImport", defaultValue: DEFAULT_SETTINGS.autoImport }
-      },
-      {
-        name: t("set.fetchArticles"),
-        desc: t("set.fetchArticles.desc"),
-        control: { type: "toggle", key: "fetchArticles", defaultValue: DEFAULT_SETTINGS.fetchArticles }
-      },
-      {
-        name: t("set.groupByAccount"),
-        desc: t("set.groupByAccount.desc"),
-        control: {
-          type: "toggle",
-          key: "groupArticlesByAccount",
-          defaultValue: DEFAULT_SETTINGS.groupArticlesByAccount
-        }
-      },
-      {
-        name: t("set.notify"),
-        control: { type: "toggle", key: "notifyOnMessage", defaultValue: DEFAULT_SETTINGS.notifyOnMessage }
-      },
-      {
-        name: t("set.autoReply"),
-        desc: t("set.autoReply.desc"),
-        control: { type: "toggle", key: "autoReply", defaultValue: DEFAULT_SETTINGS.autoReply }
-      },
-      {
-        name: "",
-        searchable: false,
-        render: (setting) => {
-          setting.settingEl.createEl("p", { text: t("set.footer"), cls: "setting-item-description" });
-        }
-      },
-      // Where agents learn the outbox protocol: a note file maintained inside the vault
-      {
-        name: t("set.agentGuide"),
-        desc: t("set.agentGuide.desc", { path: `${this.plugin.settings.inboxFolder}/Agent.md` })
-      }
-    ];
-  }
-  /** Login-status section: shows the bound ID when logged in; inline QR code otherwise */
-  renderLoginSection(containerEl) {
-    this.alive = true;
-    containerEl.empty();
-    const st = this.plugin.getState();
-    const section = containerEl.createDiv({ cls: "welink-login-section" });
-    if (st?.token) {
-      new import_obsidian3.Setting(section).setName(t("login.status")).setDesc(t("login.bound", { bot: st.botId || "?", user: st.scannedUser || "?" })).addButton(
-        (b) => b.setButtonText(t("login.rescan")).onClick(() => {
-          void this.startInlineLogin(section);
-        })
-      ).addButton(
-        (b) => b.setButtonText(t("login.logout")).setDestructive().onClick(async () => {
-          this.plugin.disconnect();
-          this.plugin.clearCredentials();
-          new import_obsidian3.Notice(t("notice.loggedOut"));
-          this.update();
-        })
-      );
-      let testInput = null;
-      new import_obsidian3.Setting(section).setName(t("sendTest.name")).setDesc(t("sendTest.desc")).addText((txt) => {
-        txt.setPlaceholder(t("sendTest.placeholder")).setValue("Hello from WeLink");
-        txt.inputEl.addClass("welink-send-input");
-        testInput = txt;
-      }).addButton((b) => {
-        b.setButtonText(t("sendTest.send")).setCta();
-        b.onClick(async () => {
-          const text = (testInput?.getValue() ?? "").trim();
-          if (!text) {
-            new import_obsidian3.Notice(t("sendTest.empty"));
-            return;
-          }
-          b.setDisabled(true);
-          const res = await this.plugin.sendTestMessage(text);
-          b.setDisabled(false);
-          if (res.ok) {
-            new import_obsidian3.Notice(t("sendTest.ok"));
-          } else {
-            new import_obsidian3.Notice(t("sendTest.failed", { err: buildSendFailure(res.errmsg, res.ret, res.contextToken) }), 1e4);
-          }
-        });
-      });
-    } else {
-      section.createEl("p", { text: t("login.notLoggedIn") });
-      void this.startInlineLogin(section);
-    }
-  }
-  /** Inline scan inside the settings page: render QR -> poll -> refresh the pane on success */
-  async startInlineLogin(section) {
-    section.empty();
-    const qrWrap = section.createDiv({ cls: "welink-qr" });
-    const statusEl = section.createEl("p", { text: t("login.fetching"), cls: "welink-qr-status" });
-    const out = await loginLoop(this.plugin.getTransport(), this.plugin.getApiBase(), {
-      onQr: (url) => {
-        if (!this.alive) return;
-        this.renderQrInto(qrWrap, url);
-        statusEl.setText(t("login.waiting"));
-      },
-      onScanned: () => {
-        if (this.alive) statusEl.setText(t("login.scanned"));
-      },
-      onError: (msg) => {
-        if (this.alive) statusEl.setText(msg);
-      },
-      cancelled: () => !this.alive
-    });
-    if (!this.alive) return;
-    if (out) {
-      this.plugin.applyLogin(out);
-      new import_obsidian3.Notice(t("notice.loggedIn"));
-      this.update();
-    }
-  }
-  /** Render the QR code into the given container (canvas + URL fallback text) */
-  renderQrInto(el, url) {
-    el.empty();
-    try {
-      const qr = encodeQr(url);
-      const n = qr.size + 8;
-      const cell = Math.max(3, Math.min(8, Math.floor(240 / n)));
-      const canvas = el.createEl("canvas");
-      canvas.width = n * cell;
-      canvas.height = n * cell;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "#000000";
-      const quiet = 4;
-      for (let r = 0; r < qr.size; r++) {
-        for (let c = 0; c < qr.size; c++) {
-          if (qr.isDark(r, c)) {
-            ctx.fillRect((c + quiet) * cell, (r + quiet) * cell, cell, cell);
-          }
-        }
-      }
-    } catch {
-      el.createDiv({ text: url });
-    }
-    el.createDiv({ text: url, cls: "welink-qr-url" });
-  }
-};
-
 // src/qr-modal.ts
-var import_obsidian4 = require("obsidian");
 var QrLoginModal = class extends import_obsidian4.Modal {
   constructor(app, transport, baseUrl, onDone) {
     super(app);
@@ -22253,34 +22252,60 @@ var QrLoginModal = class extends import_obsidian4.Modal {
     this.onDone = onDone;
   }
   cancelled = false;
+  attemptCancelled = false;
   qrEl = null;
   statusEl = null;
+  retryEl = null;
   onOpen() {
     const { contentEl } = this;
+    this.modalEl.addClass("welink-qr-modal");
     contentEl.empty();
     contentEl.createEl("h3", { text: t("modal.title") });
     contentEl.createEl("p", { text: t("modal.hint"), cls: "welink-qr-hint" });
     this.qrEl = contentEl.createDiv({ cls: "welink-qr welink-qr-center" });
     this.statusEl = contentEl.createEl("p", { text: t("login.fetching"), cls: "welink-qr-status" });
+    const actions = contentEl.createDiv({ cls: "welink-qr-actions" });
+    this.retryEl = actions.createEl("button", { text: t("login.retry") });
+    this.retryEl.hidden = true;
+    this.retryEl.addEventListener("click", () => this.startLogin());
+    const cancel = actions.createEl("button", { text: t("modal.cancel") });
+    cancel.addEventListener("click", () => this.close());
+    this.startLogin();
+  }
+  startLogin() {
+    if (this.cancelled) return;
+    this.attemptCancelled = false;
+    this.qrEl?.empty();
+    this.setStatus(t("login.fetching"));
+    if (this.retryEl) this.retryEl.hidden = true;
     void loginLoop(this.transport, this.baseUrl, {
       onQr: (url) => {
-        this.renderQr(url);
-        this.setStatus(t("login.waiting"));
+        if (this.cancelled) return;
+        this.attemptCancelled = !this.renderQr(url);
+        this.setStatus(this.attemptCancelled ? t("login.renderFailed") : t("login.waiting"));
       },
       onScanned: () => this.setStatus(t("login.scanned")),
       onError: (msg) => this.setStatus(msg),
-      cancelled: () => this.cancelled
+      cancelled: () => this.cancelled || this.attemptCancelled
     }).then((out) => {
-      if (!out || this.cancelled) return;
+      if (this.cancelled) return;
+      if (!out) {
+        this.qrEl?.empty();
+        if (this.retryEl) this.retryEl.hidden = false;
+        return;
+      }
       this.setStatus(t("login.success"));
       this.close();
       this.onDone(out);
     }).catch((e) => {
+      if (this.cancelled) return;
+      this.qrEl?.empty();
       this.setStatus(String(e?.message ?? e));
+      if (this.retryEl) this.retryEl.hidden = false;
     });
   }
   renderQr(url) {
-    if (!this.qrEl) return;
+    if (!this.qrEl) return false;
     this.qrEl.empty();
     try {
       const qr = encodeQr(url);
@@ -22291,7 +22316,7 @@ var QrLoginModal = class extends import_obsidian4.Modal {
       canvas.width = n * cell;
       canvas.height = n * cell;
       const ctx = canvas.getContext("2d");
-      if (!ctx) return;
+      if (!ctx) throw new Error("Canvas is unavailable");
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = "#000000";
@@ -22302,9 +22327,11 @@ var QrLoginModal = class extends import_obsidian4.Modal {
           }
         }
       }
-      this.qrEl.createEl("a", { text: t("modal.openLink"), href: url, cls: "welink-qr-link" });
+      return true;
     } catch (e) {
-      this.qrEl.createEl("p", { text: t("modal.renderFailed", { err: String(e?.message ?? e) }) });
+      this.qrEl.empty();
+      this.setStatus(t("modal.renderFailed", { err: String(e?.message ?? e) }));
+      return false;
     }
   }
   setStatus(text) {
@@ -22312,6 +22339,7 @@ var QrLoginModal = class extends import_obsidian4.Modal {
   }
   onClose() {
     this.cancelled = true;
+    this.attemptCancelled = true;
     this.contentEl.empty();
   }
 };
@@ -22477,6 +22505,7 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
   polling = false;
   stopRequested = false;
   connState = "disconnected";
+  connectionListeners = /* @__PURE__ */ new Set();
   statusBar = null;
   outbox = null;
   /** command id -> i18n key, so names can be re-rendered when the language changes */
@@ -22573,8 +22602,15 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
     this.statusBar.setAttribute("aria-label", this.store.get().lastError || "");
   }
   setConn(s) {
+    if (this.connState === s) return;
     this.connState = s;
     this.renderStatus();
+    for (const listener of this.connectionListeners) listener();
+  }
+  /** Keep the settings status in sync with the polling state. */
+  onConnectionStateChange(listener) {
+    this.connectionListeners.add(listener);
+    return () => this.connectionListeners.delete(listener);
   }
   /** Current connection state */
   getConnState() {
@@ -22625,10 +22661,11 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
     this.setConn("disconnected");
   }
   /** Start scan-login (for the command palette) */
-  startLogin() {
+  startLogin(onDone) {
     new QrLoginModal(this.app, this.transport, ILINK_DEFAULT_BASE, (out) => {
       this.applyLogin(out);
       new import_obsidian5.Notice(t("notice.loggedIn"));
+      onDone?.();
     }).open();
   }
   /** Disconnect and clear login credentials */
