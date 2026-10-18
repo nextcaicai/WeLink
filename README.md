@@ -1,200 +1,200 @@
-<p align="right"><strong>中文</strong> · <a href="README_EN.md">English</a></p>
+<p align="right"><a href="README_CN.md">中文</a> · <strong>English</strong></p>
 
 # WeLink
 
-Obsidian 桌面端插件。通过腾讯官方 **ilink** 机器人网关收发消息，不改装微信客户端，不需要关注任何服务号或小程序，也不经过作者的个人服务器。安全、稳定。
+An [Obsidian](https://obsidian.md) desktop plugin. It sends and receives messages through Tencent’s official **ilink** bot gateway. It does not modify the WeChat client, does not require following any official account or mini program, and does not pass through the author’s own server.
 
-你只需要扫码绑定自己常用的微信账号，就可以把「发到微信 Clawbot 的文字、图片、语音、文件、公众号文章链接」收进Obsidian 知识库。
+Scan to bind your own WeChat account, then send text, images, voice, files, and official-account article links to the WeChat Clawbot. They land in your Obsidian vault.
 
-## 功能
+## Features
 
-- **收**：微信消息写入当天对话笔记（收发同一时间线）；图片、视频、文件、语音解密后存到附件目录；消息里的链接会尝试抓成 Markdown 文章笔记。
-- **独立笔记**：纯文字消息第一行写成 `#单独保存`，正文从下一行开始，会单独存成一条笔记，每天的对话笔记里只留链接。
-- **发**：往发件箱丢一个文件即可。`.md` 作为文本消息发送（支持标题、列表、加粗、代码块）；图片、视频、文档作为附件发送（≤100MB）。
-- **Agent**：插件在收件箱目录维护 `Agent.md`，Agent 读完就能用发件箱给你发微信。完整协议见 [Agent.md](Agent.md)。
+- **Receive:** WeChat messages are written into the daily conversation note (received and sent on one timeline). Images, videos, files, and voice are decrypted into the attachment folder. Links in messages are fetched as Markdown article notes when possible.
+- **Standalone notes:** If the first line of a plain-text message is `#单独保存`, the body starting on the next line is saved as its own note. The daily conversation note keeps only a link.
+- **Send:** Drop one file into the outbox. A `.md` file is sent as text (headings, lists, bold, and code blocks are supported). Images, videos, and documents are sent as attachments (≤100MB).
+- **Agent:** The plugin maintains `Agent.md` in the inbox folder. After reading it, an Agent can send WeChat messages through the outbox. See [Agent.md](Agent.md) for the protocol.
 
-本项目基于 [Wechatian](https://github.com/laruence/wechatian) fork。进行了以下增强和优化：
+This project is a fork of [Wechatian](https://github.com/laruence/wechatian), with these enhancements:
 
-- **独立笔记（新）**：通过设置如触发词`#单独保存`，就可以将发给微信 Clawbot 发送的纯文字内容单独存成一条笔记，而不混在当天流水账里。
-- **公众号文章**：优化了对公众号贴图内容、纯文字内容的抓取，微信验证页、点赞收藏字样等页面元素不再被当成正文写进笔记。
-- **扫码和连接**：修复了点击「重新扫码」和「推出登录」后二维码不出现的情况，同时优化了未连接 / 已连接 / 会话过期的状态显示。
-- **语音优化**：兼容网关较新的媒体地址，语音能够和转录文字一并写入笔记。
+- **Standalone notes (new):** Set a trigger such as `#单独保存`, then plain text sent to the WeChat Clawbot is saved as its own note instead of mixing into the daily log.
+- **Official-account articles:** Fetching is improved for image-heavy and text-only posts. Verification pages and UI chrome such as like/favorite labels are no longer written into the note as article body.
+- **Scan and connection:** Fixed the case where the QR code did not appear after **Re-scan** or **Log out**. Connection states (not connected / connected / session expired) are clearer.
+- **Voice:** Compatible with newer gateway media URLs. Voice audio is saved together with any transcript the gateway provides.
 
-## 环境要求
+## Requirements
 
-- Obsidian 桌面端 **1.13.0** 或更高（手机 App 不能运行本插件）
-- 能访问微信 ilink 网关的网络
-- 一个你自己的微信账号，用来扫码绑定
+- Obsidian desktop **1.13.0** or later (the mobile app cannot run this plugin)
+- Network access to the WeChat ilink gateway
+- Your own WeChat account, used to scan and bind
 
-当前未上架 Obsidian 社区插件市场。安装后，Obsidian 会从 `<Vault>/.obsidian/plugins/welink/` 加载 `manifest.json`、`main.js` 和 `styles.css`。
+WeLink is not in the Obsidian community plugin store yet. After install, Obsidian loads `manifest.json`, `main.js`, and `styles.css` from `<Vault>/.obsidian/plugins/welink/`.
 
-## 安装
+## Install
 
-| 方式 | 适合谁 | 效果 |
+| Method | Who it is for | What it does |
 |---|---|---|
-| 方法一：让 Agent 安装 | 已经在用 Cursor / Claude 等 Agent | 把本仓库和下面那段提示词交给它即可 |
-| 方法二：Releases | 只想用，不改代码 | 把构建好的三个文件放进插件目录 |
-| 方法三：BRAT | 想跟着仓库更新 | 由 BRAT（Beta Reviewers Auto-update Tester）拉取本仓库 |
-| 方法四：源码构建 | 开发或自行打包 | 本地编译后再拷进 vault |
+| Method 1: Let an Agent install | You already use Cursor, Claude, or a similar Agent | Hand it this repo and the prompt below |
+| Method 2: Releases | You just want to use it | Copy the three built files into the plugin folder |
+| Method 3: BRAT | You want updates from the repo | BRAT (Beta Reviewers Auto-update Tester) pulls this repository |
+| Method 4: Build from source | You are developing or packaging it yourself | Compile locally, then copy into the vault |
 
-**方法一：让 Agent 安装**
+**Method 1: Let an Agent install**
 
-把本仓库和下面这段话一起交给 Agent：
+Give the Agent this repository and the following prompt:
 
 ```text
-请阅读 README.md，把 WeLink 安装到我指定的 Obsidian vault。
-只安装 Obsidian 运行所需的 main.js、manifest.json、styles.css。
-不要修改我的笔记内容，不要删除其他插件目录，不要读取、打印或提交密钥。
-装完后告诉我接下来如何扫码绑定。
+Read README.md and install WeLink into the Obsidian vault I specify.
+Install only main.js, manifest.json, and styles.css — the files Obsidian loads.
+Do not modify my notes, do not delete other plugin folders, and do not read, print, or commit secrets.
+When finished, tell me how to scan and bind WeChat.
 ```
 
-**方法二：从 Releases 安装**
+**Method 2: Install from Releases**
 
-1. 打开本仓库的 [Releases](https://github.com/nextcaicai/WeLink/releases/)，下载 `main.js`、`manifest.json`、`styles.css`。
-2. 放到 `<你的库>/.obsidian/plugins/welink/`（三个文件直接在这个文件夹里，不要多套一层目录）。
-3. Obsidian → 设置 → 第三方插件 → 关闭安全模式 → 刷新 → 启用 **WeLink**。
-4. 改完文件后重新加载插件，或重启 Obsidian。
+1. Open this repo’s [Releases](https://github.com/nextcaicai/WeLink/releases/) and download `main.js`, `manifest.json`, and `styles.css`.
+2. Put them in `<your-vault>/.obsidian/plugins/welink/` (the three files sit directly in that folder — do not nest another directory).
+3. Obsidian → Settings → Community plugins → turn off Restricted mode → reload → enable **WeLink**.
+4. After changing the files, reload the plugin or restart Obsidian.
 
-**方法三：用 BRAT 安装**
+**Method 3: Install with BRAT**
 
-1. 先安装社区插件 [BRAT](https://obsidian.md/plugins?id=obsidian42-brat)。
-2. 在 BRAT 里添加本仓库地址。
-3. 启用 **WeLink**，然后重新加载插件。
+1. Install the community plugin [BRAT](https://obsidian.md/plugins?id=obsidian42-brat).
+2. In BRAT, add `https://github.com/nextcaicai/WeLink`.
+3. Enable **WeLink**, then reload the plugin.
 
-**方法四：从源码构建**
+**Method 4: Build from source**
 
 ```bash
-git clone <本仓库地址>
+git clone https://github.com/nextcaicai/WeLink.git
 cd WeLink
 npm install
 OBSIDIAN_PLUGIN_DIR=/path/to/vault/.obsidian/plugins/welink npm run build
 ```
 
-未设置 `OBSIDIAN_PLUGIN_DIR` 时，构建只生成仓库根目录的 `main.js`，不会写入任何 vault。
+If `OBSIDIAN_PLUGIN_DIR` is not set, the build only writes `main.js` at the repo root and does not touch any vault.
 
+## Quick start
 
-## 快速上手
+About five minutes. Button labels below match the English UI.
 
-大约五分钟。设置页的按钮文案以界面为准，下面简体中文界面描述。
+1. Obsidian → Settings → WeLink → **Connect WeChat**. In the **Connect WeChat** window, scan with WeChat and confirm on your phone.
+2. A bot contact appears in WeChat. The status bar shows **WeChat online**, and settings show **Connected**.
+3. **Send any message to this bot from WeChat first** (for example, “Hello”). The gateway issues the send credential only after the bound account has messaged the bot. Skip this step and test send will fail.
+4. Back in settings, click **Send** under **Test connection**. When the test message arrives on your phone, the bridge is live in both directions.
 
-1. Obsidian → 设置 → WeLink → **连接微信**。弹出「连接微信」窗口，用微信扫码并在手机上确认。
-2. 通讯录里会出现一个机器人联系人；状态栏显示「微信在线」，设置页显示「已连接」。
-3. **先从微信给这个机器人发任意一条消息**（例如「你好」）。网关只在绑定账号发过消息后，才下发发送凭证；跳过这一步，测试发送会失败。
-4. 回到设置页，在「测试连通性」里点 **发送**。手机收到测试消息，说明双向通道已经通了。
+Command palette commands: `Connect WeChat`, `Disconnect WeChat`, `Re-scan QR code to log in`, `Open today's inbox`.
 
+## Usage
 
-## 使用
-
-默认目录如下，均可在「文件存放与发送」里改：
+Default folders, all changeable under **Files and sending**:
 
 ```text
 WeLink/
-├── Agent.md              # 给 Agent 看的发件说明（插件维护）
-├── 2026-10-17.md         # 当天对话笔记（接收 / 发送）
-├── notes/                # 「独立笔记触发词」单独保存的纯文字笔记
-├── articles/             # 公众号 / 网页文章笔记
-│   └── <公众号名>/
-│       ├── 2026-10-17 某篇文章.md
-│       └── assets/       # 该公众号文章的配图
-├── attachments/          # 聊天图片、文件、视频、语音
-└── outbox/               # 往这里写文件就会发给自己
+├── Agent.md              # outbox instructions for Agents (plugin-maintained)
+├── 2026-10-17.md         # daily conversation note (received / sent)
+├── notes/                # plain-text notes saved via the standalone note trigger
+├── articles/             # official-account / web article notes
+│   └── <account>/
+│       ├── 2026-10-17 Some title.md
+│       └── assets/       # images that belong to that account's articles
+├── attachments/          # chat images, files, videos, voice
+└── outbox/               # write a file here to send it to yourself
 ```
 
-### 接收
+### Receiving
 
-发给机器人的内容，会进入当天的 `WeLink/YYYY-MM-DD.md`：带时间、标记「接收/发送」，正文在引用块里，媒体用 `![[...]]` 嵌入。
+Content sent to the bot lands in `WeLink/YYYY-MM-DD.md`: timestamped, marked received/sent, body in a quote block, media as `![[...]]`.
 
-| 你发的内容 | 结果 |
+| You send | Result |
 |---|---|
-| 普通文字 | 追加到当天对话笔记 |
-| 第一行是 `#单独保存` 的纯文字 | 去掉触发词，存到 `WeLink/notes/`，对话笔记里只留链接 |
-| 图片 / 视频 / 文件 / 语音 | 解密后写入 `WeLink/attachments/`，并嵌进当天笔记；语音会尽量转成可播放的 WAV |
-| 带 http(s) 链接的消息 | 额外尝试抓取标题和正文，建成文章笔记 |
+| Ordinary text | Appended to the daily conversation note |
+| Plain text whose first line is `#单独保存` | Trigger stripped; saved under `WeLink/notes/`; daily note keeps a link |
+| Image / video / file / voice | Decrypted into `WeLink/attachments/` and embedded in the daily note; voice is transcoded to playable WAV when possible |
+| A message with http(s) links | Also fetched as article notes when possible |
 
-独立笔记只处理「纯文字、无链接、无附件」的消息。链接或附件仍按原来的导入方式处理。触发词必须整行完全一致，可在设置里改。
+Standalone notes apply only to plain text with no links and no attachments. Linked or attached messages keep the normal import path. The trigger must match the whole first line; you can change it in settings.
 
-文章抓取默认开启。一条消息最多处理 5 个链接；公众号文章按账号分子目录，可关闭。抓取走独立 HTTP 请求，不使用你浏览器里已打开的登录态。普通公开文章通常能拿到正文；部分页面会返回验证页，笔记里可能出现「允许 / 微信扫一扫」而不是原文。遇到这种情况，发原始链接重试，或关掉「抓取文章信息」。
+Article fetching is on by default. At most 5 links per message are processed. Official-account articles can be grouped into a folder per account (optional). Fetching uses a standalone HTTP request and does not reuse your browser login. Public articles usually come through; some pages return a verification screen, and the note may show “Allow / Scan with WeChat” instead of the article. Retry with the original link, or turn off **Fetch article info**.
 
-「总是回复」默认开启：消息写入库后，机器人会回一条确认（例如图片、文章保存在哪）。消息很多时可能触发网关限流，可在设置里关掉。
+**Always reply on receipt** is on by default: after a message is recorded, the bot sends a confirmation (for example, where an image or article was saved). Heavy traffic may hit the gateway rate limit; turn this off in settings if needed.
 
-### 发送
+### Sending
 
-这是给自己的单向通道：**不能指定收件人**，所有文件都发给扫码绑定的那个微信。不要调任何 HTTP API，文件通道就是全部接口。
+This is a one-to-one channel to yourself: **no recipient is specified**. Every file goes to the WeChat account that scanned to bind. Do not call any HTTP API; the file channel is the whole interface.
 
-往 `WeLink/outbox/` 写**一个文件**：
+Write **one file** into `WeLink/outbox/`:
 
-| 写入发件箱的文件 | 效果 |
+| File in the outbox | Result |
 |---|---|
-| `notify.md`（任意文本） | 内容原样作为文本消息发送，支持 Markdown；建议控制在手机一屏内 |
-| 图片 `.jpg/.png/.gif/.webp`、视频 `.mp4` 等、文档 `.pdf/.docx/…`（≤100MB） | 作为附件发送 |
+| `notify.md` (any text) | Sent as a text message, Markdown supported; keep it to about one phone screen |
+| Image `.jpg/.png/.gif/.webp`, video `.mp4`, document `.pdf/.docx/…` (≤100MB) | Sent as an attachment |
 
-插件在下一轮轮询（约 30–60 秒）消费发件箱。写完后等大约一分钟再看：
+The plugin consumes the outbox on its next poll (about 30–60 seconds). Wait about a minute, then check:
 
-- **文件消失** = 发送成功，并记进当天对话笔记（媒体会在 `attachments/` 留副本并链接）
-- **文件还在** = 失败：`.md` 末尾会追加 `<!-- WeLink send failed: ... -->`；媒体会生成同名 `.welink-failed.md` 说明原因
+- **File gone** = sent, and recorded in today’s conversation note (media keeps a copy under `attachments/` and is linked)
+- **File still there** = failed: a `.md` gets a trailing `<!-- WeLink send failed: ... -->` comment; media gets a sibling `.welink-failed.md` with the reason
 
-未识别的扩展名会留在发件箱，不会被发送。
+Unknown extensions stay in the outbox and are not sent.
 
-### 给 Agent
+### For Agents
 
-让 Agent 读取 vault 里的 `WeLink/Agent.md`（路径以设置为准）。它会说明：写哪个目录、如何判断成功、去哪读你的回复、以及限流。完整说明见仓库里的 [Agent.md](Agent.md)。
+Point the Agent at `WeLink/Agent.md` in the vault (use the path from settings). It explains which folder to write, how to judge success, where to read your reply, and the rate limit. The full protocol is in [Agent.md](Agent.md).
 
-这条通道适合通知（任务完成）和拍板（发问题和选项，你回一句），不适合闲聊。网关对主动发送有限流，大约每天只能发数条。
+Use this channel for notifications (a job finished) and decisions (send a question with options, you reply in one line), not for chat. The gateway rate-limits proactive sends to a handful per day.
 
-## 安全与隐私
+## Safety and privacy
 
-- 插件直接连接微信 ilink 网关，消息只写进当前 vault，不经过作者服务器，也没有遥测。
-- 只接受扫码绑定的那个微信账号；其他人即使知道机器人 ID，也不会写入你的库。
-- 登录态保存在插件目录的 `state.json`（token、cursor、发送凭据等）。设置项在同目录的 `data.json`。不要把这两个文件提交到 Git，也不要发给别人。
-- 会访问的网络：
-  - `https://ilinkai.weixin.qq.com`：扫码、长轮询收消息、发送（网关也可能返回专用地址）
-  - `https://novac2c.cdn.weixin.qq.com/c2c`：收发图片、视频、文件、语音
-  - 仅在开启「抓取文章信息」时：消息里的文章链接本身
-- 关掉「自动导入消息」后，插件仍会轮询，但不会把内容写入笔记。
+- The plugin talks to the WeChat ilink gateway directly. Messages are stored only in this vault. There is no author server and no telemetry.
+- Only the WeChat account that scanned to bind is accepted. Anyone else who learns the bot ID cannot write into your vault.
+- Login state lives in `state.json` in the plugin folder (token, cursor, send credentials, and similar). Settings live in `data.json` in the same folder. Do not commit these files or share them.
+- Network destinations:
+  - `https://ilinkai.weixin.qq.com`: scan, long-poll receive, send (the gateway may also return a dedicated base URL)
+  - `https://novac2c.cdn.weixin.qq.com/c2c`: images, videos, files, voice
+  - Only when **Fetch article info** is on: the article URLs inside messages
+- If you turn off **Auto-import messages**, the plugin still polls, but it does not write content into notes.
 
-## 常见问题
+## FAQ
 
-**电脑没开 Obsidian 时，发给机器人的消息会丢吗？**
-不会立刻丢。下次打开 Obsidian 并连上后会补收。网关具体保留多久没有公开说明，很久以前的离线消息只能当尽力而为。
+**If Obsidian is closed, do messages sent to the bot get lost?**
+Not immediately. They are picked up the next time you open Obsidian and connect. How long the gateway keeps them is not documented; treat very old offline messages as best-effort.
 
-**为什么刚扫完码还不能发送？**
-需要先从微信给机器人发任意一条消息。设置页的失败提示会写「还没有发送凭据」。
+**Why can’t I send right after scanning?**
+Send any message to the bot from WeChat first. The settings error says you do not have a send credential yet.
 
-**手机 Obsidian 能用吗？**
-插件本身只在桌面端运行。它写入的是普通 Markdown，用 iCloud / Obsidian Sync / Git 同步后，手机可以阅读，但不能在手机上收发。
+**Does it work in Obsidian mobile?**
+The plugin itself is desktop-only. It writes plain Markdown, so iCloud / Obsidian Sync / Git can let you read on a phone, but you cannot send or receive from mobile.
 
-**为什么转发的文章或文件没进来？**
-ilink 机器人侧的已知限制：转发的文章和文件可能收不到。请发原始链接，或直接发送文件本身。
+**Why didn’t a forwarded article or file arrive?**
+Known ilink bot limitation: forwarded articles and files may not arrive. Send the original link, or send the file itself.
 
-**语音有文字稿吗？**
-微信如果把转写文字一起发过来，会写入当天笔记；音频会另外存成可播放的 WAV。微信没给文字时，当前版本不会再拿音频去别处识别。
+**Do voice messages include a transcript?**
+If WeChat sends a transcript with the voice message, it is written into the daily note. The audio is also saved as playable WAV. If WeChat does not send text, this version does not send the audio to another recognition service.
 
-**会话过期怎么办？**
-状态栏会显示「会话过期」。到设置页点「重新扫码」，确认后再从微信给机器人发一条消息，发送才会重新解锁。
+**What if the session expires?**
+The status bar shows **session expired**. In settings, click **Re-scan**, confirm, then send the bot a message from WeChat again so sending unlocks.
 
-## 使用注意
+## Good to know
 
-- **限流**：主动发送是通知/拍板渠道，不是聊天工具；回执太多也可能被拒。
-- **一台设备**：同一账号不要在多台电脑同时开着插件长轮询，消息流会被抢。
-- **桌面在线**：要持续接收，需要桌面 Obsidian 开着并保持连接。
+- **Rate limit:** Proactive sends are a notification/decision channel, not a chat tool. Receipt replies can also be rejected if there are too many.
+- **One device:** Do not run the plugin on multiple computers for the same account at once. Concurrent long-polls compete for the message stream.
+- **Desktop online:** Continuous receiving requires desktop Obsidian to stay open and connected.
 
-## 贡献
+## Contributing
 
-欢迎 issue 和 PR。报问题时请带上：
+Issues and PRs are welcome. Please include:
 
-- 插件版本（当前 `0.1.7`）和 Obsidian 版本
-- 系统（macOS / Windows / Linux）
-- 复现步骤、期望结果、实际结果
-- 若与某个平台有关：原始内容、目标笔记、导入/粘贴结果；需要截图时请打码账号和二维码
+- Plugin version (currently `0.1.7`) and Obsidian version
+- OS (macOS / Windows / Linux)
+- Steps to reproduce, expected result, actual result
+- For platform-specific issues: source content, target note, and import/paste result; redact account IDs and QR codes in screenshots
 
-开发命令：
+Development commands:
 
 ```bash
-npm test    # 构建并跑单元测试
+npm test    # build, then run unit tests
 npm run lint
 npm run build
 ```
 
 ## License
 
-作者：[nextcacai](https://github.com/nextcacai)，[MIT](LICENSE)
+Author: [nextcacai](https://github.com/nextcacai), [MIT](LICENSE)
