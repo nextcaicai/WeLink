@@ -42,14 +42,12 @@ WeLink is not in the Obsidian community plugin store yet. After install, Obsidia
 Copy the whole prompt below, replace `REPLACE_WITH_YOUR_VAULT_PATH` with your Obsidian vault directory, then paste it to the Agent:
 
 ```text
-Install the WeLink Obsidian plugin from https://github.com/nextcaicai/WeLink.
-Read README.md in that repository.
+Install the WeLink Obsidian plugin (https://github.com/nextcaicai/WeLink) into my Obsidian vault.
 
 My Obsidian vault directory is:
 REPLACE_WITH_YOUR_VAULT_PATH
 
-That path is the vault root. Install into .obsidian/plugins/welink/ under it yourself; do not ask me for the .obsidian path.
-Install only manifest.json, main.js, and styles.css. They must sit directly in the welink folder — do not nest another directory.
+Install it into .obsidian/plugins/welink/ under that directory. Install only manifest.json, main.js, and styles.css; the three files must sit directly in the welink folder, with no extra nested directory.
 Do not modify my notes. Do not delete other plugin folders. Do not read, print, or commit secrets (including state.json and data.json).
 When finished, tell me where the files were placed, whether I should reload the plugin or restart Obsidian, and how to scan and bind WeChat.
 ```

@@ -42,8 +42,7 @@ Obsidian 桌面端插件。通过腾讯官方 **ilink** 机器人网关收发消
 复制下面整段提示词，把 `REPLACE_WITH_YOUR_VAULT_PATH` 换成你的 Obsidian 库目录，再交给 Agent：
 
 ```text
-请从 https://github.com/nextcaicai/WeLink 安装 WeLink Obsidian 插件。
-请阅读该仓库的 README_CN.md。
+请将 WeLink Obsidian 插件（https://github.com/nextcaicai/WeLink）安装到我的 Obsidian 库。
 
 我的 Obsidian 库目录是：
 REPLACE_WITH_YOUR_VAULT_PATH
