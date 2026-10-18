@@ -1,3 +1,5 @@
+<p align="right"><strong>中文</strong> · <a href="README_EN.md">English</a></p>
+
 # WeLink
 
 Obsidian 桌面端插件。通过腾讯官方 **ilink** 机器人网关收发消息，不改装微信客户端，不需要关注任何服务号或小程序，也不经过作者的个人服务器。安全、稳定。
