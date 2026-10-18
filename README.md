@@ -32,20 +32,26 @@ WeLink is not in the Obsidian community plugin store yet. After install, Obsidia
 
 | Method | Who it is for | What it does |
 |---|---|---|
-| Method 1: Let an Agent install | You already use Cursor, Claude, or a similar Agent | Hand it this repo and the prompt below |
+| Method 1: Let an Agent install | You already use Cursor, Claude, or a similar Agent | Copy the prompt below, fill in your vault path, then paste it to the Agent |
 | Method 2: Releases | You just want to use it | Copy the three built files into the plugin folder |
 | Method 3: BRAT | You want updates from the repo | BRAT (Beta Reviewers Auto-update Tester) pulls this repository |
 | Method 4: Build from source | You are developing or packaging it yourself | Compile locally, then copy into the vault |
 
 **Method 1: Let an Agent install**
 
-Give the Agent this repository and the following prompt:
+Copy the whole prompt below, replace `REPLACE_WITH_YOUR_VAULT_PATH` with your Obsidian vault directory, then paste it to the Agent:
 
 ```text
-Read README.md and install WeLink into the Obsidian vault I specify.
-Install only main.js, manifest.json, and styles.css — the files Obsidian loads.
-Do not modify my notes, do not delete other plugin folders, and do not read, print, or commit secrets.
-When finished, tell me how to scan and bind WeChat.
+Install the WeLink Obsidian plugin from https://github.com/nextcaicai/WeLink.
+Read README.md in that repository.
+
+My Obsidian vault directory is:
+REPLACE_WITH_YOUR_VAULT_PATH
+
+That path is the vault root. Install into .obsidian/plugins/welink/ under it yourself; do not ask me for the .obsidian path.
+Install only manifest.json, main.js, and styles.css. They must sit directly in the welink folder — do not nest another directory.
+Do not modify my notes. Do not delete other plugin folders. Do not read, print, or commit secrets (including state.json and data.json).
+When finished, tell me where the files were placed, whether I should reload the plugin or restart Obsidian, and how to scan and bind WeChat.
 ```
 
 **Method 2: Install from Releases**

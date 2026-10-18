@@ -32,20 +32,25 @@ Obsidian 桌面端插件。通过腾讯官方 **ilink** 机器人网关收发消
 
 | 方式 | 适合谁 | 效果 |
 |---|---|---|
-| 方法一：让 Agent 安装 | 已经在用 Cursor / Claude 等 Agent | 把本仓库和下面那段提示词交给它即可 |
+| 方法一：让 Agent 安装 | 已经在用 Cursor / Claude 等 Agent | 复制下面提示词，填上你的库目录后交给它 |
 | 方法二：Releases | 只想用，不改代码 | 把构建好的三个文件放进插件目录 |
 | 方法三：BRAT | 想跟着仓库更新 | 由 BRAT（Beta Reviewers Auto-update Tester）拉取本仓库 |
 | 方法四：源码构建 | 开发或自行打包 | 本地编译后再拷进 vault |
 
 **方法一：让 Agent 安装**
 
-把本仓库和下面这段话一起交给 Agent：
+复制下面整段提示词，把 `REPLACE_WITH_YOUR_VAULT_PATH` 换成你的 Obsidian 库目录，再交给 Agent：
 
 ```text
-请阅读 README_CN.md，把 WeLink 安装到我指定的 Obsidian vault。
-只安装 Obsidian 运行所需的 main.js、manifest.json、styles.css。
-不要修改我的笔记内容，不要删除其他插件目录，不要读取、打印或提交密钥。
-装完后告诉我接下来如何扫码绑定。
+请从 https://github.com/nextcaicai/WeLink 安装 WeLink Obsidian 插件。
+请阅读该仓库的 README_CN.md。
+
+我的 Obsidian 库目录是：
+REPLACE_WITH_YOUR_VAULT_PATH
+
+请自行安装到该目录下的 .obsidian/plugins/welink/。只安装 manifest.json、main.js、styles.css；三个文件必须直接放在 welink 文件夹内，不要多套一层目录。
+不要修改我的笔记内容。不要删除其他插件目录。不要读取、打印或提交密钥（包括 state.json、data.json）。
+装完后告诉我：文件放在了哪、要不要重启或重新加载插件，以及接下来如何扫码绑定。
 ```
 
 **方法二：从 Releases 安装**
