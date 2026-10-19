@@ -22636,10 +22636,10 @@ var WXLinkPlugin = class extends import_obsidian5.Plugin {
     this.statusBar = this.addStatusBarItem();
     this.renderStatus();
     const cmds = [
-      ["wxlink-connect", "cmd.connect", () => void this.connect()],
-      ["wxlink-disconnect", "cmd.disconnect", () => this.disconnect()],
-      ["wxlink-login", "cmd.login", () => this.startLogin()],
-      ["wxlink-open-inbox", "cmd.inbox", () => void this.openTodayInbox()]
+      ["welink-connect", "cmd.connect", () => void this.connect()],
+      ["welink-disconnect", "cmd.disconnect", () => this.disconnect()],
+      ["welink-login", "cmd.login", () => this.startLogin()],
+      ["welink-open-inbox", "cmd.inbox", () => void this.openTodayInbox()]
     ];
     for (const [id, key, callback] of cmds) {
       this.commandNameKeys[id] = key;

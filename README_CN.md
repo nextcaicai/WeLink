@@ -26,9 +26,9 @@ Obsidian 桌面端插件。通过腾讯官方 **ilink** 机器人网关收发消
 - 能访问微信 ilink 网关的网络
 - 一个你自己的微信账号，用来扫码绑定
 
-当前未上架 Obsidian 社区插件市场。安装后，Obsidian 会从 `<Vault>/.obsidian/plugins/wxlink/` 加载 `manifest.json`、`main.js` 和 `styles.css`。
+社区插件 ID 是 `welink`（这个不能改）。安装后，Obsidian 会从 `<Vault>/.obsidian/plugins/welink/` 加载 `manifest.json`、`main.js` 和 `styles.css`。界面显示名是 **WXLink**。
 
-本插件原名 WeLink。请装到 `wxlink` 目录，不要继续用旧的 `welink`。若库里已经有 `WeLink/` 笔记目录，在你新建 `WXLink/` 或改设置路径之前，插件会继续往旧目录写。
+若库里已经有 `WeLink/` 笔记目录，在你新建 `WXLink/` 或改设置路径之前，插件会继续往旧目录写。
 
 ## 安装
 
@@ -49,7 +49,7 @@ Obsidian 桌面端插件。通过腾讯官方 **ilink** 机器人网关收发消
 我的 Obsidian 库目录是：
 REPLACE_WITH_YOUR_VAULT_PATH
 
-请自行安装到该目录下的 .obsidian/plugins/wxlink/。只安装 manifest.json、main.js、styles.css；三个文件必须直接放在 wxlink 文件夹内，不要多套一层目录。
+请自行安装到该目录下的 .obsidian/plugins/welink/。只安装 manifest.json、main.js、styles.css；三个文件必须直接放在 welink 文件夹内，不要多套一层目录。
 不要修改我的笔记内容。不要删除其他插件目录。不要读取、打印或提交密钥（包括 state.json、data.json）。
 装完后告诉我：文件放在了哪、要不要重启或重新加载插件，以及接下来如何扫码绑定。
 ```
@@ -57,7 +57,7 @@ REPLACE_WITH_YOUR_VAULT_PATH
 **方法二：从 Releases 安装**
 
 1. 打开本仓库的 [Releases](https://github.com/nextcaicai/WXLink/releases/)，下载 `main.js`、`manifest.json`、`styles.css`。
-2. 放到 `<你的库>/.obsidian/plugins/wxlink/`（三个文件直接在这个文件夹里，不要多套一层目录）。
+2. 放到 `<你的库>/.obsidian/plugins/welink/`（三个文件直接在这个文件夹里，不要多套一层目录）。
 3. Obsidian → 设置 → 第三方插件 → 关闭安全模式 → 刷新 → 启用 **WXLink**。
 4. 改完文件后重新加载插件，或重启 Obsidian。
 
@@ -73,7 +73,7 @@ REPLACE_WITH_YOUR_VAULT_PATH
 git clone <本仓库地址>
 cd WXLink
 npm install
-OBSIDIAN_PLUGIN_DIR=/path/to/vault/.obsidian/plugins/wxlink npm run build
+OBSIDIAN_PLUGIN_DIR=/path/to/vault/.obsidian/plugins/welink npm run build
 ```
 
 未设置 `OBSIDIAN_PLUGIN_DIR` 时，构建只生成仓库根目录的 `main.js`，不会写入任何 vault。
@@ -188,7 +188,7 @@ ilink 机器人侧的已知限制：转发的文章和文件可能收不到。�
 
 欢迎 issue 和 PR。报问题时请带上：
 
-- 插件版本（当前 `0.2.0`）和 Obsidian 版本
+- 插件版本（当前 `0.2.1`）和 Obsidian 版本
 - 系统（macOS / Windows / Linux）
 - 复现步骤、期望结果、实际结果
 - 若与某个平台有关：原始内容、目标笔记、导入/粘贴结果；需要截图时请打码账号和二维码

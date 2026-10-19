@@ -26,9 +26,9 @@ This project is a fork of [Wechatian](https://github.com/laruence/wechatian), wi
 - Network access to the WeChat ilink gateway
 - Your own WeChat account, used to scan and bind
 
-WXLink is not in the Obsidian community plugin store yet. After install, Obsidian loads `manifest.json`, `main.js`, and `styles.css` from `<Vault>/.obsidian/plugins/wxlink/`.
+The community plugin ID is `welink` (this cannot be changed). After install, Obsidian loads `manifest.json`, `main.js`, and `styles.css` from `<Vault>/.obsidian/plugins/welink/`. The display name is **WXLink**.
 
-This plugin was previously named WeLink. Install into `wxlink`, not the old `welink` folder. If your vault already has a `WeLink/` notes tree, the plugin keeps using it until you create `WXLink/` or change the paths in settings.
+If your vault already has a `WeLink/` notes tree, the plugin keeps using it until you create `WXLink/` or change the paths in settings.
 
 ## Install
 
@@ -49,7 +49,7 @@ Install the WXLink Obsidian plugin (https://github.com/nextcaicai/WXLink) into m
 My Obsidian vault directory is:
 REPLACE_WITH_YOUR_VAULT_PATH
 
-Install it into .obsidian/plugins/wxlink/ under that directory. Install only manifest.json, main.js, and styles.css; the three files must sit directly in the wxlink folder, with no extra nested directory.
+Install it into .obsidian/plugins/welink/ under that directory. Install only manifest.json, main.js, and styles.css; the three files must sit directly in the welink folder, with no extra nested directory.
 Do not modify my notes. Do not delete other plugin folders. Do not read, print, or commit secrets (including state.json and data.json).
 When finished, tell me where the files were placed, whether I should reload the plugin or restart Obsidian, and how to scan and bind WeChat.
 ```
@@ -57,7 +57,7 @@ When finished, tell me where the files were placed, whether I should reload the 
 **Method 2: Install from Releases**
 
 1. Open this repo’s [Releases](https://github.com/nextcaicai/WXLink/releases/) and download `main.js`, `manifest.json`, and `styles.css`.
-2. Put them in `<your-vault>/.obsidian/plugins/wxlink/` (the three files sit directly in that folder — do not nest another directory).
+2. Put them in `<your-vault>/.obsidian/plugins/welink/` (the three files sit directly in that folder — do not nest another directory).
 3. Obsidian → Settings → Community plugins → turn off Restricted mode → reload → enable **WXLink**.
 4. After changing the files, reload the plugin or restart Obsidian.
 
@@ -73,7 +73,7 @@ When finished, tell me where the files were placed, whether I should reload the 
 git clone https://github.com/nextcaicai/WXLink.git
 cd WXLink
 npm install
-OBSIDIAN_PLUGIN_DIR=/path/to/vault/.obsidian/plugins/wxlink npm run build
+OBSIDIAN_PLUGIN_DIR=/path/to/vault/.obsidian/plugins/welink npm run build
 ```
 
 If `OBSIDIAN_PLUGIN_DIR` is not set, the build only writes `main.js` at the repo root and does not touch any vault.
@@ -188,7 +188,7 @@ The status bar shows **session expired**. In settings, click **Re-scan**, confir
 
 Issues and PRs are welcome. Please include:
 
-- Plugin version (currently `0.2.0`) and Obsidian version
+- Plugin version (currently `0.2.1`) and Obsidian version
 - OS (macOS / Windows / Linux)
 - Steps to reproduce, expected result, actual result
 - For platform-specific issues: source content, target note, and import/paste result; redact account IDs and QR codes in screenshots
