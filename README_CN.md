@@ -1,6 +1,6 @@
 <p align="right"><strong>中文</strong> · <a href="README.md">English</a></p>
 
-# WeLink
+# WXLink
 
 Obsidian 桌面端插件。通过腾讯官方 **ilink** 机器人网关收发消息，不改装微信客户端，不需要关注任何服务号或小程序，也不经过作者的个人服务器。安全、稳定。
 
@@ -26,7 +26,9 @@ Obsidian 桌面端插件。通过腾讯官方 **ilink** 机器人网关收发消
 - 能访问微信 ilink 网关的网络
 - 一个你自己的微信账号，用来扫码绑定
 
-当前未上架 Obsidian 社区插件市场。安装后，Obsidian 会从 `<Vault>/.obsidian/plugins/welink/` 加载 `manifest.json`、`main.js` 和 `styles.css`。
+当前未上架 Obsidian 社区插件市场。安装后，Obsidian 会从 `<Vault>/.obsidian/plugins/wxlink/` 加载 `manifest.json`、`main.js` 和 `styles.css`。
+
+本插件原名 WeLink。请装到 `wxlink` 目录，不要继续用旧的 `welink`。若库里已经有 `WeLink/` 笔记目录，在你新建 `WXLink/` 或改设置路径之前，插件会继续往旧目录写。
 
 ## 安装
 
@@ -42,36 +44,36 @@ Obsidian 桌面端插件。通过腾讯官方 **ilink** 机器人网关收发消
 复制下面整段提示词，把 `REPLACE_WITH_YOUR_VAULT_PATH` 换成你的 Obsidian 库目录，再交给 Agent：
 
 ```text
-请将 WeLink Obsidian 插件（https://github.com/nextcaicai/WeLink）安装到我的 Obsidian 库。
+请将 WXLink Obsidian 插件（https://github.com/nextcaicai/WXLink）安装到我的 Obsidian 库。
 
 我的 Obsidian 库目录是：
 REPLACE_WITH_YOUR_VAULT_PATH
 
-请自行安装到该目录下的 .obsidian/plugins/welink/。只安装 manifest.json、main.js、styles.css；三个文件必须直接放在 welink 文件夹内，不要多套一层目录。
+请自行安装到该目录下的 .obsidian/plugins/wxlink/。只安装 manifest.json、main.js、styles.css；三个文件必须直接放在 wxlink 文件夹内，不要多套一层目录。
 不要修改我的笔记内容。不要删除其他插件目录。不要读取、打印或提交密钥（包括 state.json、data.json）。
 装完后告诉我：文件放在了哪、要不要重启或重新加载插件，以及接下来如何扫码绑定。
 ```
 
 **方法二：从 Releases 安装**
 
-1. 打开本仓库的 [Releases](https://github.com/nextcaicai/WeLink/releases/)，下载 `main.js`、`manifest.json`、`styles.css`。
-2. 放到 `<你的库>/.obsidian/plugins/welink/`（三个文件直接在这个文件夹里，不要多套一层目录）。
-3. Obsidian → 设置 → 第三方插件 → 关闭安全模式 → 刷新 → 启用 **WeLink**。
+1. 打开本仓库的 [Releases](https://github.com/nextcaicai/WXLink/releases/)，下载 `main.js`、`manifest.json`、`styles.css`。
+2. 放到 `<你的库>/.obsidian/plugins/wxlink/`（三个文件直接在这个文件夹里，不要多套一层目录）。
+3. Obsidian → 设置 → 第三方插件 → 关闭安全模式 → 刷新 → 启用 **WXLink**。
 4. 改完文件后重新加载插件，或重启 Obsidian。
 
 **方法三：用 BRAT 安装**
 
 1. 先安装社区插件 [BRAT](https://obsidian.md/plugins?id=obsidian42-brat)。
 2. 在 BRAT 里添加本仓库地址。
-3. 启用 **WeLink**，然后重新加载插件。
+3. 启用 **WXLink**，然后重新加载插件。
 
 **方法四：从源码构建**
 
 ```bash
 git clone <本仓库地址>
-cd WeLink
+cd WXLink
 npm install
-OBSIDIAN_PLUGIN_DIR=/path/to/vault/.obsidian/plugins/welink npm run build
+OBSIDIAN_PLUGIN_DIR=/path/to/vault/.obsidian/plugins/wxlink npm run build
 ```
 
 未设置 `OBSIDIAN_PLUGIN_DIR` 时，构建只生成仓库根目录的 `main.js`，不会写入任何 vault。
@@ -81,7 +83,7 @@ OBSIDIAN_PLUGIN_DIR=/path/to/vault/.obsidian/plugins/welink npm run build
 
 大约五分钟。设置页的按钮文案以界面为准，下面简体中文界面描述。
 
-1. Obsidian → 设置 → WeLink → **连接微信**。弹出「连接微信」窗口，用微信扫码并在手机上确认。
+1. Obsidian → 设置 → WXLink → **连接微信**。弹出「连接微信」窗口，用微信扫码并在手机上确认。
 2. 通讯录里会出现一个机器人联系人；状态栏显示「微信在线」，设置页显示「已连接」。
 3. **先从微信给这个机器人发任意一条消息**（例如「你好」）。网关只在绑定账号发过消息后，才下发发送凭证；跳过这一步，测试发送会失败。
 4. 回到设置页，在「测试连通性」里点 **发送**。手机收到测试消息，说明双向通道已经通了。
@@ -92,7 +94,7 @@ OBSIDIAN_PLUGIN_DIR=/path/to/vault/.obsidian/plugins/welink npm run build
 默认目录如下，均可在「文件存放与发送」里改：
 
 ```text
-WeLink/
+WXLink/
 ├── Agent.md              # 给 Agent 看的发件说明（插件维护）
 ├── 2026-10-17.md         # 当天对话笔记（接收 / 发送）
 ├── notes/                # 「独立笔记触发词」单独保存的纯文字笔记
@@ -106,13 +108,13 @@ WeLink/
 
 ### 接收
 
-发给机器人的内容，会进入当天的 `WeLink/YYYY-MM-DD.md`：带时间、标记「接收/发送」，正文在引用块里，媒体用 `![[...]]` 嵌入。
+发给机器人的内容，会进入当天的 `WXLink/YYYY-MM-DD.md`：带时间、标记「接收/发送」，正文在引用块里，媒体用 `![[...]]` 嵌入。
 
 | 你发的内容 | 结果 |
 |---|---|
 | 普通文字 | 追加到当天对话笔记 |
-| 第一行是 `#单独保存` 的纯文字 | 去掉触发词，存到 `WeLink/notes/`，对话笔记里只留链接 |
-| 图片 / 视频 / 文件 / 语音 | 解密后写入 `WeLink/attachments/`，并嵌进当天笔记；语音会尽量转成可播放的 WAV |
+| 第一行是 `#单独保存` 的纯文字 | 去掉触发词，存到 `WXLink/notes/`，对话笔记里只留链接 |
+| 图片 / 视频 / 文件 / 语音 | 解密后写入 `WXLink/attachments/`，并嵌进当天笔记；语音会尽量转成可播放的 WAV |
 | 带 http(s) 链接的消息 | 额外尝试抓取标题和正文，建成文章笔记 |
 
 独立笔记只处理「纯文字、无链接、无附件」的消息。链接或附件仍按原来的导入方式处理。触发词必须整行完全一致，可在设置里改。
@@ -125,7 +127,7 @@ WeLink/
 
 这是给自己的单向通道：**不能指定收件人**，所有文件都发给扫码绑定的那个微信。不要调任何 HTTP API，文件通道就是全部接口。
 
-往 `WeLink/outbox/` 写**一个文件**：
+往 `WXLink/outbox/` 写**一个文件**：
 
 | 写入发件箱的文件 | 效果 |
 |---|---|
@@ -135,13 +137,13 @@ WeLink/
 插件在下一轮轮询（约 30–60 秒）消费发件箱。写完后等大约一分钟再看：
 
 - **文件消失** = 发送成功，并记进当天对话笔记（媒体会在 `attachments/` 留副本并链接）
-- **文件还在** = 失败：`.md` 末尾会追加 `<!-- WeLink send failed: ... -->`；媒体会生成同名 `.welink-failed.md` 说明原因
+- **文件还在** = 失败：`.md` 末尾会追加 `<!-- WXLink send failed: ... -->`；媒体会生成同名 `.wxlink-failed.md` 说明原因
 
 未识别的扩展名会留在发件箱，不会被发送。
 
 ### 给 Agent
 
-让 Agent 读取 vault 里的 `WeLink/Agent.md`（路径以设置为准）。它会说明：写哪个目录、如何判断成功、去哪读你的回复、以及限流。完整说明见仓库里的 [Agent.md](Agent.md)。
+让 Agent 读取 vault 里的 `WXLink/Agent.md`（路径以设置为准）。它会说明：写哪个目录、如何判断成功、去哪读你的回复、以及限流。完整说明见仓库里的 [Agent.md](Agent.md)。
 
 这条通道适合通知（任务完成）和拍板（发问题和选项，你回一句），不适合闲聊。网关对主动发送有限流，大约每天只能发数条。
 
@@ -186,7 +188,7 @@ ilink 机器人侧的已知限制：转发的文章和文件可能收不到。�
 
 欢迎 issue 和 PR。报问题时请带上：
 
-- 插件版本（当前 `0.1.7`）和 Obsidian 版本
+- 插件版本（当前 `0.2.0`）和 Obsidian 版本
 - 系统（macOS / Windows / Linux）
 - 复现步骤、期望结果、实际结果
 - 若与某个平台有关：原始内容、目标笔记、导入/粘贴结果；需要截图时请打码账号和二维码

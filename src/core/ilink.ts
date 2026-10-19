@@ -66,7 +66,7 @@ export class IlinkClient {
   ) {}
 
   private get channelVersion(): string {
-    return this.opts.channelVersion ?? 'welink-weixin/1.0';
+    return this.opts.channelVersion ?? 'wxlink-weixin/1.0';
   }
 
   private get longPollTimeoutMs(): number {

@@ -1,10 +1,10 @@
-# WeLink — AI Agent Guide
+# WXLink — AI Agent Guide
 
-WeLink is an Obsidian plugin exposing a **one-to-one WeChat channel**: everything sent goes to the vault owner's own bound WeChat account. This document teaches you (an AI assistant) how to use it. 中文版见文末。
+WXLink is an Obsidian plugin exposing a **one-to-one WeChat channel**: everything sent goes to the vault owner's own bound WeChat account. This document teaches you (an AI assistant) how to use it. 中文版见文末。
 
 ## Sending
 
-Write **one file** into the outbox folder (default `WeLink/outbox/`; in a live vault, follow the runtime `Agent.md` in the inbox folder for actual paths). **Never call any HTTP API — the file channel is the whole interface; no recipient is ever specified.**
+Write **one file** into the outbox folder (default `WXLink/outbox/`; in a live vault, follow the runtime `Agent.md` in the inbox folder for actual paths). **Never call any HTTP API — the file channel is the whole interface; no recipient is ever specified.**
 
 | File you write | What gets sent |
 |---|---|
@@ -16,11 +16,11 @@ Write **one file** into the outbox folder (default `WeLink/outbox/`; in a live v
 The plugin consumes the outbox on its next poll (~30–60 s). Wait about a minute, then check:
 
 - **File gone** = sent; recorded in today's conversation note (media copies kept in `attachments/` and linked)
-- **File present** = failed: an `.md` gets a `<!-- WeLink send failed: ... -->` comment appended; media get a `<name>.welink-failed.md` sidecar with the reason
+- **File present** = failed: an `.md` gets a `<!-- WXLink send failed: ... -->` comment appended; media get a `<name>.wxlink-failed.md` sidecar with the reason
 
 ## Receiving replies
 
-Inbound WeChat messages are appended to the daily conversation note `<inbox>/YYYY-MM-DD.md` (default `WeLink/YYYY-MM-DD.md`): timestamped, marked received/sent, bodies in quote blocks, media as `![[...]]` embeds. Read it to get the user's replies.
+Inbound WeChat messages are appended to the daily conversation note `<inbox>/YYYY-MM-DD.md` (default `WXLink/YYYY-MM-DD.md`): timestamped, marked received/sent, bodies in quote blocks, media as `![[...]]` embeds. Read it to get the user's replies.
 
 ## Constraints
 
@@ -28,13 +28,13 @@ The gateway rate-limits proactive sends (a handful per day). Use the channel for
 
 ---
 
-# WeLink — AI 助理使用指南（中文）
+# WXLink — AI 助理使用指南（中文）
 
-WeLink 是一个 Obsidian 插件,提供一条**一对一微信通道**:所有消息都发给 vault 主人自己绑定的微信。
+WXLink 是一个 Obsidian 插件,提供一条**一对一微信通道**:所有消息都发给 vault 主人自己绑定的微信。
 
 ## 发送
 
-往发件箱目录写**一个文件**即可(默认 `WeLink/outbox/`;在已安装插件的 vault 里,以收件箱目录中运行时 `Agent.md` 或插件设置里的实际路径为准)。**不调任何 API,文件通道是唯一接口;不需要也不能指定收件人。**
+往发件箱目录写**一个文件**即可(默认 `WXLink/outbox/`;在已安装插件的 vault 里,以收件箱目录中运行时 `Agent.md` 或插件设置里的实际路径为准)。**不调任何 API,文件通道是唯一接口;不需要也不能指定收件人。**
 
 | 你写的文件 | 效果 |
 |---|---|
@@ -46,11 +46,11 @@ WeLink 是一个 Obsidian 插件,提供一条**一对一微信通道**:所有消
 插件在下一轮轮询(约 30–60 秒)消费发件箱。写入后**等约一分钟**再检查:
 
 - **文件被删除** = 发送成功,并记录进当天对话笔记(媒体在 `attachments/` 存副本并链接)
-- **文件还在** = 失败:`.md` 末尾追加 `<!-- WeLink send failed: ... -->` 注释;媒体生成同名 `.welink-failed.md` 记录原因
+- **文件还在** = 失败:`.md` 末尾追加 `<!-- WXLink send failed: ... -->` 注释;媒体生成同名 `.wxlink-failed.md` 记录原因
 
 ## 接收回复
 
-收到的微信消息追加到当天对话笔记 `<收件箱>/YYYY-MM-DD.md`(默认 `WeLink/YYYY-MM-DD.md`):按时间排列、标记"接收/发送",消息体在引用块中,媒体为 `![[...]]` 嵌入。读这份笔记即可拿到用户的回复。
+收到的微信消息追加到当天对话笔记 `<收件箱>/YYYY-MM-DD.md`(默认 `WXLink/YYYY-MM-DD.md`):按时间排列、标记"接收/发送",消息体在引用块中,媒体为 `![[...]]` 嵌入。读这份笔记即可拿到用户的回复。
 
 ## 限制
 

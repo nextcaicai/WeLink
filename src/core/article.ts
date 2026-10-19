@@ -213,7 +213,7 @@ async function downloadImages(transport: HttpTransport, images: ArticleImage[], 
       for (let attempt = 0; attempt < 2 && !img.data; attempt++) {
         const left = deadline - Date.now();
         if (left <= 0) {
-          console.warn(`welink: article image deadline reached, keeping remote link: ${img.url}`);
+          console.warn(`wxlink: article image deadline reached, keeping remote link: ${img.url}`);
           return;
         }
         if (attempt > 0) {
@@ -225,10 +225,10 @@ async function downloadImages(transport: HttpTransport, images: ArticleImage[], 
           if (resp.status === 200) {
             img.data = new Uint8Array(resp.body);
           } else {
-            console.warn(`welink: article image HTTP ${resp.status}: ${img.url}`);
+            console.warn(`wxlink: article image HTTP ${resp.status}: ${img.url}`);
           }
         } catch (e) {
-          console.warn(`welink: article image download failed: ${String((e as Error)?.message ?? e)}`, img.url);
+          console.warn(`wxlink: article image download failed: ${String((e as Error)?.message ?? e)}`, img.url);
         }
       }
     }
@@ -262,7 +262,7 @@ function toMd(node: Node, images: ArticleImage[]): string {
         '';
       if (!src || src.startsWith('data:')) return '';
       if (images.length >= 10) {
-        console.warn(`welink: article image cap (10) reached, keeping remote link: ${src}`);
+        console.warn(`wxlink: article image cap (10) reached, keeping remote link: ${src}`);
         return `![image](${src})`;
       }
       images.push({ url: src, ext: imageExt(src), data: null });

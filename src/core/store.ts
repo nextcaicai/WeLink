@@ -91,7 +91,7 @@ export class StateStore {
         }
       } catch (e) {
         /* corrupted state: fall back to an empty one, but say so */
-        console.warn(`welink: failed to read state from ${path}:`, e);
+        console.warn(`wxlink: failed to read state from ${path}:`, e);
       }
     }
   }
@@ -131,7 +131,7 @@ export class StateStore {
       const msg = String((e as Error)?.message ?? e);
       if (msg !== this.saveError) {
         this.saveError = msg;
-        console.error(`welink: cannot persist state to ${this.file}: ${msg}`);
+        console.error(`wxlink: cannot persist state to ${this.file}: ${msg}`);
       }
     }
   }

@@ -168,9 +168,9 @@ const ARTICLE_MSG = (text: string, id: string): InboundMessage => ({
 });
 
 const IMPORT_OPTS = {
-  inboxFolder: 'WeLink',
-  attachmentFolder: 'WeLink/attachments',
-  articleFolder: 'WeLink/articles',
+  inboxFolder: 'WXLink',
+  attachmentFolder: 'WXLink/attachments',
+  articleFolder: 'WXLink/articles',
   fetchArticles: true,
   groupArticlesByAccount: false,
   parseHtml,
@@ -179,9 +179,9 @@ const IMPORT_OPTS = {
 test('importMessage: article note keeps the date prefix, daily note links it in 《》', async () => {
   const v = new Vault();
   const r = await importMessage(v.app, articleTransport(WECHAT_PAGE), ARTICLE_MSG('https://mp.weixin.qq.com/s/xyz', 'm0'), IMPORT_OPTS);
-  assert.equal(r.articleAssets[0].note, 'WeLink/articles/2026-08-27 测试文章标题.md', 'date prefix on the note name');
-  const daily = v.files.get('WeLink/2026-08-27.md')!;
-  assert.ok(daily.includes('[[WeLink/articles/2026-08-27 测试文章标题|《测试文章标题》]]'), 'article linked with 《》 in the daily note');
+  assert.equal(r.articleAssets[0].note, 'WXLink/articles/2026-08-27 测试文章标题.md', 'date prefix on the note name');
+  const daily = v.files.get('WXLink/2026-08-27.md')!;
+  assert.ok(daily.includes('[[WXLink/articles/2026-08-27 测试文章标题|《测试文章标题》]]'), 'article linked with 《》 in the daily note');
 });
 
 test('importMessage: article metadata is stored as five properties before the body', async () => {
@@ -255,7 +255,7 @@ test('importMessage: empty-body response reports failure and preserves the exist
   assert.deepEqual(second.articleFailures, ['no article body found on page']);
   assert.equal(v.files.get(notePath), savedNote, 'a failed re-fetch must not overwrite the article');
   assert.deepEqual([...v.bins.keys()], savedImages, 'a failed re-fetch must not delete images');
-  assert.ok(v.files.get('WeLink/2026-08-27.md')!.includes(url), 'raw link remains in the daily note');
+  assert.ok(v.files.get('WXLink/2026-08-27.md')!.includes(url), 'raw link remains in the daily note');
 });
 
 /* ---------------------------------------------- script stripping */
@@ -359,7 +359,7 @@ test('importMessage: fetchArticles off records the raw URL and reports no failur
   assert.equal(r.articleAssets.length, 0, 'no article note created');
   assert.deepEqual(r.articleFailures, [], 'skipping is not a failure');
   assert.equal(r.linkCount, 0, 'a link nobody tried to fetch is not counted');
-  const daily = v.files.get('WeLink/2026-08-27.md')!;
+  const daily = v.files.get('WXLink/2026-08-27.md')!;
   assert.ok(daily.includes(url), 'raw URL kept in the daily note');
   assert.ok(!daily.includes('《'), 'no article link rewriting');
 });

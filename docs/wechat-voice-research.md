@@ -1,6 +1,6 @@
 # 微信语音接收与转文字方案调研
 
-日期：2026-10-17。范围：当前 WeLink 源码、模拟验证、腾讯公开客户端与语音识别官方文档。未读取私人消息或凭据，未调用真实微信/付费识别接口，未修改插件代码或安装版本。
+日期：2026-10-17。范围：当前 WXLink 源码、模拟验证、腾讯公开客户端与语音识别官方文档。未读取私人消息或凭据，未调用真实微信/付费识别接口，未修改插件代码或安装版本。
 
 ## 结论
 
@@ -19,7 +19,7 @@
 | 独立识别服务 | 搜索 ASR/transcription/provider 实现 | 未发现 |
 | 空语音诊断 | `src/core/ilink.ts:153`、`:182`、`:255` | 无文字且无可下载媒体时，可能直接忽略 |
 
-腾讯当前公开客户端支持 CDN `full_url`，并优先使用它；WeLink 的 `IlinkMedia` 类型与下载逻辑均未处理这个字段。若实际语音仅携带 `full_url`、没有 `encrypt_query_param` 和文字，本地逻辑将忽略它。这是明确的兼容缺口，也是本次现象的候选原因，不能在没有真实消息证据时认定为根因。[腾讯协议参考](https://github.com/Tencent/openclaw-weixin/blob/main/docs/protocol.md#cdn-media-reference)、[类型定义](https://github.com/Tencent/openclaw-weixin/blob/main/src/api/types.ts)
+腾讯当前公开客户端支持 CDN `full_url`，并优先使用它；WXLink 的 `IlinkMedia` 类型与下载逻辑均未处理这个字段。若实际语音仅携带 `full_url`、没有 `encrypt_query_param` 和文字，本地逻辑将忽略它。这是明确的兼容缺口，也是本次现象的候选原因，不能在没有真实消息证据时认定为根因。[腾讯协议参考](https://github.com/Tencent/openclaw-weixin/blob/main/docs/protocol.md#cdn-media-reference)、[类型定义](https://github.com/Tencent/openclaw-weixin/blob/main/src/api/types.ts)
 
 其他需排除的情况：运行中的插件与当前源码不一致、网关没有下发该条消息、字段结构不同、绑定发送者过滤、自动导入关闭、下载或写入失败。应先在现有插件接收循环内收集脱敏诊断，不另启动竞争轮询客户端。
 
@@ -49,7 +49,7 @@
 
 OpenAI 的音频转写接口可上传 WAV 等格式；本次未做账号、网络、效果或费用对比测试。[OpenAI 转写 API](https://developers.openai.com/api/reference/resources/audio/subresources/transcriptions/methods/create)
 
-whisper.cpp 支持 Apple Silicon 加速并提供 HTTP 转写服务。WeLink 当前是桌面插件，技术上可以连接本地服务；但本次未测设备速度或中文准确率，也不建议首期把模型部署复杂性强加给所有用户。[whisper.cpp 官方仓库](https://github.com/ggml-org/whisper.cpp)
+whisper.cpp 支持 Apple Silicon 加速并提供 HTTP 转写服务。WXLink 当前是桌面插件，技术上可以连接本地服务；但本次未测设备速度或中文准确率，也不建议首期把模型部署复杂性强加给所有用户。[whisper.cpp 官方仓库](https://github.com/ggml-org/whisper.cpp)
 
 ## 推荐落地方式
 

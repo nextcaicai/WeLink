@@ -8,6 +8,16 @@ import { appendOutbound, dayStamp, ensureFolder, quoteBlock, sanitizeFileName, t
 import { buildSendFailure, t } from './i18n';
 
 const IMAGE_EXTS = new Set(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']);
+const FAILED_COMMENT = '<!-- WXLink send failed:';
+const LEGACY_FAILED_COMMENT = '<!-- WeLink send failed:';
+
+function isFailedSidecar(name: string): boolean {
+  return name.endsWith('.wxlink-failed.md') || name.endsWith('.welink-failed.md');
+}
+
+function alreadyAnnotated(content: string): boolean {
+  return content.includes(FAILED_COMMENT) || content.includes(LEGACY_FAILED_COMMENT);
+}
 
 export class Outbox {
   /** sidecar path -> content last written; skips byte-identical rewrites (iCloud churn) */
@@ -43,7 +53,7 @@ export class Outbox {
 
       // send-failure sidecars end in .md: sending them would deliver the
       // failure text as a message and delete the record — never touch them
-      if (name.endsWith('.welink-failed.md')) continue;
+      if (isFailedSidecar(name)) continue;
 
       if (ext === 'md') {
         processed += await this.flushTextFile(client, path, to, contextToken, inboxFolder);
@@ -85,8 +95,8 @@ export class Outbox {
     // The file stays for the next flush — but retry rounds must NOT rewrite it:
     // with the gateway down, rewriting every 30-60s would churn the file
     // (and fork iCloud conflict copies) forever.
-    if (!content.includes('<!-- WeLink send failed:')) {
-      const note = `\n\n<!-- WeLink send failed: ${buildSendFailure(res.errmsg, res.ret, contextToken)} -->\n`;
+    if (!alreadyAnnotated(content)) {
+      const note = `\n\n${FAILED_COMMENT} ${buildSendFailure(res.errmsg, res.ret, contextToken)} -->\n`;
       await this.app.vault.adapter.write(path, content + note);
     }
     return 0;
@@ -136,7 +146,7 @@ export class Outbox {
       return 1;
     }
     // Failure: record a categorized reason + fix hint in a sidecar note, visible without blocking retries
-    const notePath = `${path}.welink-failed.md`;
+    const notePath = `${path}.wxlink-failed.md`;
     const note = `# ${name}\n\n${buildSendFailure(res.errmsg, res.ret, contextToken)}\n`;
     if (this.sidecarWritten.get(notePath) !== note) {
       try {

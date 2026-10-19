@@ -12,12 +12,12 @@ const en: Dict = {
   'cmd.login': 'Re-scan QR code to log in',
   'cmd.inbox': "Open today's inbox",
 
-  'notice.notLoggedIn': 'WeLink: not logged in — run the command "{{cmd}}"',
-  'notice.loggedIn': 'WeLink: logged in, receiving messages',
-  'notice.loggedOut': 'WeLink: logged out — re-scan in the settings page',
-  'notice.sessionExpired': 'WeLink: WeChat session expired — please re-scan to log in',
+  'notice.notLoggedIn': 'WXLink: not logged in — run the command "{{cmd}}"',
+  'notice.loggedIn': 'WXLink: logged in, receiving messages',
+  'notice.loggedOut': 'WXLink: logged out — re-scan in the settings page',
+  'notice.sessionExpired': 'WXLink: WeChat session expired — please re-scan to log in',
   'error.sessionExpired': 'Session expired (-14); please re-scan to log in',
-  'notice.importFailed': 'WeLink: import failed {{err}}',
+  'notice.importFailed': 'WXLink: import failed {{err}}',
   'notice.noMsgToday': 'No messages today ({{path}})',
   'notice.prefix': 'WeChat',
   'notice.attachments': '{{n}} attachment(s)',
@@ -101,7 +101,7 @@ const en: Dict = {
   'importer.summary': 'Summary',
   'importer.inboxTitle': '{{date}} WeChat Inbox',
 
-  'outbox.failedNote': 'WeLink send failed: ret={{ret}} {{msg}}',
+  'outbox.failedNote': 'WXLink send failed: ret={{ret}} {{msg}}',
 
   'qr.missingInResponse': 'get_bot_qrcode response missing QR code: {{resp}}',
   'qr.fetchFailed': 'Failed to fetch QR code: {{err}}',
@@ -154,12 +154,12 @@ const zh: Dict = {
   'cmd.login': '重新扫码登录',
   'cmd.inbox': '打开今日收件箱',
 
-  'notice.notLoggedIn': 'WeLink:尚未登录,运行命令「{{cmd}}」',
-  'notice.loggedIn': 'WeLink: 登录成功,开始接收消息',
-  'notice.loggedOut': 'WeLink: 已登出,请在设置页重新扫码',
-  'notice.sessionExpired': 'WeLink: 微信会话过期,请重新扫码登录',
+  'notice.notLoggedIn': 'WXLink:尚未登录,运行命令「{{cmd}}」',
+  'notice.loggedIn': 'WXLink: 登录成功,开始接收消息',
+  'notice.loggedOut': 'WXLink: 已登出,请在设置页重新扫码',
+  'notice.sessionExpired': 'WXLink: 微信会话过期,请重新扫码登录',
   'error.sessionExpired': '会话过期(-14),请重新扫码登录',
-  'notice.importFailed': 'WeLink: 导入失败 {{err}}',
+  'notice.importFailed': 'WXLink: 导入失败 {{err}}',
   'notice.noMsgToday': '今日暂无消息({{path}})',
   'notice.prefix': '微信',
   'notice.attachments': '{{n}} 个附件',
@@ -243,7 +243,7 @@ const zh: Dict = {
   'importer.summary': '摘要',
   'importer.inboxTitle': '{{date}} 微信收件箱',
 
-  'outbox.failedNote': 'WeLink 发送失败: ret={{ret}} {{msg}}',
+  'outbox.failedNote': 'WXLink 发送失败: ret={{ret}} {{msg}}',
 
   'qr.missingInResponse': 'get_bot_qrcode 响应缺少二维码：{{resp}}',
   'qr.fetchFailed': '获取二维码失败：{{err}}',
@@ -296,12 +296,12 @@ const tw: Dict = {
   'cmd.login': '重新掃碼登入',
   'cmd.inbox': '開啟今日收件匣',
 
-  'notice.notLoggedIn': 'WeLink:尚未登入,執行指令「{{cmd}}」',
-  'notice.loggedIn': 'WeLink: 登入成功,開始接收訊息',
-  'notice.loggedOut': 'WeLink: 已登出,請在設定頁重新掃碼',
-  'notice.sessionExpired': 'WeLink: 微信工作階段過期,請重新掃碼登入',
+  'notice.notLoggedIn': 'WXLink:尚未登入,執行指令「{{cmd}}」',
+  'notice.loggedIn': 'WXLink: 登入成功,開始接收訊息',
+  'notice.loggedOut': 'WXLink: 已登出,請在設定頁重新掃碼',
+  'notice.sessionExpired': 'WXLink: 微信工作階段過期,請重新掃碼登入',
   'error.sessionExpired': '工作階段過期(-14),請重新掃碼登入',
-  'notice.importFailed': 'WeLink: 匯入失敗 {{err}}',
+  'notice.importFailed': 'WXLink: 匯入失敗 {{err}}',
   'notice.noMsgToday': '今日暫無訊息({{path}})',
   'notice.prefix': '微信',
   'notice.attachments': '{{n}} 個附件',
@@ -385,7 +385,7 @@ const tw: Dict = {
   'importer.summary': '摘要',
   'importer.inboxTitle': '{{date}} 微信收件匣',
 
-  'outbox.failedNote': 'WeLink 發送失敗: ret={{ret}} {{msg}}',
+  'outbox.failedNote': 'WXLink 發送失敗: ret={{ret}} {{msg}}',
 
   'qr.missingInResponse': 'get_bot_qrcode 回應缺少二維碼：{{resp}}',
   'qr.fetchFailed': '取得二維碼失敗：{{err}}',
@@ -519,9 +519,9 @@ const KIND_KEY: Record<'image' | 'video' | 'audio' | 'file', string> = {
   file: 'reply.kind.file',
 };
 
-/** The receipt shows vault paths; the WeLink/ root folder is noise to the user */
+/** The receipt shows vault paths; the inbox root folder is noise to the user */
 function stripVaultRoot(path: string): string {
-  return path.replace(/^WeLink\//, '');
+  return path.replace(/^(?:WXLink|WeLink)\//, '');
 }
 
 /**

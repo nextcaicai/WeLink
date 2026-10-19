@@ -682,18 +682,18 @@ test('outbox: image file -> sendMedia chain, copy kept, file deleted', async () 
   const tr = mediaScript();
   const outbox = new Outbox(app);
   const data = Buffer.from('fake-jpeg');
-  await adapter.writeBinary('WeLink/outbox/pic.jpg', new Uint8Array(data).buffer as ArrayBuffer);
+  await adapter.writeBinary('WXLink/outbox/pic.jpg', new Uint8Array(data).buffer as ArrayBuffer);
 
-  const n = await outbox.flush(new IlinkClient(tr, { baseUrl: 'https://gw.example', cdnBase: 'https://cdn.example' }, 'bot'), store, 'WeLink/outbox', 'WeLink', 'WeLink/attachments');
+  const n = await outbox.flush(new IlinkClient(tr, { baseUrl: 'https://gw.example', cdnBase: 'https://cdn.example' }, 'bot'), store, 'WXLink/outbox', 'WXLink', 'WXLink/attachments');
   assert.equal(n, 1);
-  assert.equal(bins.has('WeLink/outbox/pic.jpg'), false, 'outbox file deleted after success');
+  assert.equal(bins.has('WXLink/outbox/pic.jpg'), false, 'outbox file deleted after success');
 
   // a copy is kept for the daily note to link
   const copy = [...bins.keys()].find((p) => p.includes('_sent_pic.jpg'));
   assert.ok(copy, `copy saved, bins: ${[...bins.keys()]}`);
 
   // recorded in the daily note as a sent embed
-  const daily = [...files.keys()].find((f) => /WeLink\/\d{4}-\d{2}-\d{2}\.md$/.test(f));
+  const daily = [...files.keys()].find((f) => /WXLink\/\d{4}-\d{2}-\d{2}\.md$/.test(f));
   assert.ok(daily, 'daily note written');
   assert.ok(files.get(daily!)!.includes(`![[${copy}]]`), 'note embeds the copy');
 
@@ -710,12 +710,12 @@ test('outbox: media failure keeps the file with a categorized sidecar', async ()
     .on(/cdn\.example\/upload/, { status: 200, headers: { 'x-encrypted-param': 'DL' } })
     .on(/sendmessage/, { body: JSON.stringify({ ret: -1, errmsg: 'no permission' }) });
   const outbox = new Outbox(app);
-  await adapter.writeBinary('WeLink/outbox/pic.png', new Uint8Array([1, 2]).buffer as ArrayBuffer);
+  await adapter.writeBinary('WXLink/outbox/pic.png', new Uint8Array([1, 2]).buffer as ArrayBuffer);
 
-  const n = await outbox.flush(new IlinkClient(tr, { baseUrl: 'https://gw.example', cdnBase: 'https://cdn.example' }, 'bot'), store, 'WeLink/outbox', 'WeLink', 'WeLink/attachments');
+  const n = await outbox.flush(new IlinkClient(tr, { baseUrl: 'https://gw.example', cdnBase: 'https://cdn.example' }, 'bot'), store, 'WXLink/outbox', 'WXLink', 'WXLink/attachments');
   assert.equal(n, 0);
-  assert.equal(bins.has('WeLink/outbox/pic.png'), true, 'file kept for retry');
-  const sidecar = [...files.keys()].find((f) => f.endsWith('.welink-failed.md'));
+  assert.equal(bins.has('WXLink/outbox/pic.png'), true, 'file kept for retry');
+  const sidecar = [...files.keys()].find((f) => f.endsWith('.wxlink-failed.md'));
   assert.ok(sidecar, 'failure sidecar written');
   assert.ok(files.get(sidecar!)!.includes('发送被拒'), 'categorized reason');
   assert.ok(files.get(sidecar!)!.includes('稍等几分钟'), 'fix hint');

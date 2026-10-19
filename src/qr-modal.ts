@@ -23,14 +23,14 @@ export class QrLoginModal extends Modal {
 
   onOpen(): void {
     const { contentEl } = this;
-    this.modalEl.addClass('welink-qr-modal');
+    this.modalEl.addClass('wxlink-qr-modal');
     contentEl.empty();
-    contentEl.createEl('h3', { text: t('modal.title'), cls: 'welink-qr-title' });
-    this.qrEl = contentEl.createDiv({ cls: 'welink-qr welink-qr-center' });
-    contentEl.createEl('p', { text: t('modal.hint'), cls: 'welink-qr-hint' });
-    this.statusEl = contentEl.createEl('p', { text: t('login.fetching'), cls: 'welink-qr-status' });
+    contentEl.createEl('h3', { text: t('modal.title'), cls: 'wxlink-qr-title' });
+    this.qrEl = contentEl.createDiv({ cls: 'wxlink-qr wxlink-qr-center' });
+    contentEl.createEl('p', { text: t('modal.hint'), cls: 'wxlink-qr-hint' });
+    this.statusEl = contentEl.createEl('p', { text: t('login.fetching'), cls: 'wxlink-qr-status' });
     this.statusEl.setAttribute('aria-live', 'polite');
-    const actions = contentEl.createDiv({ cls: 'welink-qr-actions' });
+    const actions = contentEl.createDiv({ cls: 'wxlink-qr-actions' });
     this.retryEl = actions.createEl('button', { text: t('login.retry') });
     this.retryEl.hidden = true;
     this.retryEl.addEventListener('click', () => this.startLogin());
@@ -83,7 +83,7 @@ export class QrLoginModal extends Modal {
       const cell = 3;
       const quiet = 4;
       const n = qr.size + quiet * 2;
-      const canvas = this.qrEl.createEl('canvas', { cls: 'welink-qr-canvas' });
+      const canvas = this.qrEl.createEl('canvas', { cls: 'wxlink-qr-canvas' });
       canvas.width = n * cell;
       canvas.height = n * cell;
       const ctx = canvas.getContext('2d');

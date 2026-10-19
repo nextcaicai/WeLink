@@ -1,7 +1,7 @@
 {
-  "id": "welink",
-  "name": "WeLink",
-  "version": "0.1.7",
+  "id": "wxlink",
+  "name": "WXLink",
+  "version": "0.2.0",
   "minAppVersion": "1.13.0",
   "description": "WeChat messaging bridge: send and receive messages, attachments, and articles between WeChat and your vault.",
   "author": "nextcacai",

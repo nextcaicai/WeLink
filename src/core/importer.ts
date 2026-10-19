@@ -89,7 +89,7 @@ function noteTitle(body: string): string {
 
 function storedSourceHash(note: string): string {
   const frontmatter = /^---\r?\n([\s\S]*?)\r?\n---/.exec(note)?.[1] ?? '';
-  return /^welink_source_hash:\s*([a-f0-9]+)\s*$/m.exec(frontmatter)?.[1] ?? '';
+  return /^(?:wxlink|welink)_source_hash:\s*([a-f0-9]+)\s*$/m.exec(frontmatter)?.[1] ?? '';
 }
 
 /** Find a same-day note created from the exact same incoming text, without reading or changing its body. */
@@ -127,7 +127,7 @@ async function saveSingleNote(
   const notePath = await uniquePath(app, rawPath);
   const note = [
     '---',
-    `welink_source_hash: ${hash}`,
+    `wxlink_source_hash: ${hash}`,
     '---',
     '',
     body,

@@ -1,4 +1,4 @@
-/** WeLink main plugin: WeChat message bridge */
+/** WXLink main plugin: WeChat message bridge */
 import { normalizePath, Notice, Plugin, TFile } from 'obsidian';
 import { IlinkClient, type PollResult, sleep } from './core/ilink';
 import type { InboundMessage } from './core/types';
@@ -8,7 +8,7 @@ import { StateStore, type BotState } from './core/store';
 import { appendOutbound, ensureFolder, importMessage, quoteBlock, timeOfDay, type ImportResult } from './core/importer';
 import { ensureAgentGuide } from './core/agent-guide';
 import type { LoginOutcome } from './core/qrlogin';
-import { DEFAULT_SETTINGS, FOLDER_KEYS, WeLinkSettings, WeLinkSettingTab } from './settings';
+import { adoptLegacyFolderDefaults, DEFAULT_SETTINGS, FOLDER_KEYS, LEGACY_INBOX_FOLDER, WXLinkSettings, WXLinkSettingTab } from './settings';
 import { QrLoginModal } from './qr-modal';
 import { Outbox } from './outbox';
 import { CDN_BASE, ILINK_DEFAULT_BASE } from './core/constants';
@@ -19,8 +19,8 @@ const TICKET_TTL_MS = 24 * 3600_000;
 
 export type ConnState = 'disconnected' | 'connecting' | 'connected' | 'expired' | 'error';
 
-export default class WeLinkPlugin extends Plugin {
-  settings: WeLinkSettings = DEFAULT_SETTINGS;
+export default class WXLinkPlugin extends Plugin {
+  settings: WXLinkSettings = DEFAULT_SETTINGS;
   store!: StateStore;
   private client: IlinkClient | null = null;
   /** The gateway accepts undici's fetch stack; Node's http/https stack gets 412.
@@ -40,6 +40,7 @@ export default class WeLinkPlugin extends Plugin {
 
   async onload(): Promise<void> {
     await this.loadSettings();
+    await this.adoptLegacyFolders();
     applyLanguage(this.settings.language); // respect the saved choice; 'system' follows Obsidian
     // State lives inside the plugin's own folder: that directory always exists
     // once the plugin is installed, so the write can never fail on a missing parent
@@ -53,17 +54,17 @@ export default class WeLinkPlugin extends Plugin {
     this.renderStatus();
 
     const cmds: Array<[string, string, () => void]> = [
-      ['welink-connect', 'cmd.connect', () => void this.connect()],
-      ['welink-disconnect', 'cmd.disconnect', () => this.disconnect()],
-      ['welink-login', 'cmd.login', () => this.startLogin()],
-      ['welink-open-inbox', 'cmd.inbox', () => void this.openTodayInbox()],
+      ['wxlink-connect', 'cmd.connect', () => void this.connect()],
+      ['wxlink-disconnect', 'cmd.disconnect', () => this.disconnect()],
+      ['wxlink-login', 'cmd.login', () => this.startLogin()],
+      ['wxlink-open-inbox', 'cmd.inbox', () => void this.openTodayInbox()],
     ];
     for (const [id, key, callback] of cmds) {
       this.commandNameKeys[id] = key;
       this.addCommand({ id, name: t(key), callback });
     }
 
-    this.addSettingTab(new WeLinkSettingTab(this.app, this));
+    this.addSettingTab(new WXLinkSettingTab(this.app, this));
 
     // Auto-connect once the vault is ready
     this.app.workspace.onLayoutReady(() => {
@@ -107,6 +108,19 @@ export default class WeLinkPlugin extends Plugin {
     await this.saveData(this.settings);
   }
 
+  /** First launch after the rename: reuse an existing WeLink/ tree instead of creating WXLink/. */
+  private async adoptLegacyFolders(): Promise<void> {
+    const adapter = this.app.vault.adapter;
+    const next = adoptLegacyFolderDefaults(
+      this.settings,
+      await adapter.exists(LEGACY_INBOX_FOLDER),
+      await adapter.exists(DEFAULT_SETTINGS.inboxFolder),
+    );
+    if (next === this.settings) return;
+    this.settings = next;
+    await this.saveSettings();
+  }
+
   /** Switch the UI language at runtime (commands, status bar; the settings page re-renders itself) */
   applyLanguage(lang: UiLanguage): void {
     applyLanguage(lang);
@@ -148,7 +162,7 @@ export default class WeLinkPlugin extends Plugin {
       expired: t('status.expired'),
       error: t('status.error'),
     };
-    this.statusBar.setText(`WeLink ${map[this.connState]}`);
+    this.statusBar.setText(`WXLink ${map[this.connState]}`);
     this.statusBar.setAttribute('aria-label', this.store.get().lastError || '');
   }
 

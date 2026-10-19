@@ -1,6 +1,6 @@
 <p align="right"><a href="README_CN.md">中文</a> · <strong>English</strong></p>
 
-# WeLink
+# WXLink
 
 An [Obsidian](https://obsidian.md) desktop plugin. It sends and receives messages through Tencent’s official **ilink** bot gateway. It does not modify the WeChat client, does not require following any official account or mini program, and does not pass through the author’s own server.
 
@@ -26,7 +26,9 @@ This project is a fork of [Wechatian](https://github.com/laruence/wechatian), wi
 - Network access to the WeChat ilink gateway
 - Your own WeChat account, used to scan and bind
 
-WeLink is not in the Obsidian community plugin store yet. After install, Obsidian loads `manifest.json`, `main.js`, and `styles.css` from `<Vault>/.obsidian/plugins/welink/`.
+WXLink is not in the Obsidian community plugin store yet. After install, Obsidian loads `manifest.json`, `main.js`, and `styles.css` from `<Vault>/.obsidian/plugins/wxlink/`.
+
+This plugin was previously named WeLink. Install into `wxlink`, not the old `welink` folder. If your vault already has a `WeLink/` notes tree, the plugin keeps using it until you create `WXLink/` or change the paths in settings.
 
 ## Install
 
@@ -42,36 +44,36 @@ WeLink is not in the Obsidian community plugin store yet. After install, Obsidia
 Copy the whole prompt below, replace `REPLACE_WITH_YOUR_VAULT_PATH` with your Obsidian vault directory, then paste it to the Agent:
 
 ```text
-Install the WeLink Obsidian plugin (https://github.com/nextcaicai/WeLink) into my Obsidian vault.
+Install the WXLink Obsidian plugin (https://github.com/nextcaicai/WXLink) into my Obsidian vault.
 
 My Obsidian vault directory is:
 REPLACE_WITH_YOUR_VAULT_PATH
 
-Install it into .obsidian/plugins/welink/ under that directory. Install only manifest.json, main.js, and styles.css; the three files must sit directly in the welink folder, with no extra nested directory.
+Install it into .obsidian/plugins/wxlink/ under that directory. Install only manifest.json, main.js, and styles.css; the three files must sit directly in the wxlink folder, with no extra nested directory.
 Do not modify my notes. Do not delete other plugin folders. Do not read, print, or commit secrets (including state.json and data.json).
 When finished, tell me where the files were placed, whether I should reload the plugin or restart Obsidian, and how to scan and bind WeChat.
 ```
 
 **Method 2: Install from Releases**
 
-1. Open this repo’s [Releases](https://github.com/nextcaicai/WeLink/releases/) and download `main.js`, `manifest.json`, and `styles.css`.
-2. Put them in `<your-vault>/.obsidian/plugins/welink/` (the three files sit directly in that folder — do not nest another directory).
-3. Obsidian → Settings → Community plugins → turn off Restricted mode → reload → enable **WeLink**.
+1. Open this repo’s [Releases](https://github.com/nextcaicai/WXLink/releases/) and download `main.js`, `manifest.json`, and `styles.css`.
+2. Put them in `<your-vault>/.obsidian/plugins/wxlink/` (the three files sit directly in that folder — do not nest another directory).
+3. Obsidian → Settings → Community plugins → turn off Restricted mode → reload → enable **WXLink**.
 4. After changing the files, reload the plugin or restart Obsidian.
 
 **Method 3: Install with BRAT**
 
 1. Install the community plugin [BRAT](https://obsidian.md/plugins?id=obsidian42-brat).
-2. In BRAT, add `https://github.com/nextcaicai/WeLink`.
-3. Enable **WeLink**, then reload the plugin.
+2. In BRAT, add `https://github.com/nextcaicai/WXLink`.
+3. Enable **WXLink**, then reload the plugin.
 
 **Method 4: Build from source**
 
 ```bash
-git clone https://github.com/nextcaicai/WeLink.git
-cd WeLink
+git clone https://github.com/nextcaicai/WXLink.git
+cd WXLink
 npm install
-OBSIDIAN_PLUGIN_DIR=/path/to/vault/.obsidian/plugins/welink npm run build
+OBSIDIAN_PLUGIN_DIR=/path/to/vault/.obsidian/plugins/wxlink npm run build
 ```
 
 If `OBSIDIAN_PLUGIN_DIR` is not set, the build only writes `main.js` at the repo root and does not touch any vault.
@@ -80,7 +82,7 @@ If `OBSIDIAN_PLUGIN_DIR` is not set, the build only writes `main.js` at the repo
 
 About five minutes. Button labels below match the English UI.
 
-1. Obsidian → Settings → WeLink → **Connect WeChat**. In the **Connect WeChat** window, scan with WeChat and confirm on your phone.
+1. Obsidian → Settings → WXLink → **Connect WeChat**. In the **Connect WeChat** window, scan with WeChat and confirm on your phone.
 2. A bot contact appears in WeChat. The status bar shows **WeChat online**, and settings show **Connected**.
 3. **Send any message to this bot from WeChat first** (for example, “Hello”). The gateway issues the send credential only after the bound account has messaged the bot. Skip this step and test send will fail.
 4. Back in settings, click **Send** under **Test connection**. When the test message arrives on your phone, the bridge is live in both directions.
@@ -92,7 +94,7 @@ Command palette commands: `Connect WeChat`, `Disconnect WeChat`, `Re-scan QR cod
 Default folders, all changeable under **Files and sending**:
 
 ```text
-WeLink/
+WXLink/
 ├── Agent.md              # outbox instructions for Agents (plugin-maintained)
 ├── 2026-10-17.md         # daily conversation note (received / sent)
 ├── notes/                # plain-text notes saved via the standalone note trigger
@@ -106,13 +108,13 @@ WeLink/
 
 ### Receiving
 
-Content sent to the bot lands in `WeLink/YYYY-MM-DD.md`: timestamped, marked received/sent, body in a quote block, media as `![[...]]`.
+Content sent to the bot lands in `WXLink/YYYY-MM-DD.md`: timestamped, marked received/sent, body in a quote block, media as `![[...]]`.
 
 | You send | Result |
 |---|---|
 | Ordinary text | Appended to the daily conversation note |
-| Plain text whose first line is `#单独保存` | Trigger stripped; saved under `WeLink/notes/`; daily note keeps a link |
-| Image / video / file / voice | Decrypted into `WeLink/attachments/` and embedded in the daily note; voice is transcoded to playable WAV when possible |
+| Plain text whose first line is `#单独保存` | Trigger stripped; saved under `WXLink/notes/`; daily note keeps a link |
+| Image / video / file / voice | Decrypted into `WXLink/attachments/` and embedded in the daily note; voice is transcoded to playable WAV when possible |
 | A message with http(s) links | Also fetched as article notes when possible |
 
 Standalone notes apply only to plain text with no links and no attachments. Linked or attached messages keep the normal import path. The trigger must match the whole first line; you can change it in settings.
@@ -125,7 +127,7 @@ Article fetching is on by default. At most 5 links per message are processed. Of
 
 This is a one-to-one channel to yourself: **no recipient is specified**. Every file goes to the WeChat account that scanned to bind. Do not call any HTTP API; the file channel is the whole interface.
 
-Write **one file** into `WeLink/outbox/`:
+Write **one file** into `WXLink/outbox/`:
 
 | File in the outbox | Result |
 |---|---|
@@ -135,13 +137,13 @@ Write **one file** into `WeLink/outbox/`:
 The plugin consumes the outbox on its next poll (about 30–60 seconds). Wait about a minute, then check:
 
 - **File gone** = sent, and recorded in today’s conversation note (media keeps a copy under `attachments/` and is linked)
-- **File still there** = failed: a `.md` gets a trailing `<!-- WeLink send failed: ... -->` comment; media gets a sibling `.welink-failed.md` with the reason
+- **File still there** = failed: a `.md` gets a trailing `<!-- WXLink send failed: ... -->` comment; media gets a sibling `.wxlink-failed.md` with the reason
 
 Unknown extensions stay in the outbox and are not sent.
 
 ### For Agents
 
-Point the Agent at `WeLink/Agent.md` in the vault (use the path from settings). It explains which folder to write, how to judge success, where to read your reply, and the rate limit. The full protocol is in [Agent.md](Agent.md).
+Point the Agent at `WXLink/Agent.md` in the vault (use the path from settings). It explains which folder to write, how to judge success, where to read your reply, and the rate limit. The full protocol is in [Agent.md](Agent.md).
 
 Use this channel for notifications (a job finished) and decisions (send a question with options, you reply in one line), not for chat. The gateway rate-limits proactive sends to a handful per day.
 
@@ -186,7 +188,7 @@ The status bar shows **session expired**. In settings, click **Re-scan**, confir
 
 Issues and PRs are welcome. Please include:
 
-- Plugin version (currently `0.1.7`) and Obsidian version
+- Plugin version (currently `0.2.0`) and Obsidian version
 - OS (macOS / Windows / Linux)
 - Steps to reproduce, expected result, actual result
 - For platform-specific issues: source content, target note, and import/paste result; redact account IDs and QR codes in screenshots

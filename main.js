@@ -18911,7 +18911,7 @@ var require_undici = __commonJS({
 // src/main.ts
 var main_exports = {};
 __export(main_exports, {
-  default: () => WeLinkPlugin
+  default: () => WXLinkPlugin
 });
 module.exports = __toCommonJS(main_exports);
 var import_obsidian5 = require("obsidian");
@@ -19837,7 +19837,7 @@ var IlinkClient = class {
     this.downloadTransport = downloadTransport;
   }
   get channelVersion() {
-    return this.opts.channelVersion ?? "welink-weixin/1.0";
+    return this.opts.channelVersion ?? "wxlink-weixin/1.0";
   }
   get longPollTimeoutMs() {
     return this.opts.longPollTimeoutMs ?? 35e3;
@@ -20485,7 +20485,7 @@ var StateStore = class {
           return;
         }
       } catch (e) {
-        console.warn(`welink: failed to read state from ${path}:`, e);
+        console.warn(`wxlink: failed to read state from ${path}:`, e);
       }
     }
   }
@@ -20518,7 +20518,7 @@ var StateStore = class {
       const msg = String(e?.message ?? e);
       if (msg !== this.saveError) {
         this.saveError = msg;
-        console.error(`welink: cannot persist state to ${this.file}: ${msg}`);
+        console.error(`wxlink: cannot persist state to ${this.file}: ${msg}`);
       }
     }
   }
@@ -20659,7 +20659,7 @@ async function downloadImages(transport, images, deadline) {
       for (let attempt = 0; attempt < 2 && !img.data; attempt++) {
         const left = deadline - Date.now();
         if (left <= 0) {
-          console.warn(`welink: article image deadline reached, keeping remote link: ${img.url}`);
+          console.warn(`wxlink: article image deadline reached, keeping remote link: ${img.url}`);
           return;
         }
         if (attempt > 0) {
@@ -20671,10 +20671,10 @@ async function downloadImages(transport, images, deadline) {
           if (resp.status === 200) {
             img.data = new Uint8Array(resp.body);
           } else {
-            console.warn(`welink: article image HTTP ${resp.status}: ${img.url}`);
+            console.warn(`wxlink: article image HTTP ${resp.status}: ${img.url}`);
           }
         } catch (e) {
-          console.warn(`welink: article image download failed: ${String(e?.message ?? e)}`, img.url);
+          console.warn(`wxlink: article image download failed: ${String(e?.message ?? e)}`, img.url);
         }
       }
     }
@@ -20708,7 +20708,7 @@ function toMd(node, images) {
       const src = el.getAttribute("data-src") ?? el.getAttribute("data-original") ?? el.getAttribute("data-lazy-src") ?? el.getAttribute("data-actualsrc") ?? el.getAttribute("src") ?? "";
       if (!src || src.startsWith("data:")) return "";
       if (images.length >= 10) {
-        console.warn(`welink: article image cap (10) reached, keeping remote link: ${src}`);
+        console.warn(`wxlink: article image cap (10) reached, keeping remote link: ${src}`);
         return `![image](${src})`;
       }
       images.push({ url: src, ext: imageExt(src), data: null });
@@ -20796,12 +20796,12 @@ var en = {
   "cmd.disconnect": "Disconnect WeChat",
   "cmd.login": "Re-scan QR code to log in",
   "cmd.inbox": "Open today's inbox",
-  "notice.notLoggedIn": 'WeLink: not logged in \u2014 run the command "{{cmd}}"',
-  "notice.loggedIn": "WeLink: logged in, receiving messages",
-  "notice.loggedOut": "WeLink: logged out \u2014 re-scan in the settings page",
-  "notice.sessionExpired": "WeLink: WeChat session expired \u2014 please re-scan to log in",
+  "notice.notLoggedIn": 'WXLink: not logged in \u2014 run the command "{{cmd}}"',
+  "notice.loggedIn": "WXLink: logged in, receiving messages",
+  "notice.loggedOut": "WXLink: logged out \u2014 re-scan in the settings page",
+  "notice.sessionExpired": "WXLink: WeChat session expired \u2014 please re-scan to log in",
   "error.sessionExpired": "Session expired (-14); please re-scan to log in",
-  "notice.importFailed": "WeLink: import failed {{err}}",
+  "notice.importFailed": "WXLink: import failed {{err}}",
   "notice.noMsgToday": "No messages today ({{path}})",
   "notice.prefix": "WeChat",
   "notice.attachments": "{{n}} attachment(s)",
@@ -20879,7 +20879,7 @@ var en = {
   "importer.from": "From",
   "importer.summary": "Summary",
   "importer.inboxTitle": "{{date}} WeChat Inbox",
-  "outbox.failedNote": "WeLink send failed: ret={{ret}} {{msg}}",
+  "outbox.failedNote": "WXLink send failed: ret={{ret}} {{msg}}",
   "qr.missingInResponse": "get_bot_qrcode response missing QR code: {{resp}}",
   "qr.fetchFailed": "Failed to fetch QR code: {{err}}",
   "qr.refreshFailed": "Failed to refresh QR code: {{err}}",
@@ -20925,12 +20925,12 @@ var zh = {
   "cmd.disconnect": "\u65AD\u5F00\u5FAE\u4FE1",
   "cmd.login": "\u91CD\u65B0\u626B\u7801\u767B\u5F55",
   "cmd.inbox": "\u6253\u5F00\u4ECA\u65E5\u6536\u4EF6\u7BB1",
-  "notice.notLoggedIn": "WeLink:\u5C1A\u672A\u767B\u5F55,\u8FD0\u884C\u547D\u4EE4\u300C{{cmd}}\u300D",
-  "notice.loggedIn": "WeLink: \u767B\u5F55\u6210\u529F,\u5F00\u59CB\u63A5\u6536\u6D88\u606F",
-  "notice.loggedOut": "WeLink: \u5DF2\u767B\u51FA,\u8BF7\u5728\u8BBE\u7F6E\u9875\u91CD\u65B0\u626B\u7801",
-  "notice.sessionExpired": "WeLink: \u5FAE\u4FE1\u4F1A\u8BDD\u8FC7\u671F,\u8BF7\u91CD\u65B0\u626B\u7801\u767B\u5F55",
+  "notice.notLoggedIn": "WXLink:\u5C1A\u672A\u767B\u5F55,\u8FD0\u884C\u547D\u4EE4\u300C{{cmd}}\u300D",
+  "notice.loggedIn": "WXLink: \u767B\u5F55\u6210\u529F,\u5F00\u59CB\u63A5\u6536\u6D88\u606F",
+  "notice.loggedOut": "WXLink: \u5DF2\u767B\u51FA,\u8BF7\u5728\u8BBE\u7F6E\u9875\u91CD\u65B0\u626B\u7801",
+  "notice.sessionExpired": "WXLink: \u5FAE\u4FE1\u4F1A\u8BDD\u8FC7\u671F,\u8BF7\u91CD\u65B0\u626B\u7801\u767B\u5F55",
   "error.sessionExpired": "\u4F1A\u8BDD\u8FC7\u671F(-14),\u8BF7\u91CD\u65B0\u626B\u7801\u767B\u5F55",
-  "notice.importFailed": "WeLink: \u5BFC\u5165\u5931\u8D25 {{err}}",
+  "notice.importFailed": "WXLink: \u5BFC\u5165\u5931\u8D25 {{err}}",
   "notice.noMsgToday": "\u4ECA\u65E5\u6682\u65E0\u6D88\u606F({{path}})",
   "notice.prefix": "\u5FAE\u4FE1",
   "notice.attachments": "{{n}} \u4E2A\u9644\u4EF6",
@@ -21008,7 +21008,7 @@ var zh = {
   "importer.from": "\u53D1\u9001\u8005",
   "importer.summary": "\u6458\u8981",
   "importer.inboxTitle": "{{date}} \u5FAE\u4FE1\u6536\u4EF6\u7BB1",
-  "outbox.failedNote": "WeLink \u53D1\u9001\u5931\u8D25: ret={{ret}} {{msg}}",
+  "outbox.failedNote": "WXLink \u53D1\u9001\u5931\u8D25: ret={{ret}} {{msg}}",
   "qr.missingInResponse": "get_bot_qrcode \u54CD\u5E94\u7F3A\u5C11\u4E8C\u7EF4\u7801\uFF1A{{resp}}",
   "qr.fetchFailed": "\u83B7\u53D6\u4E8C\u7EF4\u7801\u5931\u8D25\uFF1A{{err}}",
   "qr.refreshFailed": "\u4E8C\u7EF4\u7801\u5237\u65B0\u5931\u8D25\uFF1A{{err}}",
@@ -21054,12 +21054,12 @@ var tw = {
   "cmd.disconnect": "\u4E2D\u65B7\u5FAE\u4FE1",
   "cmd.login": "\u91CD\u65B0\u6383\u78BC\u767B\u5165",
   "cmd.inbox": "\u958B\u555F\u4ECA\u65E5\u6536\u4EF6\u5323",
-  "notice.notLoggedIn": "WeLink:\u5C1A\u672A\u767B\u5165,\u57F7\u884C\u6307\u4EE4\u300C{{cmd}}\u300D",
-  "notice.loggedIn": "WeLink: \u767B\u5165\u6210\u529F,\u958B\u59CB\u63A5\u6536\u8A0A\u606F",
-  "notice.loggedOut": "WeLink: \u5DF2\u767B\u51FA,\u8ACB\u5728\u8A2D\u5B9A\u9801\u91CD\u65B0\u6383\u78BC",
-  "notice.sessionExpired": "WeLink: \u5FAE\u4FE1\u5DE5\u4F5C\u968E\u6BB5\u904E\u671F,\u8ACB\u91CD\u65B0\u6383\u78BC\u767B\u5165",
+  "notice.notLoggedIn": "WXLink:\u5C1A\u672A\u767B\u5165,\u57F7\u884C\u6307\u4EE4\u300C{{cmd}}\u300D",
+  "notice.loggedIn": "WXLink: \u767B\u5165\u6210\u529F,\u958B\u59CB\u63A5\u6536\u8A0A\u606F",
+  "notice.loggedOut": "WXLink: \u5DF2\u767B\u51FA,\u8ACB\u5728\u8A2D\u5B9A\u9801\u91CD\u65B0\u6383\u78BC",
+  "notice.sessionExpired": "WXLink: \u5FAE\u4FE1\u5DE5\u4F5C\u968E\u6BB5\u904E\u671F,\u8ACB\u91CD\u65B0\u6383\u78BC\u767B\u5165",
   "error.sessionExpired": "\u5DE5\u4F5C\u968E\u6BB5\u904E\u671F(-14),\u8ACB\u91CD\u65B0\u6383\u78BC\u767B\u5165",
-  "notice.importFailed": "WeLink: \u532F\u5165\u5931\u6557 {{err}}",
+  "notice.importFailed": "WXLink: \u532F\u5165\u5931\u6557 {{err}}",
   "notice.noMsgToday": "\u4ECA\u65E5\u66AB\u7121\u8A0A\u606F({{path}})",
   "notice.prefix": "\u5FAE\u4FE1",
   "notice.attachments": "{{n}} \u500B\u9644\u4EF6",
@@ -21137,7 +21137,7 @@ var tw = {
   "importer.from": "\u767C\u9001\u8005",
   "importer.summary": "\u6458\u8981",
   "importer.inboxTitle": "{{date}} \u5FAE\u4FE1\u6536\u4EF6\u5323",
-  "outbox.failedNote": "WeLink \u767C\u9001\u5931\u6557: ret={{ret}} {{msg}}",
+  "outbox.failedNote": "WXLink \u767C\u9001\u5931\u6557: ret={{ret}} {{msg}}",
   "qr.missingInResponse": "get_bot_qrcode \u56DE\u61C9\u7F3A\u5C11\u4E8C\u7DAD\u78BC\uFF1A{{resp}}",
   "qr.fetchFailed": "\u53D6\u5F97\u4E8C\u7DAD\u78BC\u5931\u6557\uFF1A{{err}}",
   "qr.refreshFailed": "\u4E8C\u7DAD\u78BC\u91CD\u65B0\u6574\u7406\u5931\u6557\uFF1A{{err}}",
@@ -21230,7 +21230,7 @@ var KIND_KEY = {
   file: "reply.kind.file"
 };
 function stripVaultRoot(path) {
-  return path.replace(/^WeLink\//, "");
+  return path.replace(/^(?:WXLink|WeLink)\//, "");
 }
 function buildReceiptReplies(results) {
   const lines = [];
@@ -21297,7 +21297,7 @@ function noteTitle(body) {
 }
 function storedSourceHash(note) {
   const frontmatter = /^---\r?\n([\s\S]*?)\r?\n---/.exec(note)?.[1] ?? "";
-  return /^welink_source_hash:\s*([a-f0-9]+)\s*$/m.exec(frontmatter)?.[1] ?? "";
+  return /^(?:wxlink|welink)_source_hash:\s*([a-f0-9]+)\s*$/m.exec(frontmatter)?.[1] ?? "";
 }
 async function findExistingSingleNote(app, folder, date, hash) {
   try {
@@ -21324,7 +21324,7 @@ async function saveSingleNote(app, folder, timeMs, body) {
   const notePath = await uniquePath(app, rawPath);
   const note = [
     "---",
-    `welink_source_hash: ${hash}`,
+    `wxlink_source_hash: ${hash}`,
     "---",
     "",
     body
@@ -21501,7 +21501,7 @@ async function appendOutbound(app, inboxFolder, timeMs, sender, lines) {
 }
 
 // src/core/agent-guide.ts
-var GUIDE_REV = "4";
+var GUIDE_REV = "5";
 function agentGuideMeta(content) {
   const fm = /^---\s*\n([\s\S]*?)\n---/.exec(content)?.[1] ?? "";
   const lang = /lang:\s*"?(\w+)"?/.exec(fm)?.[1] ?? "";
@@ -21519,9 +21519,9 @@ rev: ${GUIDE_REV}
 paths: "${pathsKey(s)}"
 ---
 
-# WeChat Send (WeLink)
+# WeChat Send (WXLink)
 
-This Obsidian vault runs the WeLink plugin, which exposes a one-to-one WeChat channel: every message goes to the vault owner's own bound WeChat account.
+This Obsidian vault runs the WXLink plugin, which exposes a one-to-one WeChat channel: every message goes to the vault owner's own bound WeChat account.
 
 ## Sending
 
@@ -21530,7 +21530,7 @@ Write a file into the outbox folder \`${s.outboxFolder}/\`:
 - \`.md\` file: the content is sent verbatim as a text message \u2014 **markdown is supported** (headings, lists, bold, code blocks); keep it within a phone screen or so (the file name carries no meaning)
 - Image (\`.jpg/.png/.gif/.webp\`), video (\`.mp4\` etc.) or document (\`.pdf/.docx/...\`, \u2264100MB): sent as an attachment
 
-The plugin consumes the outbox on its next poll (~30-60 s). A successful send deletes the file and records the message in today's conversation note under \`${s.inboxFolder}/\` (marked "sent"; media sends keep a copy under \`${s.attachmentFolder}/\` and link it from the note). A failure keeps the file (an \`.md\` gets a \`<!-- WeLink send failed: ... -->\` comment appended, a media file gets a \`<name>.welink-failed.md\` sidecar). After writing, wait about a minute and check whether the file still exists to determine the result.
+The plugin consumes the outbox on its next poll (~30-60 s). A successful send deletes the file and records the message in today's conversation note under \`${s.inboxFolder}/\` (marked "sent"; media sends keep a copy under \`${s.attachmentFolder}/\` and link it from the note). A failure keeps the file (an \`.md\` gets a \`<!-- WXLink send failed: ... -->\` comment appended, a media file gets a \`<name>.wxlink-failed.md\` sidecar). After writing, wait about a minute and check whether the file still exists to determine the result.
 
 ## Receiving
 
@@ -21550,9 +21550,9 @@ rev: ${GUIDE_REV}
 paths: "${pathsKey(s)}"
 ---
 
-# \u5FAE\u4FE1\u53D1\u9001(WeLink)
+# \u5FAE\u4FE1\u53D1\u9001(WXLink)
 
-\u672C vault \u88C5\u4E86 WeLink \u63D2\u4EF6,\u63D0\u4F9B\u4E00\u6761\u4E00\u5BF9\u4E00\u5FAE\u4FE1\u901A\u9053:\u6240\u6709\u6D88\u606F\u90FD\u53D1\u7ED9 vault \u4E3B\u4EBA\u81EA\u5DF1\u7ED1\u5B9A\u7684\u5FAE\u4FE1\u3002
+\u672C vault \u88C5\u4E86 WXLink \u63D2\u4EF6,\u63D0\u4F9B\u4E00\u6761\u4E00\u5BF9\u4E00\u5FAE\u4FE1\u901A\u9053:\u6240\u6709\u6D88\u606F\u90FD\u53D1\u7ED9 vault \u4E3B\u4EBA\u81EA\u5DF1\u7ED1\u5B9A\u7684\u5FAE\u4FE1\u3002
 
 ## \u53D1\u9001
 
@@ -21561,7 +21561,7 @@ paths: "${pathsKey(s)}"
 - \`.md\` \u6587\u4EF6:\u5185\u5BB9**\u539F\u6837**\u4F5C\u4E3A\u6587\u672C\u6D88\u606F\u53D1\u9001,**\u652F\u6301 markdown \u683C\u5F0F**(\u6807\u9898\u3001\u5217\u8868\u3001\u52A0\u7C97\u3001\u4EE3\u7801\u5757),\u5EFA\u8BAE\u63A7\u5236\u5728\u624B\u673A\u4E00\u5C4F\u5185(\u6587\u4EF6\u540D\u65E0\u8BED\u4E49)
 - \u56FE\u7247(\`.jpg/.png/.gif/.webp\`)\u3001\u89C6\u9891(\`.mp4\` \u7B49)\u6216\u6587\u6863(\`.pdf/.docx/...\`,\u2264100MB):\u4F5C\u4E3A\u9644\u4EF6\u53D1\u9001
 
-\u63D2\u4EF6\u5728\u4E0B\u4E00\u8F6E\u8F6E\u8BE2(\u7EA6 30-60 \u79D2)\u6D88\u8D39\u53D1\u4EF6\u7BB1\u3002\u53D1\u9001\u6210\u529F\u4F1A\u5220\u9664\u6587\u4EF6,\u5E76\u628A\u8FD9\u6761\u6D88\u606F\u8BB0\u5F55\u8FDB \`${s.inboxFolder}/\` \u4E0B\u5F53\u5929\u7684\u5BF9\u8BDD\u7B14\u8BB0(\u6807\u8BB0"\u53D1\u9001";\u5A92\u4F53\u53D1\u9001\u4F1A\u5728 \`${s.attachmentFolder}/\` \u5B58\u4E00\u4EFD\u526F\u672C\u5E76\u5728\u7B14\u8BB0\u91CC\u94FE\u63A5)\u3002\u5931\u8D25\u4F1A\u4FDD\u7559\u6587\u4EF6(\`.md\` \u672B\u5C3E\u8FFD\u52A0 \`<!-- WeLink send failed: ... -->\` \u6CE8\u91CA,\u5A92\u4F53\u6587\u4EF6\u751F\u6210 \`<\u6587\u4EF6\u540D>.welink-failed.md\` \u8BB0\u5F55)\u3002\u5199\u5165\u540E\u7B49\u7EA6\u4E00\u5206\u949F,\u68C0\u67E5\u6587\u4EF6\u662F\u5426\u8FD8\u5728\u4EE5\u5224\u65AD\u7ED3\u679C\u3002
+\u63D2\u4EF6\u5728\u4E0B\u4E00\u8F6E\u8F6E\u8BE2(\u7EA6 30-60 \u79D2)\u6D88\u8D39\u53D1\u4EF6\u7BB1\u3002\u53D1\u9001\u6210\u529F\u4F1A\u5220\u9664\u6587\u4EF6,\u5E76\u628A\u8FD9\u6761\u6D88\u606F\u8BB0\u5F55\u8FDB \`${s.inboxFolder}/\` \u4E0B\u5F53\u5929\u7684\u5BF9\u8BDD\u7B14\u8BB0(\u6807\u8BB0"\u53D1\u9001";\u5A92\u4F53\u53D1\u9001\u4F1A\u5728 \`${s.attachmentFolder}/\` \u5B58\u4E00\u4EFD\u526F\u672C\u5E76\u5728\u7B14\u8BB0\u91CC\u94FE\u63A5)\u3002\u5931\u8D25\u4F1A\u4FDD\u7559\u6587\u4EF6(\`.md\` \u672B\u5C3E\u8FFD\u52A0 \`<!-- WXLink send failed: ... -->\` \u6CE8\u91CA,\u5A92\u4F53\u6587\u4EF6\u751F\u6210 \`<\u6587\u4EF6\u540D>.wxlink-failed.md\` \u8BB0\u5F55)\u3002\u5199\u5165\u540E\u7B49\u7EA6\u4E00\u5206\u949F,\u68C0\u67E5\u6587\u4EF6\u662F\u5426\u8FD8\u5728\u4EE5\u5224\u65AD\u7ED3\u679C\u3002
 
 ## \u63A5\u6536
 
@@ -21581,9 +21581,9 @@ rev: ${GUIDE_REV}
 paths: "${pathsKey(s)}"
 ---
 
-# \u5FAE\u4FE1\u767C\u9001(WeLink)
+# \u5FAE\u4FE1\u767C\u9001(WXLink)
 
-\u672C vault \u88DD\u4E86 WeLink \u5916\u639B,\u63D0\u4F9B\u4E00\u689D\u4E00\u5C0D\u4E00\u5FAE\u4FE1\u901A\u9053:\u6240\u6709\u8A0A\u606F\u90FD\u767C\u7D66 vault \u4E3B\u4EBA\u81EA\u5DF1\u7D81\u5B9A\u7684\u5FAE\u4FE1\u3002
+\u672C vault \u88DD\u4E86 WXLink \u5916\u639B,\u63D0\u4F9B\u4E00\u689D\u4E00\u5C0D\u4E00\u5FAE\u4FE1\u901A\u9053:\u6240\u6709\u8A0A\u606F\u90FD\u767C\u7D66 vault \u4E3B\u4EBA\u81EA\u5DF1\u7D81\u5B9A\u7684\u5FAE\u4FE1\u3002
 
 ## \u767C\u9001
 
@@ -21592,7 +21592,7 @@ paths: "${pathsKey(s)}"
 - \`.md\` \u6A94\u6848:\u5167\u5BB9**\u539F\u6A23**\u4F5C\u70BA\u6587\u5B57\u8A0A\u606F\u767C\u9001,**\u652F\u63F4 markdown \u683C\u5F0F**(\u6A19\u984C\u3001\u5217\u8868\u3001\u52A0\u7C97\u3001\u7A0B\u5F0F\u78BC\u5340\u584A),\u5EFA\u8B70\u63A7\u5236\u5728\u624B\u6A5F\u4E00\u5C4F\u5167(\u6A94\u540D\u7121\u8A9E\u7FA9)
 - \u5716\u7247(\`.jpg/.png/.gif/.webp\`)\u3001\u5F71\u7247(\`.mp4\` \u7B49)\u6216\u6587\u4EF6(\`.pdf/.docx/...\`,\u2264100MB):\u4F5C\u70BA\u9644\u4EF6\u767C\u9001
 
-\u5916\u639B\u5728\u4E0B\u4E00\u8F2A\u8F2A\u8A62(\u7D04 30-60 \u79D2)\u6D88\u8CBB\u767C\u4EF6\u5323\u3002\u767C\u9001\u6210\u529F\u6703\u522A\u9664\u6A94\u6848,\u4E26\u628A\u9019\u689D\u8A0A\u606F\u8A18\u9304\u9032 \`${s.inboxFolder}/\` \u4E0B\u7576\u5929\u7684\u5C0D\u8A71\u7B46\u8A18(\u6A19\u8A18"\u767C\u9001";\u5A92\u9AD4\u767C\u9001\u6703\u5728 \`${s.attachmentFolder}/\` \u5B58\u4E00\u4EFD\u526F\u672C\u4E26\u5728\u7B46\u8A18\u88E1\u9023\u7D50)\u3002\u5931\u6557\u6703\u4FDD\u7559\u6A94\u6848(\`.md\` \u672B\u5C3E\u8FFD\u52A0 \`<!-- WeLink send failed: ... -->\` \u8A3B\u89E3,\u5A92\u9AD4\u6A94\u6848\u7522\u751F \`<\u6A94\u540D>.welink-failed.md\` \u8A18\u9304)\u3002\u5BEB\u5165\u5F8C\u7B49\u7D04\u4E00\u5206\u9418,\u6AA2\u67E5\u6A94\u6848\u662F\u5426\u9084\u5728\u4EE5\u5224\u65B7\u7D50\u679C\u3002
+\u5916\u639B\u5728\u4E0B\u4E00\u8F2A\u8F2A\u8A62(\u7D04 30-60 \u79D2)\u6D88\u8CBB\u767C\u4EF6\u5323\u3002\u767C\u9001\u6210\u529F\u6703\u522A\u9664\u6A94\u6848,\u4E26\u628A\u9019\u689D\u8A0A\u606F\u8A18\u9304\u9032 \`${s.inboxFolder}/\` \u4E0B\u7576\u5929\u7684\u5C0D\u8A71\u7B46\u8A18(\u6A19\u8A18"\u767C\u9001";\u5A92\u9AD4\u767C\u9001\u6703\u5728 \`${s.attachmentFolder}/\` \u5B58\u4E00\u4EFD\u526F\u672C\u4E26\u5728\u7B46\u8A18\u88E1\u9023\u7D50)\u3002\u5931\u6557\u6703\u4FDD\u7559\u6A94\u6848(\`.md\` \u672B\u5C3E\u8FFD\u52A0 \`<!-- WXLink send failed: ... -->\` \u8A3B\u89E3,\u5A92\u9AD4\u6A94\u6848\u7522\u751F \`<\u6A94\u540D>.wxlink-failed.md\` \u8A18\u9304)\u3002\u5BEB\u5165\u5F8C\u7B49\u7D04\u4E00\u5206\u9418,\u6AA2\u67E5\u6A94\u6848\u662F\u5426\u9084\u5728\u4EE5\u5224\u65B7\u7D50\u679C\u3002
 
 ## \u63A5\u6536
 
@@ -21625,11 +21625,11 @@ var import_obsidian3 = require("obsidian");
 var DEFAULT_SETTINGS = {
   language: "system",
   enabled: true,
-  inboxFolder: "WeLink",
-  singleNoteFolder: "WeLink/notes",
-  articleFolder: "WeLink/articles",
-  attachmentFolder: "WeLink/attachments",
-  outboxFolder: "WeLink/outbox",
+  inboxFolder: "WXLink",
+  singleNoteFolder: "WXLink/notes",
+  articleFolder: "WXLink/articles",
+  attachmentFolder: "WXLink/attachments",
+  outboxFolder: "WXLink/outbox",
   singleNoteMarker: "#\u5355\u72EC\u4FDD\u5B58",
   fetchArticles: true,
   groupArticlesByAccount: true,
@@ -21638,10 +21638,30 @@ var DEFAULT_SETTINGS = {
   autoReply: true
 };
 var FOLDER_KEYS = ["inboxFolder", "singleNoteFolder", "articleFolder", "attachmentFolder", "outboxFolder"];
+var LEGACY_INBOX_FOLDER = "WeLink";
+function remapDefaultRoot(value, from, to) {
+  if (value === from) return to;
+  if (value.startsWith(`${from}/`)) return `${to}${value.slice(from.length)}`;
+  return value;
+}
+function adoptLegacyFolderDefaults(settings, hasLegacyInbox, hasDefaultInbox) {
+  if (settings.inboxFolder !== DEFAULT_SETTINGS.inboxFolder) return settings;
+  if (!hasLegacyInbox || hasDefaultInbox) return settings;
+  const from = DEFAULT_SETTINGS.inboxFolder;
+  const to = LEGACY_INBOX_FOLDER;
+  return {
+    ...settings,
+    inboxFolder: remapDefaultRoot(settings.inboxFolder, from, to),
+    singleNoteFolder: remapDefaultRoot(settings.singleNoteFolder, from, to),
+    articleFolder: remapDefaultRoot(settings.articleFolder, from, to),
+    attachmentFolder: remapDefaultRoot(settings.attachmentFolder, from, to),
+    outboxFolder: remapDefaultRoot(settings.outboxFolder, from, to)
+  };
+}
 function isValidSingleNoteMarker(value) {
   return typeof value === "string" && value.trim().length > 0 && !/[\r\n]/.test(value);
 }
-var WeLinkSettingTab = class extends import_obsidian3.PluginSettingTab {
+var WXLinkSettingTab = class extends import_obsidian3.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
     this.plugin = plugin;
@@ -21676,7 +21696,7 @@ var WeLinkSettingTab = class extends import_obsidian3.PluginSettingTab {
       {
         type: "group",
         heading: t("set.group.connection"),
-        cls: "welink-settings-group",
+        cls: "wxlink-settings-group",
         items: [
           {
             name: t("set.autoConnect"),
@@ -21694,7 +21714,7 @@ var WeLinkSettingTab = class extends import_obsidian3.PluginSettingTab {
       {
         type: "group",
         heading: t("set.group.messages"),
-        cls: "welink-settings-group",
+        cls: "wxlink-settings-group",
         items: [
           {
             name: t("set.autoImport"),
@@ -21734,7 +21754,7 @@ var WeLinkSettingTab = class extends import_obsidian3.PluginSettingTab {
       {
         type: "group",
         heading: t("set.group.files"),
-        cls: "welink-settings-group",
+        cls: "wxlink-settings-group",
         items: [
           {
             name: t("set.inboxFolder"),
@@ -21771,7 +21791,7 @@ var WeLinkSettingTab = class extends import_obsidian3.PluginSettingTab {
       {
         type: "group",
         heading: t("set.group.general"),
-        cls: "welink-settings-group",
+        cls: "wxlink-settings-group",
         items: [
           {
             name: t("set.language"),
@@ -21793,7 +21813,7 @@ var WeLinkSettingTab = class extends import_obsidian3.PluginSettingTab {
   }
   renderBotSetting(setting) {
     setting.setName(t("set.wechatBot")).setDesc(t("set.wechatBot.desc"));
-    this.botStatusEl = setting.nameEl.createSpan({ cls: "welink-bot-status" });
+    this.botStatusEl = setting.nameEl.createSpan({ cls: "wxlink-bot-status" });
     this.botStatusEl.setAttribute("aria-live", "polite");
     this.updateBotStatus();
     if (this.plugin.getState().token) {
@@ -21821,8 +21841,8 @@ var WeLinkSettingTab = class extends import_obsidian3.PluginSettingTab {
   renderTestSetting(setting) {
     let testInput = null;
     setting.setName(t("sendTest.name")).setDesc(t("sendTest.desc")).addText((txt) => {
-      txt.setPlaceholder(t("sendTest.placeholder")).setValue("Hello from WeLink");
-      txt.inputEl.addClass("welink-send-input");
+      txt.setPlaceholder(t("sendTest.placeholder")).setValue("Hello from WXLink");
+      txt.inputEl.addClass("wxlink-send-input");
       testInput = txt;
     }).addButton((button) => {
       button.setButtonText(t("sendTest.send")).setCta();
@@ -22340,14 +22360,14 @@ var QrLoginModal = class extends import_obsidian4.Modal {
   retryEl = null;
   onOpen() {
     const { contentEl } = this;
-    this.modalEl.addClass("welink-qr-modal");
+    this.modalEl.addClass("wxlink-qr-modal");
     contentEl.empty();
-    contentEl.createEl("h3", { text: t("modal.title"), cls: "welink-qr-title" });
-    this.qrEl = contentEl.createDiv({ cls: "welink-qr welink-qr-center" });
-    contentEl.createEl("p", { text: t("modal.hint"), cls: "welink-qr-hint" });
-    this.statusEl = contentEl.createEl("p", { text: t("login.fetching"), cls: "welink-qr-status" });
+    contentEl.createEl("h3", { text: t("modal.title"), cls: "wxlink-qr-title" });
+    this.qrEl = contentEl.createDiv({ cls: "wxlink-qr wxlink-qr-center" });
+    contentEl.createEl("p", { text: t("modal.hint"), cls: "wxlink-qr-hint" });
+    this.statusEl = contentEl.createEl("p", { text: t("login.fetching"), cls: "wxlink-qr-status" });
     this.statusEl.setAttribute("aria-live", "polite");
-    const actions = contentEl.createDiv({ cls: "welink-qr-actions" });
+    const actions = contentEl.createDiv({ cls: "wxlink-qr-actions" });
     this.retryEl = actions.createEl("button", { text: t("login.retry") });
     this.retryEl.hidden = true;
     this.retryEl.addEventListener("click", () => this.startLogin());
@@ -22395,7 +22415,7 @@ var QrLoginModal = class extends import_obsidian4.Modal {
       const cell = 3;
       const quiet = 4;
       const n = qr.size + quiet * 2;
-      const canvas = this.qrEl.createEl("canvas", { cls: "welink-qr-canvas" });
+      const canvas = this.qrEl.createEl("canvas", { cls: "wxlink-qr-canvas" });
       canvas.width = n * cell;
       canvas.height = n * cell;
       const ctx = canvas.getContext("2d");
@@ -22431,6 +22451,14 @@ var QrLoginModal = class extends import_obsidian4.Modal {
 
 // src/outbox.ts
 var IMAGE_EXTS = /* @__PURE__ */ new Set(["jpg", "jpeg", "png", "gif", "webp", "bmp"]);
+var FAILED_COMMENT = "<!-- WXLink send failed:";
+var LEGACY_FAILED_COMMENT = "<!-- WeLink send failed:";
+function isFailedSidecar(name) {
+  return name.endsWith(".wxlink-failed.md") || name.endsWith(".welink-failed.md");
+}
+function alreadyAnnotated(content) {
+  return content.includes(FAILED_COMMENT) || content.includes(LEGACY_FAILED_COMMENT);
+}
 var Outbox = class {
   constructor(app) {
     this.app = app;
@@ -22456,7 +22484,7 @@ var Outbox = class {
     for (const path of listing.files) {
       const name = path.split("/").pop() ?? "";
       const ext = (name.includes(".") ? name.split(".").pop() ?? "" : "").toLowerCase();
-      if (name.endsWith(".welink-failed.md")) continue;
+      if (isFailedSidecar(name)) continue;
       if (ext === "md") {
         processed += await this.flushTextFile(client, path, to, contextToken, inboxFolder);
         continue;
@@ -22485,10 +22513,10 @@ var Outbox = class {
       await this.app.vault.adapter.remove(path);
       return 1;
     }
-    if (!content.includes("<!-- WeLink send failed:")) {
+    if (!alreadyAnnotated(content)) {
       const note = `
 
-<!-- WeLink send failed: ${buildSendFailure(res.errmsg, res.ret, contextToken)} -->
+${FAILED_COMMENT} ${buildSendFailure(res.errmsg, res.ret, contextToken)} -->
 `;
       await this.app.vault.adapter.write(path, content + note);
     }
@@ -22526,7 +22554,7 @@ var Outbox = class {
       await this.app.vault.adapter.remove(path);
       return 1;
     }
-    const notePath = `${path}.welink-failed.md`;
+    const notePath = `${path}.wxlink-failed.md`;
     const note = `# ${name}
 
 ${buildSendFailure(res.errmsg, res.ret, contextToken)}
@@ -22578,7 +22606,7 @@ var CDN_BASE = "https://novac2c.cdn.weixin.qq.com/c2c";
 
 // src/main.ts
 var TICKET_TTL_MS = 24 * 36e5;
-var WeLinkPlugin = class extends import_obsidian5.Plugin {
+var WXLinkPlugin = class extends import_obsidian5.Plugin {
   settings = DEFAULT_SETTINGS;
   store;
   client = null;
@@ -22598,6 +22626,7 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
   commandNameKeys = {};
   async onload() {
     await this.loadSettings();
+    await this.adoptLegacyFolders();
     applyLanguage(this.settings.language);
     const stateDir = this.manifest.dir ?? `${this.app.vault.configDir}/plugins/${this.manifest.id}`;
     this.store = new StateStore(this.app, `${stateDir}/state.json`);
@@ -22607,16 +22636,16 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
     this.statusBar = this.addStatusBarItem();
     this.renderStatus();
     const cmds = [
-      ["welink-connect", "cmd.connect", () => void this.connect()],
-      ["welink-disconnect", "cmd.disconnect", () => this.disconnect()],
-      ["welink-login", "cmd.login", () => this.startLogin()],
-      ["welink-open-inbox", "cmd.inbox", () => void this.openTodayInbox()]
+      ["wxlink-connect", "cmd.connect", () => void this.connect()],
+      ["wxlink-disconnect", "cmd.disconnect", () => this.disconnect()],
+      ["wxlink-login", "cmd.login", () => this.startLogin()],
+      ["wxlink-open-inbox", "cmd.inbox", () => void this.openTodayInbox()]
     ];
     for (const [id, key, callback] of cmds) {
       this.commandNameKeys[id] = key;
       this.addCommand({ id, name: t(key), callback });
     }
-    this.addSettingTab(new WeLinkSettingTab(this.app, this));
+    this.addSettingTab(new WXLinkSettingTab(this.app, this));
     this.app.workspace.onLayoutReady(() => {
       if (this.settings.enabled && this.store.get().token) {
         void this.startPollLoop();
@@ -22651,6 +22680,18 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
   }
   async saveSettings() {
     await this.saveData(this.settings);
+  }
+  /** First launch after the rename: reuse an existing WeLink/ tree instead of creating WXLink/. */
+  async adoptLegacyFolders() {
+    const adapter = this.app.vault.adapter;
+    const next = adoptLegacyFolderDefaults(
+      this.settings,
+      await adapter.exists(LEGACY_INBOX_FOLDER),
+      await adapter.exists(DEFAULT_SETTINGS.inboxFolder)
+    );
+    if (next === this.settings) return;
+    this.settings = next;
+    await this.saveSettings();
   }
   /** Switch the UI language at runtime (commands, status bar; the settings page re-renders itself) */
   applyLanguage(lang) {
@@ -22688,7 +22729,7 @@ var WeLinkPlugin = class extends import_obsidian5.Plugin {
       expired: t("status.expired"),
       error: t("status.error")
     };
-    this.statusBar.setText(`WeLink ${map[this.connState]}`);
+    this.statusBar.setText(`WXLink ${map[this.connState]}`);
     this.statusBar.setAttribute("aria-label", this.store.get().lastError || "");
   }
   setConn(s) {

@@ -1,11 +1,11 @@
 /** Plugin settings: declarative definitions (1.13+) with an imperative login section */
 import type { App } from 'obsidian';
 import { Notice, normalizePath, PluginSettingTab, type Setting, type SettingDefinitionItem, type TextComponent } from 'obsidian';
-import type WeLinkPlugin from './main';
+import type WXLinkPlugin from './main';
 import type { ConnState } from './main';
 import { buildSendFailure, t } from './i18n';
 
-export interface WeLinkSettings {
+export interface WXLinkSettings {
   language: 'system' | 'en' | 'zh' | 'tw'; // UI language; system follows Obsidian
   enabled: boolean; // auto-connect on startup
   inboxFolder: string;
@@ -21,14 +21,14 @@ export interface WeLinkSettings {
   autoReply: boolean; // after recording an inbound message, send a confirmation reply back
 }
 
-export const DEFAULT_SETTINGS: WeLinkSettings = {
+export const DEFAULT_SETTINGS: WXLinkSettings = {
   language: 'system',
   enabled: true,
-  inboxFolder: 'WeLink',
-  singleNoteFolder: 'WeLink/notes',
-  articleFolder: 'WeLink/articles',
-  attachmentFolder: 'WeLink/attachments',
-  outboxFolder: 'WeLink/outbox',
+  inboxFolder: 'WXLink',
+  singleNoteFolder: 'WXLink/notes',
+  articleFolder: 'WXLink/articles',
+  attachmentFolder: 'WXLink/attachments',
+  outboxFolder: 'WXLink/outbox',
   singleNoteMarker: '#单独保存',
   fetchArticles: true,
   groupArticlesByAccount: true,
@@ -37,19 +37,48 @@ export const DEFAULT_SETTINGS: WeLinkSettings = {
   autoReply: true,
 };
 
-export const FOLDER_KEYS = ['inboxFolder', 'singleNoteFolder', 'articleFolder', 'attachmentFolder', 'outboxFolder'] as const satisfies readonly (keyof WeLinkSettings)[];
+export const FOLDER_KEYS = ['inboxFolder', 'singleNoteFolder', 'articleFolder', 'attachmentFolder', 'outboxFolder'] as const satisfies readonly (keyof WXLinkSettings)[];
+
+/** Pre-rename inbox root. Keep writing there when a vault already has that tree. */
+export const LEGACY_INBOX_FOLDER = 'WeLink';
+
+function remapDefaultRoot(value: string, from: string, to: string): string {
+  if (value === from) return to;
+  if (value.startsWith(`${from}/`)) return `${to}${value.slice(from.length)}`;
+  return value;
+}
+
+/** If the vault still has WeLink/ and no WXLink/, keep the old folder tree instead of creating a parallel one. */
+export function adoptLegacyFolderDefaults(
+  settings: WXLinkSettings,
+  hasLegacyInbox: boolean,
+  hasDefaultInbox: boolean,
+): WXLinkSettings {
+  if (settings.inboxFolder !== DEFAULT_SETTINGS.inboxFolder) return settings;
+  if (!hasLegacyInbox || hasDefaultInbox) return settings;
+  const from = DEFAULT_SETTINGS.inboxFolder;
+  const to = LEGACY_INBOX_FOLDER;
+  return {
+    ...settings,
+    inboxFolder: remapDefaultRoot(settings.inboxFolder, from, to),
+    singleNoteFolder: remapDefaultRoot(settings.singleNoteFolder, from, to),
+    articleFolder: remapDefaultRoot(settings.articleFolder, from, to),
+    attachmentFolder: remapDefaultRoot(settings.attachmentFolder, from, to),
+    outboxFolder: remapDefaultRoot(settings.outboxFolder, from, to),
+  };
+}
 
 /** A marker must be one visible line, so matching it at the start of a message stays predictable. */
 export function isValidSingleNoteMarker(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0 && !/[\r\n]/.test(value);
 }
 
-export class WeLinkSettingTab extends PluginSettingTab {
+export class WXLinkSettingTab extends PluginSettingTab {
   private botStatusEl: HTMLElement | null = null;
 
   constructor(
     app: App,
-    private plugin: WeLinkPlugin,
+    private plugin: WXLinkPlugin,
   ) {
     super(app, plugin);
     this.plugin.onConnectionStateChange(() => this.updateBotStatus());
@@ -74,7 +103,7 @@ export class WeLinkSettingTab extends PluginSettingTab {
     }
     (this.plugin.settings as unknown as Record<string, unknown>)[key] = value;
     if (key === 'language') {
-      this.plugin.applyLanguage(value as WeLinkSettings['language']); // switch commands/status bar immediately
+      this.plugin.applyLanguage(value as WXLinkSettings['language']); // switch commands/status bar immediately
       this.update(); // re-render every label in the new language
     }
     if ((FOLDER_KEYS as readonly string[]).includes(key) || key === 'singleNoteMarker') this.plugin.refreshAgentGuide(); // paths/marker changed -> Agent.md must stay current
@@ -86,7 +115,7 @@ export class WeLinkSettingTab extends PluginSettingTab {
       {
         type: 'group',
         heading: t('set.group.connection'),
-        cls: 'welink-settings-group',
+        cls: 'wxlink-settings-group',
         items: [
           {
             name: t('set.autoConnect'),
@@ -104,7 +133,7 @@ export class WeLinkSettingTab extends PluginSettingTab {
       {
         type: 'group',
         heading: t('set.group.messages'),
-        cls: 'welink-settings-group',
+        cls: 'wxlink-settings-group',
         items: [
           {
             name: t('set.autoImport'),
@@ -144,7 +173,7 @@ export class WeLinkSettingTab extends PluginSettingTab {
       {
         type: 'group',
         heading: t('set.group.files'),
-        cls: 'welink-settings-group',
+        cls: 'wxlink-settings-group',
         items: [
           {
             name: t('set.inboxFolder'),
@@ -181,7 +210,7 @@ export class WeLinkSettingTab extends PluginSettingTab {
       {
         type: 'group',
         heading: t('set.group.general'),
-        cls: 'welink-settings-group',
+        cls: 'wxlink-settings-group',
         items: [
           {
             name: t('set.language'),
@@ -204,7 +233,7 @@ export class WeLinkSettingTab extends PluginSettingTab {
 
   private renderBotSetting(setting: Setting): void {
     setting.setName(t('set.wechatBot')).setDesc(t('set.wechatBot.desc'));
-    this.botStatusEl = setting.nameEl.createSpan({ cls: 'welink-bot-status' });
+    this.botStatusEl = setting.nameEl.createSpan({ cls: 'wxlink-bot-status' });
     this.botStatusEl.setAttribute('aria-live', 'polite');
     this.updateBotStatus();
 
@@ -245,8 +274,8 @@ export class WeLinkSettingTab extends PluginSettingTab {
       .setName(t('sendTest.name'))
       .setDesc(t('sendTest.desc'))
       .addText((txt) => {
-        txt.setPlaceholder(t('sendTest.placeholder')).setValue('Hello from WeLink');
-        txt.inputEl.addClass('welink-send-input');
+        txt.setPlaceholder(t('sendTest.placeholder')).setValue('Hello from WXLink');
+        txt.inputEl.addClass('wxlink-send-input');
         testInput = txt;
       })
       .addButton((button) => {

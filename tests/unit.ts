@@ -26,8 +26,8 @@ import { Outbox } from '../src/outbox';
 import { StateStore } from '../src/core/store';
 import { IlinkClient } from '../src/core/ilink';
 import { agentGuideMeta, ensureAgentGuide } from '../src/core/agent-guide';
-import type { WeLinkSettings } from '../src/settings';
-import { DEFAULT_SETTINGS, isValidSingleNoteMarker } from '../src/settings';
+import type { WXLinkSettings } from '../src/settings';
+import { adoptLegacyFolderDefaults, DEFAULT_SETTINGS, isValidSingleNoteMarker } from '../src/settings';
 
 // Node has no `window`; some modules (StateStore, article) schedule via window.setTimeout
 (globalThis as { window?: unknown }).window = globalThis;
@@ -122,13 +122,13 @@ const MSG = (over: Partial<InboundMessage> = {}): InboundMessage => ({
   ...over,
 });
 
-const SETTINGS = (over: Partial<WeLinkSettings> = {}): WeLinkSettings => ({ ...DEFAULT_SETTINGS, ...over });
+const SETTINGS = (over: Partial<WXLinkSettings> = {}): WXLinkSettings => ({ ...DEFAULT_SETTINGS, ...over });
 
 const IMPORT_OPTS = {
-  inboxFolder: 'WeLink',
-  attachmentFolder: 'WeLink/attachments',
-  articleFolder: 'WeLink/articles',
-  singleNoteFolder: 'WeLink/notes',
+  inboxFolder: 'WXLink',
+  attachmentFolder: 'WXLink/attachments',
+  articleFolder: 'WXLink/articles',
+  singleNoteFolder: 'WXLink/notes',
   singleNoteMarker: '#单独保存',
   fetchArticles: false,
   groupArticlesByAccount: false,
@@ -159,7 +159,7 @@ test('parseAesKey: rejects garbage', () => {
 
 test('encrypt/decrypt ECB roundtrip', () => {
   const key = Buffer.from('0123456789abcdef');
-  const plain = Buffer.from('hello welink — some unicode too');
+  const plain = Buffer.from('hello wxlink — some unicode too');
   const enc = encryptEcb(plain, key);
   assert.notDeepEqual(enc, plain);
   assert.deepEqual(decryptEcb(enc, key), plain);
@@ -271,18 +271,18 @@ test('applyLanguage / resolvedLanguage / t', () => {
 
 /* ------------------------------------------------- receipt reply assembly */
 
-const RECEIPT_OK = { ok: true, appended: true, dailyNote: 'WeLink/2026-08-27.md', attachments: [], attachmentFailures: [], linkCount: 0, articleAssets: [], articleFailures: [] };
+const RECEIPT_OK = { ok: true, appended: true, dailyNote: 'WXLink/2026-08-27.md', attachments: [], attachmentFailures: [], linkCount: 0, articleAssets: [], articleFailures: [] };
 
 test('buildReceiptReplies: plain text points at the daily note', () => {
   applyLanguage('zh');
   assert.deepEqual(buildReceiptReplies([RECEIPT_OK]), ['收到消息, 记录到了: `2026-08-27.md`']);
 });
 
-test('buildReceiptReplies: one uniform line per attachment, WeLink/ prefix stripped', () => {
+test('buildReceiptReplies: one uniform line per attachment, inbox root prefix stripped', () => {
   applyLanguage('zh');
   const lines = buildReceiptReplies([
-    { ...RECEIPT_OK, attachments: [{ kind: 'image', path: 'WeLink/attachments/a.jpg' }] },
-    { ...RECEIPT_OK, attachments: [{ kind: 'file', path: 'WeLink/attachments/b.pdf' }] },
+    { ...RECEIPT_OK, attachments: [{ kind: 'image', path: 'WXLink/attachments/a.jpg' }] },
+    { ...RECEIPT_OK, attachments: [{ kind: 'file', path: 'WXLink/attachments/b.pdf' }] },
   ]);
   assert.deepEqual(lines, ['收到图片, 记录到了: `attachments/a.jpg`\n收到文件, 记录到了: `attachments/b.pdf`']);
 });
@@ -292,15 +292,23 @@ test('buildReceiptReplies: article note is reported as an article, no title echo
   const lines = buildReceiptReplies([
     {
       ...RECEIPT_OK,
-      articleAssets: [{ title: '深度长文', url: 'https://mp.weixin.qq.com/s/abc', note: 'WeLink/articles/深度长文.md', assetsDir: 'WeLink/articles/assets', assetCount: 2 }],
+      articleAssets: [{ title: '深度长文', url: 'https://mp.weixin.qq.com/s/abc', note: 'WXLink/articles/深度长文.md', assetsDir: 'WXLink/articles/assets', assetCount: 2 }],
     },
   ]);
   assert.deepEqual(lines, ['收到文章, 记录到了: `articles/深度长文.md`']);
 });
 
+test('buildReceiptReplies: legacy WeLink/ prefix is also stripped', () => {
+  applyLanguage('zh');
+  const lines = buildReceiptReplies([
+    { ...RECEIPT_OK, dailyNote: 'WeLink/2026-08-27.md', attachments: [{ kind: 'image', path: 'WeLink/attachments/a.jpg' }] },
+  ]);
+  assert.deepEqual(lines, ['收到图片, 记录到了: `attachments/a.jpg`']);
+});
+
 test('buildReceiptReplies: separately saved text points at its note', () => {
   applyLanguage('zh');
-  const lines = buildReceiptReplies([{ ...RECEIPT_OK, singleNote: { note: 'WeLink/notes/2026-08-27 想法.md' } }]);
+  const lines = buildReceiptReplies([{ ...RECEIPT_OK, singleNote: { note: 'WXLink/notes/2026-08-27 想法.md' } }]);
   assert.deepEqual(lines, ['收到笔记, 记录到了: `notes/2026-08-27 想法.md`']);
 });
 
@@ -330,7 +338,7 @@ test('buildReceiptReplies: link present but no result at all reports an unknown 
 
 test('buildReceiptReplies follows the active language', () => {
   applyLanguage('tw');
-  const twLines = buildReceiptReplies([{ ...RECEIPT_OK, attachments: [{ kind: 'image', path: 'WeLink/attachments/a.jpg' }] }]);
+  const twLines = buildReceiptReplies([{ ...RECEIPT_OK, attachments: [{ kind: 'image', path: 'WXLink/attachments/a.jpg' }] }]);
   assert.deepEqual(twLines, ['收到圖片, 記錄到了: `attachments/a.jpg`']);
   applyLanguage('en');
   const enLines = buildReceiptReplies([RECEIPT_OK]);
@@ -368,8 +376,8 @@ test('importMessage: text message -> daily note with metadata and quote', async 
   const v = new FakeVault();
   const r = await importMessage(v.app, new StubTransport(), MSG({ text: 'hello world' }), IMPORT_OPTS);
   assert.equal(r.appended, true);
-  assert.equal(r.dailyNote, 'WeLink/2026-08-27.md');
-  const note = v.files.get('WeLink/2026-08-27.md')!;
+  assert.equal(r.dailyNote, 'WXLink/2026-08-27.md');
+  const note = v.files.get('WXLink/2026-08-27.md')!;
   assert.ok(note.startsWith('---\ndate: 2026-08-27\nsender: user123\n---'));
   assert.ok(note.includes('hello world'));
   assert.ok(note.includes('14:30'));
@@ -381,15 +389,15 @@ test('importMessage: marked plain text creates a separate note and daily link wi
   const r = await importMessage(v.app, new StubTransport(), MSG({ text: '#单独保存\n一个想法\n第二行' }), IMPORT_OPTS);
   assert.deepEqual(r.singleNote, {
     title: '一个想法',
-    note: 'WeLink/notes/2026-08-27 一个想法.md',
+    note: 'WXLink/notes/2026-08-27 一个想法.md',
     reused: false,
   });
   const saved = v.files.get(r.singleNote!.note)!;
-  assert.ok(saved.includes('welink_source_hash:'), 'source identity enables safe duplicate reuse');
+  assert.ok(saved.includes('wxlink_source_hash:'), 'source identity enables safe duplicate reuse');
   assert.ok(saved.endsWith('\n\n一个想法\n第二行'), 'body remains intact after the marker line is removed');
   assert.ok(!saved.includes('# 一个想法'), 'the first content line is not rendered twice as a generated heading');
-  const daily = v.files.get('WeLink/2026-08-27.md')!;
-  assert.ok(daily.includes('[[WeLink/notes/2026-08-27 一个想法|一个想法]]'));
+  const daily = v.files.get('WXLink/2026-08-27.md')!;
+  assert.ok(daily.includes('[[WXLink/notes/2026-08-27 一个想法|一个想法]]'));
   assert.ok(!daily.includes('#单独保存'));
 });
 
@@ -401,7 +409,7 @@ test('importMessage: a long Unicode first line is truncated for the file title w
 
   assert.equal(r.singleNote!.title, expectedTitle);
   assert.equal(Array.from(r.singleNote!.title).length, 21, '20 Unicode characters plus an ellipsis');
-  assert.equal(r.singleNote!.note, `WeLink/notes/2026-08-27 ${expectedTitle}.md`);
+  assert.equal(r.singleNote!.note, `WXLink/notes/2026-08-27 ${expectedTitle}.md`);
   assert.ok(v.files.get(r.singleNote!.note)!.endsWith(`\n\n${firstLine}\n完整正文`), 'the note body is never truncated');
 });
 
@@ -415,15 +423,25 @@ test('importMessage: same marked body reuses the note without overwriting user e
   assert.equal(second.singleNote!.note, path);
   assert.equal(second.singleNote!.reused, true);
   assert.ok(v.files.get(path)!.includes('用户补充的内容'), 'existing note is linked, never rewritten');
-  assert.equal([...v.files.keys()].filter((p) => p.startsWith('WeLink/notes/')).length, 1);
+  assert.equal([...v.files.keys()].filter((p) => p.startsWith('WXLink/notes/')).length, 1);
+});
+
+test('importMessage: reuses a note that still has the pre-rename source hash', async () => {
+  const v = new FakeVault();
+  const first = await importMessage(v.app, new StubTransport(), MSG({ text: '#单独保存\n旧哈希' }), IMPORT_OPTS);
+  const path = first.singleNote!.note;
+  v.files.set(path, v.files.get(path)!.replace('wxlink_source_hash:', 'welink_source_hash:'));
+  const second = await importMessage(v.app, new StubTransport(), MSG({ messageId: 'm2', text: '#单独保存\n旧哈希' }), IMPORT_OPTS);
+  assert.equal(second.singleNote!.note, path);
+  assert.equal(second.singleNote!.reused, true);
 });
 
 test('importMessage: a colliding user file is preserved and a new safe note path is used', async () => {
   const v = new FakeVault();
-  const collision = 'WeLink/notes/2026-08-27 一个想法.md';
+  const collision = 'WXLink/notes/2026-08-27 一个想法.md';
   v.files.set(collision, '用户已有笔记');
   const r = await importMessage(v.app, new StubTransport(), MSG({ text: '#单独保存\n一个想法' }), IMPORT_OPTS);
-  assert.equal(r.singleNote!.note, 'WeLink/notes/2026-08-27 一个想法_1.md');
+  assert.equal(r.singleNote!.note, 'WXLink/notes/2026-08-27 一个想法_1.md');
   assert.equal(v.files.get(collision), '用户已有笔记', 'a filename collision must never overwrite user content');
 });
 
@@ -432,7 +450,7 @@ test('importMessage: appends to an existing daily note', async () => {
   await importMessage(v.app, new StubTransport(), MSG({ text: 'first' }), IMPORT_OPTS);
   const r2 = await importMessage(v.app, new StubTransport(), MSG({ messageId: 'm2', text: 'second' }), IMPORT_OPTS);
   assert.equal(r2.appended, true);
-  const note = v.files.get('WeLink/2026-08-27.md')!;
+  const note = v.files.get('WXLink/2026-08-27.md')!;
   assert.ok(note.includes('first'));
   assert.ok(note.includes('second'));
   assert.equal(note.split('---').length, 3, 'header written exactly once');
@@ -448,7 +466,7 @@ test('importMessage: attachments saved with vault path in result', async () => {
   const r = await importMessage(v.app, new StubTransport(), msg, IMPORT_OPTS);
   assert.equal(r.attachments.length, 2);
   assert.equal(r.attachmentFailures.length, 0);
-  assert.ok(r.attachments[0].path.startsWith('WeLink/attachments/'));
+  assert.ok(r.attachments[0].path.startsWith('WXLink/attachments/'));
   assert.ok(r.attachments[0].path.endsWith('photo.jpg'));
   assert.deepEqual(r.attachments.map((a) => a.kind), ['image', 'file']);
   for (const a of r.attachments) {
@@ -503,7 +521,7 @@ test('importMessage: transcoded .wav voice embeds an inline player; raw .silk st
   assert.equal(r.attachments.length, 2);
   assert.ok(r.attachments[0].path.endsWith('.wav'));
   assert.ok(r.attachments[1].path.endsWith('.silk'));
-  const note = v.files.get('WeLink/2026-08-27.md')!;
+  const note = v.files.get('WXLink/2026-08-27.md')!;
   assert.ok(note.includes(`![[${r.attachments[0].path}]]`), '.wav renders as an embedded player');
   assert.ok(note.includes(`[[${r.attachments[1].path}|voice.silk]]`), '.silk fallback stays a plain link');
   const stored = v.bins.get(r.attachments[0].path)!;
@@ -557,9 +575,9 @@ function outboxFixture() {
     outbox.flush(
       client,
       store,
-      opts.folder ?? 'WeLink/outbox',
-      opts.inboxFolder ?? 'WeLink',
-      opts.attachmentFolder ?? 'WeLink/attachments',
+      opts.folder ?? 'WXLink/outbox',
+      opts.inboxFolder ?? 'WXLink',
+      opts.attachmentFolder ?? 'WXLink/attachments',
     );
   return { v, transport, client, store, flush };
 }
@@ -571,29 +589,29 @@ test('outbox: missing folder is a no-op', async () => {
 
 test('outbox: .md success deletes file and records the send', async () => {
   const { v, transport, flush } = outboxFixture();
-  await v.adapter.write('WeLink/outbox/hello.md', '**done**');
+  await v.adapter.write('WXLink/outbox/hello.md', '**done**');
   const n = await flush();
   assert.equal(n, 1);
-  assert.equal(v.files.has('WeLink/outbox/hello.md'), false, 'file deleted after success');
+  assert.equal(v.files.has('WXLink/outbox/hello.md'), false, 'file deleted after success');
   const sendReq = transport.requests.find((r) => r.url.includes('/ilink/bot/sendmessage'));
   assert.ok(sendReq, 'gateway sendmessage called');
   assert.ok((sendReq!.body as string).includes('**done**'));
   // outbox records sends under *today's* date (Date.now), not a fixture date
   const d = new Date();
   const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  assert.ok(v.files.get(`WeLink/${today}.md`)?.includes('**done**'), 'send recorded in daily note');
+  assert.ok(v.files.get(`WXLink/${today}.md`)?.includes('**done**'), 'send recorded in daily note');
 });
 
 test('outbox: failure keeps the file with a categorized hint', async () => {
   const { v, transport, flush } = outboxFixture();
-  await v.adapter.write('WeLink/outbox/hello.md', 'retry me');
+  await v.adapter.write('WXLink/outbox/hello.md', 'retry me');
   transport.response = { status: 200, body: JSON.stringify({ ret: -1, errmsg: 'no permission' }) };
   applyLanguage('zh');
   const n = await flush();
   assert.equal(n, 0);
-  const content = v.files.get('WeLink/outbox/hello.md')!;
+  const content = v.files.get('WXLink/outbox/hello.md')!;
   assert.ok(content.startsWith('retry me'));
-  assert.ok(content.includes('WeLink send failed:'), 'agent-readable failure marker preserved');
+  assert.ok(content.includes('WXLink send failed:'), 'agent-readable failure marker preserved');
   assert.ok(content.includes('发送被拒'), 'categorized reason present');
   assert.ok(content.includes('稍等几分钟'), 'fix hint present');
 
@@ -601,21 +619,21 @@ test('outbox: failure keeps the file with a categorized hint', async () => {
   // every flush would churn the file (and fork iCloud conflict copies) forever
   const flush2 = await flush();
   assert.equal(flush2, 0);
-  assert.equal(v.files.get('WeLink/outbox/hello.md'), content, 'second flush leaves the file byte-identical');
+  assert.equal(v.files.get('WXLink/outbox/hello.md'), content, 'second flush leaves the file byte-identical');
 });
 
 test('outbox: unknown extension is left alone', async () => {
   const { v, flush } = outboxFixture();
-  await v.adapter.write('WeLink/outbox/thing.xyz', 'x');
+  await v.adapter.write('WXLink/outbox/thing.xyz', 'x');
   assert.equal(await flush(), 0);
-  assert.equal(v.files.has('WeLink/outbox/thing.xyz'), true);
+  assert.equal(v.files.has('WXLink/outbox/thing.xyz'), true);
 });
 
 test('outbox: empty .md is deleted without sending', async () => {
   const { v, transport, flush } = outboxFixture();
-  await v.adapter.write('WeLink/outbox/empty.md', '   ');
+  await v.adapter.write('WXLink/outbox/empty.md', '   ');
   assert.equal(await flush(), 0);
-  assert.equal(v.files.has('WeLink/outbox/empty.md'), false);
+  assert.equal(v.files.has('WXLink/outbox/empty.md'), false);
   assert.equal(transport.requests.length, 0);
 });
 
@@ -623,19 +641,27 @@ test('outbox: failure sidecars are never sent as messages or deleted', async () 
   const { v, transport, flush } = outboxFixture();
   // a leftover failure record from an earlier media attempt ends in .md and
   // would otherwise be delivered to WeChat as text and deleted
-  await v.adapter.write('WeLink/outbox/photo.jpg.welink-failed.md', '# photo.jpg\n\nsome failure reason\n');
+  await v.adapter.write('WXLink/outbox/photo.jpg.wxlink-failed.md', '# photo.jpg\n\nsome failure reason\n');
   assert.equal(await flush(), 0);
-  assert.equal(v.files.has('WeLink/outbox/photo.jpg.welink-failed.md'), true, 'sidecar left untouched');
+  assert.equal(v.files.has('WXLink/outbox/photo.jpg.wxlink-failed.md'), true, 'sidecar left untouched');
   assert.equal(transport.requests.length, 0, 'nothing sent to the gateway');
+});
+
+test('outbox: pre-rename failure sidecars are also left untouched', async () => {
+  const { v, transport, flush } = outboxFixture();
+  await v.adapter.write('WXLink/outbox/photo.jpg.welink-failed.md', '# photo.jpg\n\nlegacy failure\n');
+  assert.equal(await flush(), 0);
+  assert.equal(v.files.has('WXLink/outbox/photo.jpg.welink-failed.md'), true);
+  assert.equal(transport.requests.length, 0);
 });
 
 test('outbox: media failure writes the sidecar once; retries never rewrite it', async () => {
   const { v, transport, flush } = outboxFixture();
-  v.bins.set('WeLink/outbox/photo.jpg', new Uint8Array([1, 2, 3, 4]));
+  v.bins.set('WXLink/outbox/photo.jpg', new Uint8Array([1, 2, 3, 4]));
   // getuploadurl rejects -> sendMedia fails before any CDN traffic
   transport.response = { status: 200, body: JSON.stringify({ errcode: -1, errmsg: 'denied' }) };
   await flush();
-  const sidecar = 'WeLink/outbox/photo.jpg.welink-failed.md';
+  const sidecar = 'WXLink/outbox/photo.jpg.wxlink-failed.md';
   assert.equal(v.files.has(sidecar), true, 'sidecar written on first failure');
   assert.ok(v.files.get(sidecar)!.startsWith('# photo.jpg'));
   assert.equal(v.writes.get(sidecar), 1);
@@ -644,7 +670,7 @@ test('outbox: media failure writes the sidecar once; retries never rewrite it', 
   // rewriting it each round would churn iCloud conflict copies forever
   await flush();
   await flush();
-  assert.equal(v.bins.has('WeLink/outbox/photo.jpg'), true, 'media kept for retry');
+  assert.equal(v.bins.has('WXLink/outbox/photo.jpg'), true, 'media kept for retry');
   assert.equal(v.writes.get(sidecar), 1, 'retries skip the byte-identical rewrite');
 });
 
@@ -663,7 +689,7 @@ test('agent guides document the current save-as-note marker in every language an
   const v = new FakeVault();
   const settings = SETTINGS({ singleNoteMarker: '#note' });
   await ensureAgentGuide(v.app, settings, 'en');
-  const path = 'WeLink/Agent.md';
+  const path = 'WXLink/Agent.md';
   assert.ok(v.files.get(path)!.includes('first line exactly `#note`'));
   const firstMeta = agentGuideMeta(v.files.get(path)!);
 
@@ -682,10 +708,21 @@ test('agent guides document the current save-as-note marker in every language an
 test('DEFAULT_SETTINGS: autoReply defaults on', () => {
   assert.equal(DEFAULT_SETTINGS.autoReply, true);
   assert.equal(DEFAULT_SETTINGS.language, 'system');
+  assert.equal(DEFAULT_SETTINGS.inboxFolder, 'WXLink');
   assert.equal(DEFAULT_SETTINGS.singleNoteMarker, '#单独保存');
   assert.equal(isValidSingleNoteMarker('#capture'), true);
   assert.equal(isValidSingleNoteMarker(''), false);
   assert.equal(isValidSingleNoteMarker('two\nlines'), false);
+});
+
+test('adoptLegacyFolderDefaults: keeps WeLink/ when that tree already exists', () => {
+  const next = adoptLegacyFolderDefaults(DEFAULT_SETTINGS, true, false);
+  assert.equal(next.inboxFolder, 'WeLink');
+  assert.equal(next.outboxFolder, 'WeLink/outbox');
+  assert.equal(adoptLegacyFolderDefaults(DEFAULT_SETTINGS, false, false), DEFAULT_SETTINGS);
+  assert.equal(adoptLegacyFolderDefaults(DEFAULT_SETTINGS, true, true), DEFAULT_SETTINGS);
+  const custom = { ...DEFAULT_SETTINGS, inboxFolder: 'Inbox' };
+  assert.equal(adoptLegacyFolderDefaults(custom, true, false), custom);
 });
 
 /* -------------------------------------------------------------- cleanup */

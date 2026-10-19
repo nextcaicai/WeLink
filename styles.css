@@ -1,11 +1,11 @@
 /* Native setting groups render the title outside the card, 4px left of the
    option labels inside. Nudge it right so both share the same left edge. */
-.welink-settings-group .setting-item-heading {
+.wxlink-settings-group .setting-item-heading {
   padding-inline: var(--setting-items-padding-x);
 }
 
 /* The state is secondary to the normal-sized setting title. */
-.welink-bot-status {
+.wxlink-bot-status {
   margin-inline-start: 8px;
   color: var(--text-muted);
   font-size: var(--font-ui-smaller);
@@ -13,37 +13,37 @@
   white-space: nowrap;
 }
 
-.welink-bot-status[data-state='connected'] {
+.wxlink-bot-status[data-state='connected'] {
   color: var(--color-green);
 }
 
-.welink-bot-status[data-state='connecting'],
-.welink-bot-status[data-state='expired'] {
+.wxlink-bot-status[data-state='connecting'],
+.wxlink-bot-status[data-state='expired'] {
   color: var(--color-orange);
 }
 
-.welink-bot-status[data-state='error'] {
+.wxlink-bot-status[data-state='error'] {
   color: var(--text-error);
 }
 
 /* QR code is requested and shown only in the scan modal. */
-.welink-qr-modal {
+.wxlink-qr-modal {
   width: min(320px, calc(100vw - 32px));
   max-width: 320px;
   border-radius: 10px;
 }
 
-.welink-qr-modal .modal-content {
+.wxlink-qr-modal .modal-content {
   text-align: center;
 }
 
-.welink-qr-title {
+.wxlink-qr-title {
   margin: 0 0 14px;
   font-size: var(--font-ui-medium);
   font-weight: var(--font-semibold);
 }
 
-.welink-qr canvas {
+.wxlink-qr canvas {
   image-rendering: pixelated;
   border: 6px solid #fff;
   border-radius: 4px;
@@ -52,42 +52,42 @@
   height: auto;
 }
 
-.welink-qr-hint {
+.wxlink-qr-hint {
   margin: 12px 0 0;
   color: var(--text-muted);
   font-size: var(--font-ui-small);
 }
 
-.welink-qr-status {
+.wxlink-qr-status {
   margin: 8px 0 0;
   text-align: center;
   color: var(--text-muted);
   font-size: var(--font-ui-small);
 }
 
-.welink-qr-status[hidden] {
+.wxlink-qr-status[hidden] {
   display: none;
 }
 
-.welink-qr-center {
+.wxlink-qr-center {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 0;
 }
 
-.welink-qr-actions {
+.wxlink-qr-actions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
   margin-top: 16px;
 }
 
-.welink-qr-actions button[hidden] {
+.wxlink-qr-actions button[hidden] {
   display: none;
 }
 
 /* Test-send input on the settings page */
-.welink-send-input {
+.wxlink-send-input {
   min-width: 240px;
 }
