@@ -20452,6 +20452,7 @@ var StateStore = class {
       scannedUser: "",
       cursor: "",
       contextTokens: {},
+      outboxSent: {},
       pausedUntil: 0,
       dedup: [],
       typingTickets: {},
@@ -20831,7 +20832,9 @@ var en = {
   "set.attachmentFolder": "Attachment folder",
   "set.attachmentFolder.desc": "Folder for images/files/videos/voice messages",
   "set.outboxFolder": "Outbox folder",
-  "set.outboxFolder.desc": "A one-to-one channel to yourself: an agent writes files here \u2014 .md sends its content as text, images/videos/documents are sent as attachments \u2014 each file is deleted after a successful send",
+  "set.outboxFolder.desc": "A one-to-one channel to yourself: an agent writes files here \u2014 .md sends its content as text, images/videos/documents are sent as attachments",
+  "set.deleteOutboxAfterSend": "Delete outbox originals after sending",
+  "set.deleteOutboxAfterSend.desc": "On by default. Delete originals after the gateway confirms success. Turn off to retain them; unchanged files will not be sent again, even after restarting. Change the content or use a new file name to send again.",
   "set.singleNoteMarker": "Standalone note trigger",
   "set.singleNoteMarker.desc": "When the first line of a plain-text message exactly matches this trigger, it is saved as its own note in the standalone notes folder. Start the body on the next line; the trigger line is not written into the note.",
   "set.singleNoteMarker.invalid": "The trigger must be a non-empty single line.",
@@ -20960,7 +20963,9 @@ var zh = {
   "set.attachmentFolder": "\u9644\u4EF6\u76EE\u5F55",
   "set.attachmentFolder.desc": "\u56FE\u7247\u3001\u6587\u4EF6\u3001\u89C6\u9891\u548C\u8BED\u97F3\u7684\u5B58\u653E\u76EE\u5F55",
   "set.outboxFolder": "\u53D1\u4EF6\u7BB1\u76EE\u5F55",
-  "set.outboxFolder.desc": "\u7ED9\u81EA\u5DF1\u7684\u5355\u5411\u901A\u9053\uFF1AAgent \u5728\u6B64\u5199\u5165\u6587\u4EF6\uFF1B.md \u6587\u4EF6\u4F5C\u4E3A\u6587\u672C\u6D88\u606F\u53D1\u9001\uFF0C\u56FE\u7247\u3001\u89C6\u9891\u548C\u6587\u6863\u4F5C\u4E3A\u9644\u4EF6\u53D1\u9001\u3002\u53D1\u9001\u6210\u529F\u540E\u5220\u9664\u6587\u4EF6\u3002",
+  "set.outboxFolder.desc": "\u7ED9\u81EA\u5DF1\u7684\u5355\u5411\u901A\u9053\uFF1AAgent \u5728\u6B64\u5199\u5165\u6587\u4EF6\uFF1B.md \u6587\u4EF6\u4F5C\u4E3A\u6587\u672C\u6D88\u606F\u53D1\u9001\uFF0C\u56FE\u7247\u3001\u89C6\u9891\u548C\u6587\u6863\u4F5C\u4E3A\u9644\u4EF6\u53D1\u9001\u3002",
+  "set.deleteOutboxAfterSend": "\u53D1\u9001\u6210\u529F\u540E\u5220\u9664\u53D1\u4EF6\u7BB1\u539F\u6587\u4EF6",
+  "set.deleteOutboxAfterSend.desc": "\u9ED8\u8BA4\u5F00\u542F\uFF0C\u7F51\u5173\u786E\u8BA4\u6210\u529F\u540E\u5220\u9664\u539F\u6587\u4EF6\u3002\u5173\u95ED\u540E\u4FDD\u7559\u539F\u6587\u4EF6\uFF1B\u672A\u4FEE\u6539\u7684\u5DF2\u53D1\u9001\u6587\u4EF6\u4E0D\u4F1A\u91CD\u590D\u53D1\u9001\uFF0C\u91CD\u542F\u540E\u4ECD\u6709\u6548\u3002\u4FEE\u6539\u5185\u5BB9\u6216\u4F7F\u7528\u65B0\u6587\u4EF6\u540D\u53EF\u518D\u6B21\u53D1\u9001\u3002",
   "set.singleNoteMarker": "\u72EC\u7ACB\u7B14\u8BB0\u89E6\u53D1\u8BCD",
   "set.singleNoteMarker.desc": "\u7EAF\u6587\u5B57\u6D88\u606F\u7B2C\u4E00\u884C\u4E0E\u8BE5\u89E6\u53D1\u8BCD\u5B8C\u5168\u4E00\u81F4\u65F6\uFF0C\u4F1A\u5355\u72EC\u5B58\u6210\u4E00\u6761\u7B14\u8BB0\uFF08\u89C1\u300C\u72EC\u7ACB\u7B14\u8BB0\u76EE\u5F55\u300D\uFF09\u3002\u4E0B\u4E00\u884C\u8D77\u5199\u6B63\u6587\uFF1B\u6807\u8BB0\u4E0D\u4F1A\u5199\u5165\u7B14\u8BB0\u3002",
   "set.singleNoteMarker.invalid": "\u89E6\u53D1\u8BCD\u5FC5\u987B\u662F\u975E\u7A7A\u7684\u5355\u884C\u6587\u5B57\u3002",
@@ -21089,7 +21094,9 @@ var tw = {
   "set.attachmentFolder": "\u9644\u4EF6\u76EE\u9304",
   "set.attachmentFolder.desc": "\u5716\u7247\u3001\u6A94\u6848\u3001\u5F71\u7247\u548C\u8A9E\u97F3\u7684\u5B58\u653E\u76EE\u9304",
   "set.outboxFolder": "\u767C\u4EF6\u5323\u76EE\u9304",
-  "set.outboxFolder.desc": "\u7D66\u81EA\u5DF1\u7684\u55AE\u5411\u901A\u9053\uFF1AAgent \u5728\u6B64\u5BEB\u5165\u6A94\u6848\uFF1B.md \u6A94\u6848\u4F5C\u70BA\u6587\u5B57\u8A0A\u606F\u767C\u9001\uFF0C\u5716\u7247\u3001\u5F71\u7247\u548C\u6587\u4EF6\u4F5C\u70BA\u9644\u4EF6\u767C\u9001\u3002\u767C\u9001\u6210\u529F\u5F8C\u522A\u9664\u6A94\u6848\u3002",
+  "set.outboxFolder.desc": "\u7D66\u81EA\u5DF1\u7684\u55AE\u5411\u901A\u9053\uFF1AAgent \u5728\u6B64\u5BEB\u5165\u6A94\u6848\uFF1B.md \u6A94\u6848\u4F5C\u70BA\u6587\u5B57\u8A0A\u606F\u767C\u9001\uFF0C\u5716\u7247\u3001\u5F71\u7247\u548C\u6587\u4EF6\u4F5C\u70BA\u9644\u4EF6\u767C\u9001\u3002",
+  "set.deleteOutboxAfterSend": "\u767C\u9001\u6210\u529F\u5F8C\u522A\u9664\u767C\u4EF6\u5323\u539F\u6A94\u6848",
+  "set.deleteOutboxAfterSend.desc": "\u9810\u8A2D\u958B\u555F\uFF0C\u9598\u9053\u5668\u78BA\u8A8D\u6210\u529F\u5F8C\u522A\u9664\u539F\u6A94\u6848\u3002\u95DC\u9589\u5F8C\u4FDD\u7559\u539F\u6A94\u6848\uFF1B\u672A\u4FEE\u6539\u7684\u5DF2\u767C\u9001\u6A94\u6848\u4E0D\u6703\u91CD\u8907\u767C\u9001\uFF0C\u91CD\u65B0\u555F\u52D5\u5F8C\u4ECD\u6709\u6548\u3002\u4FEE\u6539\u5167\u5BB9\u6216\u4F7F\u7528\u65B0\u6A94\u540D\u53EF\u518D\u6B21\u767C\u9001\u3002",
   "set.singleNoteMarker": "\u7368\u7ACB\u7B46\u8A18\u89F8\u767C\u8A5E",
   "set.singleNoteMarker.desc": "\u7D14\u6587\u5B57\u8A0A\u606F\u7B2C\u4E00\u884C\u8207\u8A72\u89F8\u767C\u8A5E\u5B8C\u5168\u4E00\u81F4\u6642\uFF0C\u6703\u55AE\u7368\u5B58\u6210\u4E00\u689D\u7B46\u8A18\uFF08\u898B\u300C\u7368\u7ACB\u7B46\u8A18\u76EE\u9304\u300D\uFF09\u3002\u4E0B\u4E00\u884C\u8D77\u5BEB\u6B63\u6587\uFF1B\u6A19\u8A18\u4E0D\u6703\u5BEB\u5165\u7B46\u8A18\u3002",
   "set.singleNoteMarker.invalid": "\u89F8\u767C\u8A5E\u5FC5\u9808\u662F\u975E\u7A7A\u7684\u55AE\u884C\u6587\u5B57\u3002",
@@ -21501,7 +21508,7 @@ async function appendOutbound(app, inboxFolder, timeMs, sender, lines) {
 }
 
 // src/core/agent-guide.ts
-var GUIDE_REV = "5";
+var GUIDE_REV = "6";
 function agentGuideMeta(content) {
   const fm = /^---\s*\n([\s\S]*?)\n---/.exec(content)?.[1] ?? "";
   const lang = /lang:\s*"?(\w+)"?/.exec(fm)?.[1] ?? "";
@@ -21510,7 +21517,7 @@ function agentGuideMeta(content) {
   return { lang, paths, rev };
 }
 function pathsKey(s) {
-  return encodeURIComponent([s.inboxFolder, s.singleNoteFolder, s.outboxFolder, s.attachmentFolder, s.singleNoteMarker].join("|"));
+  return encodeURIComponent([s.inboxFolder, s.singleNoteFolder, s.outboxFolder, s.attachmentFolder, s.singleNoteMarker, String(s.deleteOutboxAfterSend)].join("|"));
 }
 function buildEn(s) {
   return `---
@@ -21530,7 +21537,7 @@ Write a file into the outbox folder \`${s.outboxFolder}/\`:
 - \`.md\` file: the content is sent verbatim as a text message \u2014 **markdown is supported** (headings, lists, bold, code blocks); keep it within a phone screen or so (the file name carries no meaning)
 - Image (\`.jpg/.png/.gif/.webp\`), video (\`.mp4\` etc.) or document (\`.pdf/.docx/...\`, \u2264100MB): sent as an attachment
 
-The plugin consumes the outbox on its next poll (~30-60 s). A successful send deletes the file and records the message in today's conversation note under \`${s.inboxFolder}/\` (marked "sent"; media sends keep a copy under \`${s.attachmentFolder}/\` and link it from the note). A failure keeps the file (an \`.md\` gets a \`<!-- WXLink send failed: ... -->\` comment appended, a media file gets a \`<name>.wxlink-failed.md\` sidecar). After writing, wait about a minute and check whether the file still exists to determine the result.
+The plugin consumes the outbox on its next poll (~30-60 s). ${s.deleteOutboxAfterSend ? "A successful send deletes the original file." : "A successful send retains the original file; unchanged files are skipped even after restarting. Change the content or use a new file name to send again."} Every successful send records the message in today's conversation note under \`${s.inboxFolder}/\` (marked "sent"; media sends keep a copy under \`${s.attachmentFolder}/\` and link it from the note). A failure keeps the file (an \`.md\` gets a \`<!-- WXLink send failed: ... -->\` comment appended, a media file gets a \`<name>.wxlink-failed.md\` sidecar). After writing, wait about a minute and ${s.deleteOutboxAfterSend ? "check whether the file was deleted" : "check today's conversation note for the sent entry; a retained file alone does not mean failure"} to determine the result.
 
 ## Receiving
 
@@ -21561,7 +21568,7 @@ paths: "${pathsKey(s)}"
 - \`.md\` \u6587\u4EF6:\u5185\u5BB9**\u539F\u6837**\u4F5C\u4E3A\u6587\u672C\u6D88\u606F\u53D1\u9001,**\u652F\u6301 markdown \u683C\u5F0F**(\u6807\u9898\u3001\u5217\u8868\u3001\u52A0\u7C97\u3001\u4EE3\u7801\u5757),\u5EFA\u8BAE\u63A7\u5236\u5728\u624B\u673A\u4E00\u5C4F\u5185(\u6587\u4EF6\u540D\u65E0\u8BED\u4E49)
 - \u56FE\u7247(\`.jpg/.png/.gif/.webp\`)\u3001\u89C6\u9891(\`.mp4\` \u7B49)\u6216\u6587\u6863(\`.pdf/.docx/...\`,\u2264100MB):\u4F5C\u4E3A\u9644\u4EF6\u53D1\u9001
 
-\u63D2\u4EF6\u5728\u4E0B\u4E00\u8F6E\u8F6E\u8BE2(\u7EA6 30-60 \u79D2)\u6D88\u8D39\u53D1\u4EF6\u7BB1\u3002\u53D1\u9001\u6210\u529F\u4F1A\u5220\u9664\u6587\u4EF6,\u5E76\u628A\u8FD9\u6761\u6D88\u606F\u8BB0\u5F55\u8FDB \`${s.inboxFolder}/\` \u4E0B\u5F53\u5929\u7684\u5BF9\u8BDD\u7B14\u8BB0(\u6807\u8BB0"\u53D1\u9001";\u5A92\u4F53\u53D1\u9001\u4F1A\u5728 \`${s.attachmentFolder}/\` \u5B58\u4E00\u4EFD\u526F\u672C\u5E76\u5728\u7B14\u8BB0\u91CC\u94FE\u63A5)\u3002\u5931\u8D25\u4F1A\u4FDD\u7559\u6587\u4EF6(\`.md\` \u672B\u5C3E\u8FFD\u52A0 \`<!-- WXLink send failed: ... -->\` \u6CE8\u91CA,\u5A92\u4F53\u6587\u4EF6\u751F\u6210 \`<\u6587\u4EF6\u540D>.wxlink-failed.md\` \u8BB0\u5F55)\u3002\u5199\u5165\u540E\u7B49\u7EA6\u4E00\u5206\u949F,\u68C0\u67E5\u6587\u4EF6\u662F\u5426\u8FD8\u5728\u4EE5\u5224\u65AD\u7ED3\u679C\u3002
+\u63D2\u4EF6\u5728\u4E0B\u4E00\u8F6E\u8F6E\u8BE2(\u7EA6 30-60 \u79D2)\u6D88\u8D39\u53D1\u4EF6\u7BB1\u3002${s.deleteOutboxAfterSend ? "\u53D1\u9001\u6210\u529F\u4F1A\u5220\u9664\u539F\u6587\u4EF6\u3002" : "\u53D1\u9001\u6210\u529F\u4F1A\u4FDD\u7559\u539F\u6587\u4EF6\uFF1B\u672A\u4FEE\u6539\u7684\u5DF2\u53D1\u9001\u6587\u4EF6\u4F1A\u88AB\u8DF3\u8FC7\uFF0C\u91CD\u542F\u540E\u4ECD\u6709\u6548\u3002\u4FEE\u6539\u5185\u5BB9\u6216\u4F7F\u7528\u65B0\u6587\u4EF6\u540D\u53EF\u518D\u6B21\u53D1\u9001\u3002"}\u6210\u529F\u540E\u628A\u8FD9\u6761\u6D88\u606F\u8BB0\u5F55\u8FDB \`${s.inboxFolder}/\` \u4E0B\u5F53\u5929\u7684\u5BF9\u8BDD\u7B14\u8BB0(\u6807\u8BB0"\u53D1\u9001";\u5A92\u4F53\u53D1\u9001\u4F1A\u5728 \`${s.attachmentFolder}/\` \u5B58\u4E00\u4EFD\u526F\u672C\u5E76\u5728\u7B14\u8BB0\u91CC\u94FE\u63A5)\u3002\u5931\u8D25\u4F1A\u4FDD\u7559\u6587\u4EF6(\`.md\` \u672B\u5C3E\u8FFD\u52A0 \`<!-- WXLink send failed: ... -->\` \u6CE8\u91CA,\u5A92\u4F53\u6587\u4EF6\u751F\u6210 \`<\u6587\u4EF6\u540D>.wxlink-failed.md\` \u8BB0\u5F55)\u3002\u5199\u5165\u540E\u7B49\u7EA6\u4E00\u5206\u949F\uFF0C${s.deleteOutboxAfterSend ? "\u68C0\u67E5\u6587\u4EF6\u662F\u5426\u88AB\u5220\u9664" : "\u68C0\u67E5\u5F53\u5929\u5BF9\u8BDD\u7B14\u8BB0\u662F\u5426\u51FA\u73B0\u53D1\u9001\u8BB0\u5F55\uFF0C\u6587\u4EF6\u4FDD\u7559\u4E0D\u4EE3\u8868\u5931\u8D25"}\u4EE5\u5224\u65AD\u7ED3\u679C\u3002
 
 ## \u63A5\u6536
 
@@ -21592,7 +21599,7 @@ paths: "${pathsKey(s)}"
 - \`.md\` \u6A94\u6848:\u5167\u5BB9**\u539F\u6A23**\u4F5C\u70BA\u6587\u5B57\u8A0A\u606F\u767C\u9001,**\u652F\u63F4 markdown \u683C\u5F0F**(\u6A19\u984C\u3001\u5217\u8868\u3001\u52A0\u7C97\u3001\u7A0B\u5F0F\u78BC\u5340\u584A),\u5EFA\u8B70\u63A7\u5236\u5728\u624B\u6A5F\u4E00\u5C4F\u5167(\u6A94\u540D\u7121\u8A9E\u7FA9)
 - \u5716\u7247(\`.jpg/.png/.gif/.webp\`)\u3001\u5F71\u7247(\`.mp4\` \u7B49)\u6216\u6587\u4EF6(\`.pdf/.docx/...\`,\u2264100MB):\u4F5C\u70BA\u9644\u4EF6\u767C\u9001
 
-\u5916\u639B\u5728\u4E0B\u4E00\u8F2A\u8F2A\u8A62(\u7D04 30-60 \u79D2)\u6D88\u8CBB\u767C\u4EF6\u5323\u3002\u767C\u9001\u6210\u529F\u6703\u522A\u9664\u6A94\u6848,\u4E26\u628A\u9019\u689D\u8A0A\u606F\u8A18\u9304\u9032 \`${s.inboxFolder}/\` \u4E0B\u7576\u5929\u7684\u5C0D\u8A71\u7B46\u8A18(\u6A19\u8A18"\u767C\u9001";\u5A92\u9AD4\u767C\u9001\u6703\u5728 \`${s.attachmentFolder}/\` \u5B58\u4E00\u4EFD\u526F\u672C\u4E26\u5728\u7B46\u8A18\u88E1\u9023\u7D50)\u3002\u5931\u6557\u6703\u4FDD\u7559\u6A94\u6848(\`.md\` \u672B\u5C3E\u8FFD\u52A0 \`<!-- WXLink send failed: ... -->\` \u8A3B\u89E3,\u5A92\u9AD4\u6A94\u6848\u7522\u751F \`<\u6A94\u540D>.wxlink-failed.md\` \u8A18\u9304)\u3002\u5BEB\u5165\u5F8C\u7B49\u7D04\u4E00\u5206\u9418,\u6AA2\u67E5\u6A94\u6848\u662F\u5426\u9084\u5728\u4EE5\u5224\u65B7\u7D50\u679C\u3002
+\u5916\u639B\u5728\u4E0B\u4E00\u8F2A\u8F2A\u8A62(\u7D04 30-60 \u79D2)\u6D88\u8CBB\u767C\u4EF6\u5323\u3002${s.deleteOutboxAfterSend ? "\u767C\u9001\u6210\u529F\u6703\u522A\u9664\u539F\u6A94\u6848\u3002" : "\u767C\u9001\u6210\u529F\u6703\u4FDD\u7559\u539F\u6A94\u6848\uFF1B\u672A\u4FEE\u6539\u7684\u5DF2\u767C\u9001\u6A94\u6848\u6703\u88AB\u7565\u904E\uFF0C\u91CD\u65B0\u555F\u52D5\u5F8C\u4ECD\u6709\u6548\u3002\u4FEE\u6539\u5167\u5BB9\u6216\u4F7F\u7528\u65B0\u6A94\u540D\u53EF\u518D\u6B21\u767C\u9001\u3002"}\u6210\u529F\u5F8C\u628A\u9019\u689D\u8A0A\u606F\u8A18\u9304\u9032 \`${s.inboxFolder}/\` \u4E0B\u7576\u5929\u7684\u5C0D\u8A71\u7B46\u8A18(\u6A19\u8A18"\u767C\u9001";\u5A92\u9AD4\u767C\u9001\u6703\u5728 \`${s.attachmentFolder}/\` \u5B58\u4E00\u4EFD\u526F\u672C\u4E26\u5728\u7B46\u8A18\u88E1\u9023\u7D50)\u3002\u5931\u6557\u6703\u4FDD\u7559\u6A94\u6848(\`.md\` \u672B\u5C3E\u8FFD\u52A0 \`<!-- WXLink send failed: ... -->\` \u8A3B\u89E3,\u5A92\u9AD4\u6A94\u6848\u7522\u751F \`<\u6A94\u540D>.wxlink-failed.md\` \u8A18\u9304)\u3002\u5BEB\u5165\u5F8C\u7B49\u7D04\u4E00\u5206\u9418\uFF0C${s.deleteOutboxAfterSend ? "\u6AA2\u67E5\u6A94\u6848\u662F\u5426\u88AB\u522A\u9664" : "\u6AA2\u67E5\u7576\u5929\u5C0D\u8A71\u7B46\u8A18\u662F\u5426\u51FA\u73FE\u767C\u9001\u8A18\u9304\uFF0C\u4FDD\u7559\u6A94\u6848\u4E0D\u4EE3\u8868\u5931\u6557"}\u4EE5\u5224\u65B7\u7D50\u679C\u3002
 
 ## \u63A5\u6536
 
@@ -21630,6 +21637,7 @@ var DEFAULT_SETTINGS = {
   articleFolder: "WXLink/articles",
   attachmentFolder: "WXLink/attachments",
   outboxFolder: "WXLink/outbox",
+  deleteOutboxAfterSend: true,
   singleNoteMarker: "#\u5355\u72EC\u4FDD\u5B58",
   fetchArticles: true,
   groupArticlesByAccount: true,
@@ -21688,7 +21696,7 @@ var WXLinkSettingTab = class extends import_obsidian3.PluginSettingTab {
       this.plugin.applyLanguage(value);
       this.update();
     }
-    if (FOLDER_KEYS.includes(key) || key === "singleNoteMarker") this.plugin.refreshAgentGuide();
+    if (FOLDER_KEYS.includes(key) || key === "singleNoteMarker" || key === "deleteOutboxAfterSend") this.plugin.refreshAgentGuide();
     void this.plugin.saveSettings();
   }
   getSettingDefinitions() {
@@ -21780,6 +21788,11 @@ var WXLinkSettingTab = class extends import_obsidian3.PluginSettingTab {
             name: t("set.outboxFolder"),
             desc: t("set.outboxFolder.desc"),
             control: { type: "text", key: "outboxFolder", defaultValue: DEFAULT_SETTINGS.outboxFolder }
+          },
+          {
+            name: t("set.deleteOutboxAfterSend"),
+            desc: t("set.deleteOutboxAfterSend.desc"),
+            control: { type: "toggle", key: "deleteOutboxAfterSend", defaultValue: DEFAULT_SETTINGS.deleteOutboxAfterSend }
           },
           // Where agents learn the outbox protocol: a note file maintained inside the vault
           {
@@ -22470,38 +22483,47 @@ var Outbox = class {
    * This is a one-to-one channel: every file is delivered to the account that
    * scanned to bind the bot (the owner), so the file name carries no recipient.
    * .md files are sent as text; images/videos/other binaries go through the CDN.
-   * Successful sends delete the outbox file and are recorded in the daily
+   * Successful sends optionally delete the outbox file and are recorded in the daily
    * conversation note; media sends also keep a copy in the attachment folder.
    */
-  async flush(client, store, folder, inboxFolder, attachmentFolder) {
+  async flush(client, store, folder, inboxFolder, attachmentFolder, deleteAfterSend = true) {
     if (!folder || !await this.app.vault.adapter.exists(folder)) return 0;
     const st = store.get();
     const to = st.scannedUser.trim();
     if (!to) return 0;
     const contextToken = st.contextTokens[to] ?? "";
     const listing = await this.app.vault.adapter.list(folder);
+    const present = new Set(listing.files);
+    const removed = Object.keys(st.outboxSent).filter((path) => path.startsWith(`${folder}/`) && !present.has(path));
+    if (removed.length) {
+      store.update((s) => {
+        for (const path of removed) delete s.outboxSent[path];
+      });
+    }
     let processed = 0;
     for (const path of listing.files) {
       const name = path.split("/").pop() ?? "";
       const ext = (name.includes(".") ? name.split(".").pop() ?? "" : "").toLowerCase();
       if (isFailedSidecar(name)) continue;
       if (ext === "md") {
-        processed += await this.flushTextFile(client, path, to, contextToken, inboxFolder);
+        processed += await this.flushTextFile(client, path, to, contextToken, inboxFolder, store, deleteAfterSend);
         continue;
       }
       if (IMAGE_EXTS.has(ext) || isVideoExt(ext) || BINARY_EXTS.has(ext)) {
-        processed += await this.flushMediaFile(client, path, name, to, contextToken, inboxFolder, attachmentFolder);
+        processed += await this.flushMediaFile(client, path, name, to, contextToken, inboxFolder, attachmentFolder, store, deleteAfterSend);
       }
     }
     return processed;
   }
   /** .md -> send the content as a text message */
-  async flushTextFile(client, path, to, contextToken, inboxFolder) {
+  async flushTextFile(client, path, to, contextToken, inboxFolder, store, deleteAfterSend) {
     const content = (await this.app.vault.adapter.read(path)).trim();
     if (!content) {
       await this.app.vault.adapter.remove(path);
       return 0;
     }
+    const hash = md5Hex(new TextEncoder().encode(content));
+    if (this.alreadySent(store, path, to, hash)) return 0;
     const res = await client.sendText(to, content, contextToken);
     if (res.ok) {
       const now = Date.now();
@@ -22510,7 +22532,7 @@ var Outbox = class {
         "",
         ...quoteBlock(content)
       ]);
-      await this.app.vault.adapter.remove(path);
+      await this.finishSend(store, path, to, hash, deleteAfterSend);
       return 1;
     }
     if (!alreadyAnnotated(content)) {
@@ -22523,7 +22545,7 @@ ${FAILED_COMMENT} ${buildSendFailure(res.errmsg, res.ret, contextToken)} -->
     return 0;
   }
   /** image/video/file -> AES-ECB encrypt, upload to CDN, send as a media message */
-  async flushMediaFile(client, path, name, to, contextToken, inboxFolder, attachmentFolder) {
+  async flushMediaFile(client, path, name, to, contextToken, inboxFolder, attachmentFolder, store, deleteAfterSend) {
     const ext = (name.includes(".") ? name.split(".").pop() ?? "" : "").toLowerCase();
     const kind = IMAGE_EXTS.has(ext) ? "image" : isVideoExt(ext) ? "video" : "file";
     let data;
@@ -22532,6 +22554,8 @@ ${FAILED_COMMENT} ${buildSendFailure(res.errmsg, res.ret, contextToken)} -->
     } catch {
       return 0;
     }
+    const hash = md5Hex(data);
+    if (this.alreadySent(store, path, to, hash)) return 0;
     const res = await client.sendMedia(to, { kind, name, data }, contextToken);
     if (res.ok) {
       const now = Date.now();
@@ -22551,7 +22575,7 @@ ${FAILED_COMMENT} ${buildSendFailure(res.errmsg, res.ret, contextToken)} -->
         "",
         ...quoteBlock(linkLine)
       ]);
-      await this.app.vault.adapter.remove(path);
+      await this.finishSend(store, path, to, hash, deleteAfterSend);
       return 1;
     }
     const notePath = `${path}.wxlink-failed.md`;
@@ -22567,6 +22591,23 @@ ${buildSendFailure(res.errmsg, res.ret, contextToken)}
       }
     }
     return 0;
+  }
+  alreadySent(store, path, recipient, hash) {
+    const sent = store.get().outboxSent[path];
+    return sent?.recipient === recipient && sent.hash === hash;
+  }
+  async finishSend(store, path, recipient, hash, deleteAfterSend) {
+    if (deleteAfterSend) {
+      await this.app.vault.adapter.remove(path);
+      if (store.get().outboxSent[path]) store.update((s) => {
+        delete s.outboxSent[path];
+      });
+    } else {
+      store.update((s) => {
+        s.outboxSent[path] = { recipient, hash };
+      });
+      await store.saveNow();
+    }
   }
   /** _1 / _2 / ... before the extension when the copy target already exists */
   async uniqueCopyPath(path) {
@@ -22943,7 +22984,8 @@ var WXLinkPlugin = class extends import_obsidian5.Plugin {
           store,
           this.settings.outboxFolder,
           this.settings.inboxFolder,
-          this.settings.attachmentFolder
+          this.settings.attachmentFolder,
+          this.settings.deleteOutboxAfterSend
         );
       } catch {
       }

@@ -702,6 +702,24 @@ test('outbox: image file -> sendMedia chain, copy kept, file deleted', async () 
   assert.ok(JSON.stringify(jsonBody(sendReq)).includes('image_item'));
 });
 
+test('outbox: retained image keeps its original and archive without repeating the upload after restart', async () => {
+  const { app, adapter, files, bins, store } = outboxMediaFixture();
+  const tr = mediaScript();
+  const client = new IlinkClient(tr, { baseUrl: 'https://gw.example', cdnBase: 'https://cdn.example' }, 'bot');
+  const path = 'WXLink/outbox/keep.jpg';
+  const original = new Uint8Array([1, 2, 3]);
+  await adapter.writeBinary(path, original.buffer as ArrayBuffer);
+  assert.equal(await new Outbox(app).flush(client, store, 'WXLink/outbox', 'WXLink', 'WXLink/attachments', false), 1);
+  assert.deepEqual(bins.get(path), original);
+  assert.ok([...bins.keys()].some((p) => p.includes('_sent_keep.jpg')));
+  assert.ok([...files.entries()].some(([p, text]) => /WXLink\/\d{4}-\d{2}-\d{2}\.md$/.test(p) && text.includes('_sent_keep.jpg')));
+  const requests = tr.requests.length;
+  const restored = new StateStore(app, 'plugin/state.json');
+  await restored.init();
+  assert.equal(await new Outbox(app).flush(client, restored, 'WXLink/outbox', 'WXLink', 'WXLink/attachments', false), 0);
+  assert.equal(tr.requests.length, requests, 'no repeated upload or send');
+});
+
 test('outbox: media failure keeps the file with a categorized sidecar', async () => {
   applyLanguage('zh');
   const { app, adapter, files, bins, store } = outboxMediaFixture();
@@ -820,6 +838,7 @@ test('store init: legacy quotaTimes/lastPollAt are dropped and the cleaned state
   files.set('plugin/state.json', JSON.stringify({ scannedUser: 'u', quotaTimes: [1, 2], lastPollAt: 42, cursor: 'c' }));
   const store = new StateStore(app, 'plugin/state.json');
   await store.init();
+  assert.deepEqual(store.get().outboxSent, {}, 'older installs start without retained-send records');
   assert.equal(store.get().scannedUser, 'u');
   assert.equal(store.get().cursor, 'c');
   await store.saveNow();

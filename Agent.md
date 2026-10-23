@@ -15,8 +15,9 @@ Write **one file** into the outbox folder (default `WXLink/outbox/`; in a live v
 
 The plugin consumes the outbox on its next poll (~30–60 s). Wait about a minute, then check:
 
-- **File gone** = sent; recorded in today's conversation note (media copies kept in `attachments/` and linked)
-- **File present** = failed: an `.md` gets a `<!-- WXLink send failed: ... -->` comment appended; media get a `<name>.wxlink-failed.md` sidecar with the reason
+- **Delete outbox originals after sending** is on by default: a successful send deletes the original and is recorded in today's conversation note (media copies kept in `attachments/` and linked).
+- When the setting is off, successful sends retain their originals. Unchanged files are skipped even after restarting; check today's conversation note for the sent entry. Change the content or use a new file name to send again. Turning deletion back on does not retroactively remove previously retained sends.
+- Failed sends retain the original for retry: an `.md` gets a `<!-- WXLink send failed: ... -->` comment appended; media get a `<name>.wxlink-failed.md` sidecar with the reason. A file being present alone does not mean failure.
 
 ## Receiving replies
 
@@ -45,8 +46,9 @@ WXLink 是一个 Obsidian 插件,提供一条**一对一微信通道**:所有消
 
 插件在下一轮轮询(约 30–60 秒)消费发件箱。写入后**等约一分钟**再检查:
 
-- **文件被删除** = 发送成功,并记录进当天对话笔记(媒体在 `attachments/` 存副本并链接)
-- **文件还在** = 失败:`.md` 末尾追加 `<!-- WXLink send failed: ... -->` 注释;媒体生成同名 `.wxlink-failed.md` 记录原因
+- **“发送成功后删除发件箱原文件”默认开启**：网关确认成功后删除原文件，并记录进当天对话笔记（媒体在 `attachments/` 存副本并链接）。
+- **关闭后**：成功发送的原文件保留在原位置；未修改的已发送文件会被跳过，重启后仍有效。查看当天对话笔记的发送记录判断结果；修改内容或使用新文件名可再次发送。重新开启删除开关不会追溯删除此前保留的已发送文件。
+- **失败时**：保留原文件并重试；`.md` 末尾追加 `<!-- WXLink send failed: ... -->` 注释，媒体生成同名 `.wxlink-failed.md` 记录原因。不能仅凭文件还在就判断失败。
 
 ## 接收回复
 

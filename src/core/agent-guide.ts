@@ -4,7 +4,7 @@ import type { WXLinkSettings } from '../settings';
 import { ensureFolder } from './importer';
 
 /** Bump whenever the guide template content changes, so already-installed vaults regenerate their Agent.md */
-const GUIDE_REV = '5';
+const GUIDE_REV = '6';
 
 /** Generation fingerprint of an Agent.md: regenerated whenever the language, rev or any path changes */
 export function agentGuideMeta(content: string): { lang: string; paths: string; rev: string } {
@@ -16,7 +16,7 @@ export function agentGuideMeta(content: string): { lang: string; paths: string; 
 }
 
 function pathsKey(s: WXLinkSettings): string {
-  return encodeURIComponent([s.inboxFolder, s.singleNoteFolder, s.outboxFolder, s.attachmentFolder, s.singleNoteMarker].join('|'));
+  return encodeURIComponent([s.inboxFolder, s.singleNoteFolder, s.outboxFolder, s.attachmentFolder, s.singleNoteMarker, String(s.deleteOutboxAfterSend)].join('|'));
 }
 
 function buildEn(s: WXLinkSettings): string {
@@ -37,7 +37,7 @@ Write a file into the outbox folder \`${s.outboxFolder}/\`:
 - \`.md\` file: the content is sent verbatim as a text message — **markdown is supported** (headings, lists, bold, code blocks); keep it within a phone screen or so (the file name carries no meaning)
 - Image (\`.jpg/.png/.gif/.webp\`), video (\`.mp4\` etc.) or document (\`.pdf/.docx/...\`, ≤100MB): sent as an attachment
 
-The plugin consumes the outbox on its next poll (~30-60 s). A successful send deletes the file and records the message in today's conversation note under \`${s.inboxFolder}/\` (marked "sent"; media sends keep a copy under \`${s.attachmentFolder}/\` and link it from the note). A failure keeps the file (an \`.md\` gets a \`<!-- WXLink send failed: ... -->\` comment appended, a media file gets a \`<name>.wxlink-failed.md\` sidecar). After writing, wait about a minute and check whether the file still exists to determine the result.
+The plugin consumes the outbox on its next poll (~30-60 s). ${s.deleteOutboxAfterSend ? 'A successful send deletes the original file.' : 'A successful send retains the original file; unchanged files are skipped even after restarting. Change the content or use a new file name to send again.'} Every successful send records the message in today's conversation note under \`${s.inboxFolder}/\` (marked "sent"; media sends keep a copy under \`${s.attachmentFolder}/\` and link it from the note). A failure keeps the file (an \`.md\` gets a \`<!-- WXLink send failed: ... -->\` comment appended, a media file gets a \`<name>.wxlink-failed.md\` sidecar). After writing, wait about a minute and ${s.deleteOutboxAfterSend ? 'check whether the file was deleted' : "check today's conversation note for the sent entry; a retained file alone does not mean failure"} to determine the result.
 
 ## Receiving
 
@@ -69,7 +69,7 @@ paths: "${pathsKey(s)}"
 - \`.md\` 文件:内容**原样**作为文本消息发送,**支持 markdown 格式**(标题、列表、加粗、代码块),建议控制在手机一屏内(文件名无语义)
 - 图片(\`.jpg/.png/.gif/.webp\`)、视频(\`.mp4\` 等)或文档(\`.pdf/.docx/...\`,≤100MB):作为附件发送
 
-插件在下一轮轮询(约 30-60 秒)消费发件箱。发送成功会删除文件,并把这条消息记录进 \`${s.inboxFolder}/\` 下当天的对话笔记(标记"发送";媒体发送会在 \`${s.attachmentFolder}/\` 存一份副本并在笔记里链接)。失败会保留文件(\`.md\` 末尾追加 \`<!-- WXLink send failed: ... -->\` 注释,媒体文件生成 \`<文件名>.wxlink-failed.md\` 记录)。写入后等约一分钟,检查文件是否还在以判断结果。
+插件在下一轮轮询(约 30-60 秒)消费发件箱。${s.deleteOutboxAfterSend ? '发送成功会删除原文件。' : '发送成功会保留原文件；未修改的已发送文件会被跳过，重启后仍有效。修改内容或使用新文件名可再次发送。'}成功后把这条消息记录进 \`${s.inboxFolder}/\` 下当天的对话笔记(标记"发送";媒体发送会在 \`${s.attachmentFolder}/\` 存一份副本并在笔记里链接)。失败会保留文件(\`.md\` 末尾追加 \`<!-- WXLink send failed: ... -->\` 注释,媒体文件生成 \`<文件名>.wxlink-failed.md\` 记录)。写入后等约一分钟，${s.deleteOutboxAfterSend ? '检查文件是否被删除' : '检查当天对话笔记是否出现发送记录，文件保留不代表失败'}以判断结果。
 
 ## 接收
 
@@ -101,7 +101,7 @@ paths: "${pathsKey(s)}"
 - \`.md\` 檔案:內容**原樣**作為文字訊息發送,**支援 markdown 格式**(標題、列表、加粗、程式碼區塊),建議控制在手機一屏內(檔名無語義)
 - 圖片(\`.jpg/.png/.gif/.webp\`)、影片(\`.mp4\` 等)或文件(\`.pdf/.docx/...\`,≤100MB):作為附件發送
 
-外掛在下一輪輪詢(約 30-60 秒)消費發件匣。發送成功會刪除檔案,並把這條訊息記錄進 \`${s.inboxFolder}/\` 下當天的對話筆記(標記"發送";媒體發送會在 \`${s.attachmentFolder}/\` 存一份副本並在筆記裡連結)。失敗會保留檔案(\`.md\` 末尾追加 \`<!-- WXLink send failed: ... -->\` 註解,媒體檔案產生 \`<檔名>.wxlink-failed.md\` 記錄)。寫入後等約一分鐘,檢查檔案是否還在以判斷結果。
+外掛在下一輪輪詢(約 30-60 秒)消費發件匣。${s.deleteOutboxAfterSend ? '發送成功會刪除原檔案。' : '發送成功會保留原檔案；未修改的已發送檔案會被略過，重新啟動後仍有效。修改內容或使用新檔名可再次發送。'}成功後把這條訊息記錄進 \`${s.inboxFolder}/\` 下當天的對話筆記(標記"發送";媒體發送會在 \`${s.attachmentFolder}/\` 存一份副本並在筆記裡連結)。失敗會保留檔案(\`.md\` 末尾追加 \`<!-- WXLink send failed: ... -->\` 註解,媒體檔案產生 \`<檔名>.wxlink-failed.md\` 記錄)。寫入後等約一分鐘，${s.deleteOutboxAfterSend ? '檢查檔案是否被刪除' : '檢查當天對話筆記是否出現發送記錄，保留檔案不代表失敗'}以判斷結果。
 
 ## 接收
 

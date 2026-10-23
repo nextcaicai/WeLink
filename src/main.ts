@@ -420,6 +420,7 @@ export default class WXLinkPlugin extends Plugin {
           this.settings.outboxFolder,
           this.settings.inboxFolder,
           this.settings.attachmentFolder,
+          this.settings.deleteOutboxAfterSend,
         );
       } catch {
         /* send failures must not block polling */

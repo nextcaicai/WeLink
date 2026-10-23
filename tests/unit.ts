@@ -571,13 +571,14 @@ function outboxFixture() {
   const transport = new StubTransport();
   const client = new IlinkClient(transport, { baseUrl: 'https://gw.example', cdnBase: 'https://cdn.example' }, 'bottoken');
   const outbox = new Outbox(v.app);
-  const flush = (opts: Partial<{ folder: string; inboxFolder: string; attachmentFolder: string }> = {}) =>
+  const flush = (opts: Partial<{ folder: string; inboxFolder: string; attachmentFolder: string; deleteAfterSend: boolean }> = {}) =>
     outbox.flush(
       client,
       store,
       opts.folder ?? 'WXLink/outbox',
       opts.inboxFolder ?? 'WXLink',
       opts.attachmentFolder ?? 'WXLink/attachments',
+      opts.deleteAfterSend,
     );
   return { v, transport, client, store, flush };
 }
@@ -600,6 +601,78 @@ test('outbox: .md success deletes file and records the send', async () => {
   const d = new Date();
   const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   assert.ok(v.files.get(`WXLink/${today}.md`)?.includes('**done**'), 'send recorded in daily note');
+});
+
+test('outbox: retained text is recorded once and not resent after restarting or enabling deletion', async () => {
+  const { v, transport, client, store, flush } = outboxFixture();
+  const path = 'WXLink/outbox/keep.md';
+  await v.adapter.write(path, 'keep this original');
+  assert.equal(await flush({ deleteAfterSend: false }), 1);
+  assert.equal(v.files.get(path), 'keep this original');
+  const daily = [...v.files.keys()].find((p) => /WXLink\/\d{4}-\d{2}-\d{2}\.md$/.test(p))!;
+  const recorded = v.files.get(daily);
+  assert.ok(recorded?.includes('keep this original'));
+  assert.equal(await flush({ deleteAfterSend: false }), 0);
+  assert.equal(v.files.get(daily), recorded);
+
+  const restored = new StateStore(v.app, 'plugin/state.json');
+  await restored.init();
+  assert.deepEqual(restored.get().outboxSent, store.get().outboxSent);
+  const restarted = new Outbox(v.app);
+  assert.equal(await restarted.flush(client, restored, 'WXLink/outbox', 'WXLink', 'WXLink/attachments', false), 0);
+  assert.equal(await restarted.flush(client, restored, 'WXLink/outbox', 'WXLink', 'WXLink/attachments', true), 0);
+  assert.equal(v.files.get(path), 'keep this original', 'enabling deletion does not retroactively delete retained sends');
+  assert.equal(transport.requests.filter((r) => r.url.includes('/sendmessage')).length, 1);
+});
+
+test('outbox: retained text can be sent again after content changes or under a new file name', async () => {
+  const { v, store, transport, flush } = outboxFixture();
+  await v.adapter.write('WXLink/outbox/keep.md', 'version one');
+  assert.equal(await flush({ deleteAfterSend: false }), 1);
+  await v.adapter.write('WXLink/outbox/keep.md', 'version two');
+  assert.equal(await flush({ deleteAfterSend: false }), 1);
+  await v.adapter.write('WXLink/outbox/new.md', 'version two');
+  assert.equal(await flush({ deleteAfterSend: false }), 1);
+  assert.equal(await flush({ deleteAfterSend: false }), 0);
+  assert.equal(transport.requests.filter((r) => r.url.includes('/sendmessage')).length, 3);
+  await v.adapter.write('WXLink/outbox/keep.md', 'version three');
+  assert.equal(await flush({ deleteAfterSend: true }), 1);
+  assert.equal(v.files.has('WXLink/outbox/keep.md'), false, 'new sends follow the current deletion setting');
+  assert.equal(store.get().outboxSent['WXLink/outbox/keep.md'], undefined);
+});
+
+test('outbox: retained send records are recipient-specific and forgotten when originals disappear', async () => {
+  const { v, store, flush } = outboxFixture();
+  const path = 'WXLink/outbox/keep.md';
+  await v.adapter.write(path, 'message');
+  assert.equal(await flush({ deleteAfterSend: false }), 1);
+  store.update((s) => {
+    s.scannedUser = 'another-user';
+    s.contextTokens['another-user'] = 'another-token';
+  });
+  assert.equal(await flush({ deleteAfterSend: false }), 1);
+  await v.adapter.remove(path);
+  // Keep the empty folder present so the fake adapter can scan it.
+  v.folders.add('WXLink/outbox');
+  assert.equal(await flush({ deleteAfterSend: false }), 0);
+  assert.equal(store.get().outboxSent[path], undefined);
+  await v.adapter.write(path, 'message');
+  assert.equal(await flush({ deleteAfterSend: false }), 1);
+});
+
+test('outbox: retention mode still retries failures and only marks gateway-confirmed sends', async () => {
+  const { v, store, transport, flush } = outboxFixture();
+  const path = 'WXLink/outbox/retry.md';
+  await v.adapter.write(path, 'retry this');
+  transport.response = { status: 200, body: JSON.stringify({ ret: -1, errmsg: 'no permission' }) };
+  assert.equal(await flush({ deleteAfterSend: false }), 0);
+  assert.equal(store.get().outboxSent[path], undefined);
+  assert.ok(v.files.get(path)?.startsWith('retry this'));
+  transport.response = { status: 200, body: '{}' };
+  assert.equal(await flush({ deleteAfterSend: false }), 1);
+  assert.equal(await flush({ deleteAfterSend: false }), 0);
+  assert.ok(v.files.has(path));
+  assert.equal(transport.requests.filter((r) => r.url.includes('/sendmessage')).length, 2);
 });
 
 test('outbox: failure keeps the file with a categorized hint', async () => {
@@ -703,10 +776,27 @@ test('agent guides document the current save-as-note marker in every language an
   assert.ok(v.files.get(path)!.includes('完整寫成 `#收录`'));
 });
 
+test('agent guides refresh when outbox retention changes and describe how to check successful sends', async () => {
+  const v = new FakeVault();
+  const settings = SETTINGS();
+  const path = 'WXLink/Agent.md';
+  for (const lang of ['en', 'zh', 'tw'] as const) {
+    settings.deleteOutboxAfterSend = true;
+    await ensureAgentGuide(v.app, settings, lang);
+    const before = agentGuideMeta(v.files.get(path)!);
+    settings.deleteOutboxAfterSend = false;
+    await ensureAgentGuide(v.app, settings, lang);
+    const guide = v.files.get(path)!;
+    assert.notEqual(agentGuideMeta(guide).paths, before.paths);
+    assert.ok(guide.includes({ en: 'retained file alone does not mean failure', zh: '文件保留不代表失败', tw: '保留檔案不代表失敗' }[lang]));
+  }
+});
+
 /* ------------------------------------------------------------- settings */
 
 test('DEFAULT_SETTINGS: autoReply defaults on', () => {
   assert.equal(DEFAULT_SETTINGS.autoReply, true);
+  assert.equal(DEFAULT_SETTINGS.deleteOutboxAfterSend, true);
   assert.equal(DEFAULT_SETTINGS.language, 'system');
   assert.equal(DEFAULT_SETTINGS.inboxFolder, 'WXLink');
   assert.equal(DEFAULT_SETTINGS.singleNoteMarker, '#单独保存');

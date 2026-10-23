@@ -13,6 +13,7 @@ export interface WXLinkSettings {
   articleFolder: string;
   attachmentFolder: string;
   outboxFolder: string; // outbox folder (agents drop pending-send files here)
+  deleteOutboxAfterSend: boolean; // remove originals only after the gateway confirms success
   singleNoteMarker: string; // first-line marker that saves a received text message as its own note
   fetchArticles: boolean; // fetch link metadata and create article notes
   groupArticlesByAccount: boolean; // one subfolder per official account under the article folder
@@ -29,6 +30,7 @@ export const DEFAULT_SETTINGS: WXLinkSettings = {
   articleFolder: 'WXLink/articles',
   attachmentFolder: 'WXLink/attachments',
   outboxFolder: 'WXLink/outbox',
+  deleteOutboxAfterSend: true,
   singleNoteMarker: '#单独保存',
   fetchArticles: true,
   groupArticlesByAccount: true,
@@ -106,7 +108,7 @@ export class WXLinkSettingTab extends PluginSettingTab {
       this.plugin.applyLanguage(value as WXLinkSettings['language']); // switch commands/status bar immediately
       this.update(); // re-render every label in the new language
     }
-    if ((FOLDER_KEYS as readonly string[]).includes(key) || key === 'singleNoteMarker') this.plugin.refreshAgentGuide(); // paths/marker changed -> Agent.md must stay current
+    if ((FOLDER_KEYS as readonly string[]).includes(key) || key === 'singleNoteMarker' || key === 'deleteOutboxAfterSend') this.plugin.refreshAgentGuide();
     void this.plugin.saveSettings();
   }
 
@@ -199,6 +201,11 @@ export class WXLinkSettingTab extends PluginSettingTab {
             name: t('set.outboxFolder'),
             desc: t('set.outboxFolder.desc'),
             control: { type: 'text', key: 'outboxFolder', defaultValue: DEFAULT_SETTINGS.outboxFolder },
+          },
+          {
+            name: t('set.deleteOutboxAfterSend'),
+            desc: t('set.deleteOutboxAfterSend.desc'),
+            control: { type: 'toggle', key: 'deleteOutboxAfterSend', defaultValue: DEFAULT_SETTINGS.deleteOutboxAfterSend },
           },
           // Where agents learn the outbox protocol: a note file maintained inside the vault
           {

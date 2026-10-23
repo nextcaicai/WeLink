@@ -8,6 +8,8 @@ export interface BotState {
   scannedUser: string; // ilink_user_id of the user who scanned
   cursor: string;
   contextTokens: Record<string, string>;
+  /** Retained outbox originals: skip the same content for the same recipient after restart. */
+  outboxSent: Record<string, { recipient: string; hash: string }>;
   pausedUntil: number; // pause deadline after session expiry
   dedup: string[]; // recent-message dedup ring
   /** typing_ticket per ilink_user_id, with the time it was fetched (valid ~24h) */
@@ -51,6 +53,7 @@ export class StateStore {
       scannedUser: '',
       cursor: '',
       contextTokens: {},
+      outboxSent: {},
       pausedUntil: 0,
       dedup: [],
       typingTickets: {},
