@@ -134,10 +134,13 @@ Write **one file** into `WXLink/outbox/`:
 | `notify.md` (any text) | Sent as a text message, Markdown supported; keep it to about one phone screen |
 | Image `.jpg/.png/.gif/.webp`, video `.mp4`, document `.pdf/.docx/…` (≤100MB) | Sent as an attachment |
 
-The plugin consumes the outbox on its next poll (about 30–60 seconds). Wait about a minute, then check:
+The plugin consumes the outbox on its next poll (about 30–60 seconds). **Delete outbox originals after sending** is on by default:
 
-- **File gone** = sent, and recorded in today’s conversation note (media keeps a copy under `attachments/` and is linked)
-- **File still there** = failed: a `.md` gets a trailing `<!-- WXLink send failed: ... -->` comment; media gets a sibling `.wxlink-failed.md` with the reason
+- **On:** after the gateway confirms success, the original is deleted and the send is recorded in today’s conversation note (media keeps a copy under `attachments/` and is linked).
+- **Off:** a successful send keeps the original in place. Unchanged files are not sent again, even after restarting. Check today’s conversation note for the sent entry.
+- **Failure:** the original stays and will be retried. A `.md` gets a trailing `<!-- WXLink send failed: ... -->` comment; media gets a sibling `.wxlink-failed.md` with the reason.
+
+To send a retained file again, change its content or use a new file name. Turning deletion back on does not remove files that were kept earlier.
 
 Unknown extensions stay in the outbox and are not sent.
 
@@ -188,7 +191,7 @@ The status bar shows **session expired**. In settings, click **Re-scan**, confir
 
 Issues and PRs are welcome. Please include:
 
-- Plugin version (currently `0.2.1`) and Obsidian version
+- Plugin version (currently `0.2.2`) and Obsidian version
 - OS (macOS / Windows / Linux)
 - Steps to reproduce, expected result, actual result
 - For platform-specific issues: source content, target note, and import/paste result; redact account IDs and QR codes in screenshots
